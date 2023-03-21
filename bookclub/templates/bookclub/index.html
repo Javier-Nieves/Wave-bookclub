@@ -1,131 +1,169 @@
-{% extends "bookclub/layout.html" %}
 {% load static %}
 
-{% block body %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Wave Bookclub</title>
+        <link href="{% static 'bookclub/styles.css' %}" rel="stylesheet">
+        <link href="{% static 'bookclub/favicon.ico' %}" rel="icon">
+        <script src="{% static 'bookclub/books.js' %}"></script>
+    </head>
+    <body>
+          <div id="main-view">
+            <div class="main-left-part">
+              <div class="navbar">
+                <a class="brandNeon" href="{% url 'index' %}">Reading List</a>
+                <button id='history-link' class="brandNeon" href="javascript:;">History</button>
+              </div>
 
-  <body>
+              <div id="search-field-container">
+                <input type="text" class="searchField" placeholder="Search for books">
+                <button class="searchBtn">Search</button>
+              </div>
 
-    <div id="main-view">
-      <div class="main-left-part">
-        <div class="upcoming-book-container book2show" data-isclassic= "{{up_book.is_classic}}" 
-        data-bookid="{{up_book.bookid}}" class="book2show">
-          <h1 id="upcoming-title" class="book2show">{{up_book.title}}</h1>
-          <h3 id="upcoming-autor" class="book2show">{{up_book.author}}, {{up_book.year}}</h3>
-          <img id="upcoming-pic" src={{up_book.image_link}} class="book2show"></img>
-          <div id="upcoming-date">Meeting date:</div>
-        </div>
+              <div class="upcoming-book-container book2show" data-isclassic= "{{up_book.is_classic}}" 
+              data-bookid="{{up_book.bookid}}" class="book2show">
+                <h1 id="upcoming-title" class="book2show">{{up_book.title}}</h1>
+                <h3 id="upcoming-autor" class="book2show">{{up_book.author}}, {{up_book.year}}</h3>
+                <img id="upcoming-pic" src={{up_book.image_link}} class="book2show"></img>
+                <div id="upcoming-date">Meeting date:</div>
+              </div>
 
-        <div id="search-field-container">
-          <input type="text" class="searchField" placeholder="Search for books">
-          <button class="searchBtn">Search</button>
-        </div>
-      </div>
+              <div class="control-group">
+                <img class="view-image" src="" alt="Book Cover">
+                <button class="add-btn">To the Reading List</button>
+                <div class="remove-btn-container">
+                  <button class="remove-btn">Remove</button>
+                  <div class="simple-text"></div>
+                </div>
+                <div class="rate-btn-container" style="display: none;">
+                  <div class="upcom-text">Reading now</div>
+                  <button class="rate-btn">Rate</button>
+                </div>
+              </div>
 
+            </div>
 
-      <div class="main-right-part">
-        <button class="switch"></button>
+            <div class="main-right-part">
+              <button class="switch"></button>
 
-        <table id="search-results" style="display: none;">
-          <thead>
-            <tr id='search-head' class="clas-head">
-                <th>Book</th>
-                <th>Title</th>
-                <th>Author</th>
-            </tr>
-          </thead>
-          <tbody class="search-table">
-          </tbody>
-        </table>
+              <table id="search-results" style="display: none;">
+                <thead>
+                  <tr id='search-head' class="clas-head">
+                      <th>Book</th>
+                      <th>Title</th>
+                      <th>Author</th>
+                  </tr>
+                </thead>
+                <tbody class="search-table">
+                </tbody>
+              </table>
 
-        <table id="classicTable" class="hidden-table">
-          <thead>
-              <tr class="clas-head">
-                  <th >Book</th>
-                  <th>Author</th>
-                  <th class="sortYear Up">Year</th>
-                  <th>Country</th>
-                  <th class="sortPages Up">Pages</th>
-              </tr>
-          </thead>
-          <tbody>
-            {% for book in books %}
-              {% if book.is_classic and not book.read %}
-                <tr class="table-row clas-body book2show" data-bookid='{{book.bookid}}''>
-                    <td class="book-cell book2show">{{book.title}}</td>
-                    <td class="author-cell book2show">{{book.author}}</td>
-                    <td class="year-cell book2show">{{book.year}}</td>
-                    <td class="country-cell book2show">{{book.country}}</td>
-                    <td class="pages-cell book2show">{{book.pages}}</td>
-                </tr>
-              {% endif %}
-            {% endfor %}
-          </tbody>
-        </table>
+              <table id="history-view" style="display: none;">
+                <thead>
+                  <tr id='history-head' class="clas-head">
+                      <th>Title</th>
+                      <th>Author</th>
+                      <th>Year</th>
+                      <th>Country</th>
+                      <th>Pages</th>
+                      <th>Rating</th>
+                  </tr>
+                </thead>
+                <tbody class="history-table">
+                  {% for book in books %}
+                    {% if book.read %}
+                      <tr class="table-row clas-body book2show" data-bookid='{{book.bookid}}''>
+                          <td class="book-cell book2show">{{book.title}}</td>
+                          <td class="author-cell book2show">{{book.author}}</td>
+                          <td class="year-cell book2show">{{book.year}}</td>
+                          <td class="country-cell book2show">{{book.country}}</td>
+                          <td class="pages-cell book2show">{{book.pages}}</td>
+                          <td class="rating-cell book2show">{{book.rating}}</td>
+                      </tr>
+                    {% endif %}
+                  {% endfor %}
+                </tbody>
+              </table>
 
-        <table id="modernTable">
-          <thead>
-              <tr class="mod-head">
-                  <th>Book</th>
-                  <th>Author</th>
-                  <th class="sortYear Up">Year</th>
-                  <th>Country</th>
-                  <th class="sortPages Up">Pages</th>
-              </tr>
-          </thead>
-          <tbody>
-            {% for book in books %}
-              {% if not book.is_classic and not book.read %}
-                <tr class="table-row mod-body book2show" data-bookid='{{book.bookid}}'>
-                    <td class="book-cell book2show">{{book.title}}</td>
-                    <td class="author-cell book2show">{{book.author}}</td>
-                    <td class="year-cell book2show">{{book.year}}</td>
-                    <td class="country-cell book2show">{{book.country}}</td>
-                    <td class="pages-cell book2show">{{book.pages}}</td>
-                </tr>
-              {% endif %}
-            {% endfor %}
-          </tbody>
-        </table>
+              <table id="classicTable" class="hidden-table">
+                <thead>
+                    <tr class="clas-head">
+                        <th >Book</th>
+                        <th>Author</th>
+                        <th class="sortYear Up">Year</th>
+                        <th>Country</th>
+                        <th class="sortPages Up">Pages</th>
+                    </tr>
+                </thead>
+                <tbody>
+                  {% for book in books %}
+                    {% if book.is_classic and not book.read %}
+                      <tr class="table-row clas-body book2show" data-bookid='{{book.bookid}}''>
+                          <td class="book-cell book2show">{{book.title}}</td>
+                          <td class="author-cell book2show">{{book.author}}</td>
+                          <td class="year-cell book2show">{{book.year}}</td>
+                          <td class="country-cell book2show">{{book.country}}</td>
+                          <td class="pages-cell book2show">{{book.pages}}</td>
+                      </tr>
+                    {% endif %}
+                  {% endfor %}
+                </tbody>
+              </table>
 
-      </div>
+              <table id="modernTable">
+                <thead>
+                    <tr class="mod-head">
+                        <th>Book</th>
+                        <th>Author</th>
+                        <th class="sortYear Up">Year</th>
+                        <th>Country</th>
+                        <th class="sortPages Up">Pages</th>
+                    </tr>
+                </thead>
+                <tbody>
+                  {% for book in books %}
+                    {% if not book.is_classic and not book.read %}
+                      <tr class="table-row mod-body book2show" data-bookid='{{book.bookid}}'>
+                          <td class="book-cell book2show">{{book.title}}</td>
+                          <td class="author-cell book2show">{{book.author}}</td>
+                          <td class="year-cell book2show">{{book.year}}</td>
+                          <td class="country-cell book2show">{{book.country}}</td>
+                          <td class="pages-cell book2show">{{book.pages}}</td>
+                      </tr>
+                    {% endif %}
+                  {% endfor %}
+                </tbody>
+              </table>
 
-    </div>
+              <!-- book information -->
+              <div id="book-view" style="display: none;">
 
-    <!-- book information -->
-    <div id="book-view" style="display: none;">
+                <div class="book-info">
+                  <h1 class="view-title"></h1>
+                  <h2 class="view-author"></h2>
+                  <div class="view-pages"></div>
+                  <div class="view-desc"></div>
+                </div>
 
-        <div class="left-group">
-          <img class="view-image" src="" alt="Book Cover">
-          <button class="add-btn">To the Reading List</button>
-          <div class="remove-btn-container" style="display: none;">
-            <div class="simple-text"></div>
-            <button class="remove-btn">Remove</button>
+                <div class="modal">
+                  <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <h2>To add a book to a reading list</h2>
+                    <h3>Please fill in:</h3>
+                    <form class="modal-form">
+                      <input type="text" id="year-input" placeholder="Year of publication" autofocus required>
+                      <input type="text" id="country-input" placeholder="Country" required>
+                      <input type="submit" class="modal-btn" value="Add">
+                    </form>
+                  </div>
+                </div>
+
+            </div>
+
+            </div>
+
           </div>
-            <button class="rate-btn" style="display: none;">Rate</button>
-        </div>
 
-        <div class="right-group">
-          <h1 class="view-title"></h1>
-          <h2 class="view-author"></h2>
-          <div class="view-pages"></div>
-          <div class="view-desc"></div>
-        </div>
-
-        <div class="modal">
-          <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>To add a book to a reading list</h2>
-            <h3>Please fill in:</h3>
-            <form class="modal-form">
-              <input type="text" id="year-input" placeholder="Year of publication" autofocus required>
-              <input type="text" id="country-input" placeholder="Country" required>
-              <input type="submit" class="modal-btn" value="Add">
-            </form>
-          </div>
-        </div>
-
-    </div>
-
-  </body>
-
-{% endblock %}
+</body>
+</html>

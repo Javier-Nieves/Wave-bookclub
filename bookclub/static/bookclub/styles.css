@@ -3,13 +3,16 @@ input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
-nav {
+.navbar {
     display: flex;
     justify-content: center;
-    align-items: center;
-    gap: 2.5vw;
-    background-color: rgba(30, 30, 30, 0.804);
-    padding: 4px;
+    gap: 1.5vw;
+}
+a {
+    text-decoration: none;
+    color: black;
+    padding: 7px;
+    font-size: 20px;
 }
 html {
     display: flex;
@@ -22,12 +25,7 @@ body {
     background-size: cover;
     background-attachment: fixed;
     background-color: black;
-}
-a {
-    text-decoration: none;
-    color: black;
-    padding: 0 7px 0 7px;
-    font-size: 20px;
+    margin: 0;
 }
 
 h1 {
@@ -37,9 +35,12 @@ h1 {
     margin: 0px;
     color: rgb(17, 17, 17);
 }
-h3{
+h3 {
     padding: 0;
     margin: 5px;
+}
+h2 {
+    margin: 10px;
 }
 /* todo - how does After works */
 .brand {
@@ -47,8 +48,9 @@ h3{
     font-family: cursive, sans-serif;
     display: inline-block;
     position: relative;
+    color: rgba(252, 249, 252, 0.802);
   }
-  .brand::after {
+.brand::after {
     content: '';
     position: absolute;
     width: 100%;
@@ -56,11 +58,11 @@ h3{
     height: 2px;
     bottom: 6px;
     left: 0;
-    background-color: #020607;
+    background-color: rgba(252, 249, 252, 0.802);
     transform-origin: bottom right;
     transition: transform 0.25s ease-out;
   }
-  .brand:hover::after {
+.brand:hover::after {
     transform: scaleX(1);
     transform-origin: bottom left;
   }
@@ -95,42 +97,58 @@ h3{
 /* ? Main View */
 #main-view {
     display: flex;
-    justify-content: center;
+    width: 100%;
     gap: 70px;
 }
 .main-left-part, .main-right-part {
     text-align: center;
     display: flex;
+    align-items: center;
     flex-direction: column;
 }
+.main-left-part {
+    background-color: rgba(30, 30, 30, 0.804);
+    border-radius: 10px;
+    width: 27vw;
+    padding-bottom: 50px;
+}
+.main-right-part{
+    flex: 1;
+    margin-right: 70px;
+}
 .switch{
-    background-image: url('Classic3.png');
+    background-image: url('Classic2.png');
     background-size: cover;
     background-color: transparent;
     width: 10vw;
-    height: 8vw;
+    height: 8.2vw;
     border: none;
     font-size: 20px;
     padding: 10px;
-    margin: 10px 0px 10px 15vw;
+    margin: 20px 0px 20px 0px;
+    transition: transform 0.5s;
 }
 .switch:hover{
     cursor: pointer;
+    transform: scale(1.05);
 }
 
 /* ? Upcoming book */
 .upcoming-book-container {
     width: 20vw;
     padding: 10px;
+    margin-top: 10px;
     border: 1px solid grey;
     border-radius: 10px;
     font-size: 20px;
     background-color: rgba(176, 176, 174, 0.605);
     backdrop-filter: blur(13px);
+    transition: transform 0.5s ease-out;
 }
 .upcoming-book-container:hover {
     background-color: rgba(210, 210, 210, 0.582);
     cursor: pointer;
+    transform: translate(5px, 5px);
 }
 #upcoming-pic {
     width: 15vw;
@@ -142,6 +160,19 @@ h3{
     display: flex;
     align-items: center;
     flex-direction: column;
+}
+.control-group {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    margin-top: 10px;
+}
+.remove-btn-container {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin: 8px 0 8px 0;
 }
 .searchField {
     width: 20vw;
@@ -163,8 +194,7 @@ h3{
 .small-pic {
     width: 3vw;
 }
-.searchBtn {
-    width: 10vw;
+.searchBtn, .add-btn, .remove-btn, .rate-btn {
     color: rgba(201, 201, 201, 0.94);
     font-size: 18px;
     font-family: didot;
@@ -174,9 +204,38 @@ h3{
     background-color: transparent;
     backdrop-filter: blur(10px);
 }
-.searchBtn:hover {
+.searchBtn {
+    width: 10vw;
+}
+.add-btn, .rate-btn {
+justify-content: center;
+align-items: center;
+}
+.rate-btn {
+    margin-top: 13px;
+    width: 180px;
+    height: 100px;
+    font-size: 40px;
+    font-family: Copperplate, Didot, cursive;
+    padding: 15px;
+    background-image: url('rate1.webp');
+    background-repeat: no-repeat;
+    background-size: cover;
+    color: black;
+    background-color: transparent;
+    border: 1px solid yellow;
+    -webkit-text-stroke: 1px rgb(247, 247, 247);
+    transition: transform 0.5s ease-in-out;
+}
+.rate-btn:hover {
+    transform: scale(1.1);
+    cursor: pointer;
+    box-shadow: 0 0 15px yellow;
+}
+.searchBtn:hover, .add-btn:hover, .remove-btn:hover {
     background-color: rgba(255, 255, 255, 0.273);
-    box-shadow: 0 0 5px #f9f9f9d2
+    box-shadow: 0 0 5px #f9f9f9d2;
+    cursor: pointer;
 }
 
 /* ? book view */
@@ -184,21 +243,31 @@ h3{
     /* display: flex; is added in JS upon showing*/
     gap: 15px;
 }
+.view-title {
+    margin-top: 8px;
+}
+.book-info {
+    margin-top: 8vh;
+    background-color: rgba(232, 232, 232, 0.8);
+    border-radius: 10px;
+}
 .view-desc {
-    font-size: 15px;
+    font-size: 20px;
     border: 1px solid gray;
     border-radius: 5px;
     padding: 10px;
-    background-color: rgba(232, 232, 232, 0.3);
+    margin: 15px;
 }
-.view-desc:hover {
-    background-color: rgba(181, 125, 35, 0.3);
-    cursor: pointer;
+.view-pages {
+    font-size: 17px;
 }
 .view-image {
     width: 15vw;
 }
-
+.simple-text, .upcom-text {
+    font-size: 20px;
+    color: rgba(201, 201, 201, 0.94);
+}
 .modal {
     display: none; /* Hidden by default */
     position: fixed; /* Stay in place */
@@ -211,7 +280,7 @@ h3{
     background-color: rgb(0,0,0); /* Fallback color */
     background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
   }
-  
+
   /* Modal Content/Box */
   .modal-content {
     background-color: #fefefe;
@@ -305,4 +374,10 @@ th, td {
     box-shadow: 0 0 5px #f403c89b, 0 0 25px #27e7f8, 0 0 50px #03e9f4, 0 0 200px #03e9f4;
     text-shadow:
     0 0 2px #fff;
+}
+
+/* * History */
+#history-link {
+    background-color: transparent;
+    border: none;
 }

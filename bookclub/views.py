@@ -35,6 +35,7 @@ def add_book(request, bookid, year, country):
 
     info = book['volumeInfo']
 
+    # todo - remove 1973
     if year <= 1973:
         isClassic = True
     else:

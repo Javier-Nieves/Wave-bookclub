@@ -21,6 +21,7 @@ class Book(models.Model):
     is_classic = models.BooleanField(default=False)
     rating = models.FloatField(null=True, blank=True)
     meeting_date = models.DateTimeField(default=datetime.now, null=True)
+    # datetime.now().strftime('%Y-%m-%d')
 
     def __str__(self):
         return f"{self.title} - {self.author}"
