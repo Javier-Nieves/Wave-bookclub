@@ -1,4 +1,5 @@
 "use strict";
+let today = new Date().toISOString().slice(0, 4);
 
 document.addEventListener("DOMContentLoaded", function () {
   document.addEventListener("click", (e) => {
@@ -17,9 +18,10 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   // ! What's the next book? Set page style accordingly
+  // today gives year:
   let isClassic =
-    document.querySelector(".upcoming-book-container").dataset.isclassic ===
-    "True";
+    document.querySelector(".upcoming-book-container").dataset.isclassic <
+    today - 50;
   if (isClassic) {
     setStyle("modern");
   } else {
@@ -42,19 +44,31 @@ document.addEventListener("DOMContentLoaded", function () {
   };
 
   // ? add meeting date
-  const meetingBtn = document.querySelector(".meeting-btn");
+  const meetingBtn = document.querySelector(".meetingBtn");
   const bookid = document.querySelector(".upcoming-book-container").dataset
     .bookid;
-  meetingBtn.onclick = () => {
-    fetch(`/edit/${bookid}`, {
-      method: "PUT",
-      body: JSON.stringify({
-        meeting_date: "2023-03-23",
-      }),
+  try {
+    meetingBtn.addEventListener("click", () => {
+      document.querySelector(".meetingField").style.display = "block";
+      meetingBtn.addEventListener("click", () => {
+        // input will appear on first click
+        const date = document.querySelector(".meetingField").value;
+        document.querySelector(".add-date-container").onsubmit = () => {
+          // second click will sent API
+          fetch(`/edit/${bookid}`, {
+            method: "PUT",
+            body: JSON.stringify({
+              meeting_date: date,
+            }),
+          });
+          window.location.reload();
+        };
+      });
     });
-  };
+  } catch {}
 
   // ! search for the book
+  // todo - add search by title and author
   document.querySelector(".searchBtn").onclick = () => {
     let title = document.querySelector(".searchField").value;
     fetch(
@@ -68,29 +82,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // ! add book to the reading list
   document.querySelector(".add-btn").onclick = () => {
-    const bookToList = document.querySelector(".view-title").dataset.bookid;
-    let form = document.querySelector(".modal-form");
-    let close = document.querySelector(".close");
-    let modal = document.querySelector(".modal");
-    modal.style.display = "block";
-    close.onclick = () => {
-      modal.style.display = "none";
-    };
-    window.onclick = (event) => {
-      if (event.target == modal) {
-        modal.style.display = "none";
-      }
-    };
-    form.onsubmit = (e) => {
-      e.preventDefault();
-      const year = document.querySelector("#year-input").value;
-      const country = document.querySelector("#country-input").value;
-      fetch(`/add/${bookToList}/${year}/${country}`);
-      // give time for python to work
-      setTimeout(function () {
-        window.location.reload();
-      }, 500);
-    };
+    const book2change = document.querySelector(".view-title").dataset.bookid;
+    bookAction(book2change, "add");
+  };
+
+  // ! remove book from lists
+  document.querySelector(".remove-btn").onclick = () => {
+    const book2change = document.querySelector(".view-title").dataset.bookid;
+    bookAction(book2change, "remove");
   };
 
   // ! Show history
@@ -104,6 +103,7 @@ document.addEventListener("DOMContentLoaded", function () {
 function showBook(book) {
   // todo - show book from DB if it's already there
   // todo - description and cover shouldn't stay old when new ones are absent
+  // todo - show some pic when real cover is unavailable
   HideAll();
   document.querySelector("#book-view").style.display = "flex";
   const title = document.querySelector(".view-title");
@@ -142,7 +142,7 @@ function showBook(book) {
           if (response.year !== null) {
             document.querySelector(".add-btn").style.display = "none";
             document.querySelector(".simple-text").innerHTML = `from the ${
-              response.year <= 1973 ? "Classic" : "Modern"
+              response.year <= today - 50 ? "Classic" : "Modern"
             } reading list`;
             removeBtn.style.display = "flex";
             // book is upcoming?
@@ -265,6 +265,22 @@ function setStyle(style) {
   }
 }
 
+function showModal(action) {
+  const close = document.querySelector(".close");
+  const modal = document.querySelector(
+    `.modal-${action === "add" ? "add" : "remove"}`
+  );
+  modal.style.display = "block";
+  close.onclick = () => {
+    modal.style.display = "none";
+  };
+  window.onclick = (event) => {
+    if (event.target == modal) {
+      modal.style.display = "none";
+    }
+  };
+}
+
 function HideAll() {
   document.querySelector(".switch").style.display = "none";
   document.querySelector(".upcoming-book-container").style.display = "none";
@@ -275,4 +291,26 @@ function HideAll() {
   document.querySelector("#search-results").style.display = "none";
   document.querySelector(".control-group").style.display = "none";
   document.querySelector(".rate-btn-container").style.display = "none";
+}
+
+function bookAction(book2change, action) {
+  let form = document.querySelector(
+    `.modal-form-${action === "add" ? "add" : "remove"}`
+  );
+  showModal(`${action}`);
+  form.onsubmit = (e) => {
+    e.preventDefault();
+    if (action === "add") {
+      const year = document.querySelector("#year-input").value;
+      const country = document.querySelector("#country-input").value;
+      fetch(`/add/${book2change}/${year}/${country}`);
+    }
+    if (action === "remove") {
+      fetch(`/${action}/${book2change}`);
+    }
+    setTimeout(function () {
+      // give 0.5 s to Python to think about it
+      window.location.reload();
+    }, 500);
+  };
 }

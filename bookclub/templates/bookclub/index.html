@@ -21,15 +21,21 @@
                 <button class="searchBtn">Search</button>
               </div>
 
-              <div class="upcoming-book-container book2show" data-isclassic= "{{up_book.is_classic}}" 
+              <div class="upcoming-book-container book2show" data-isclassic= "{{up_book.year}}" 
               data-bookid="{{up_book.bookid}}" class="book2show">
                 <h1 id="upcoming-title" class="book2show">{{up_book.title}}</h1>
                 <h3 id="upcoming-autor" class="book2show">{{up_book.author}}, {{up_book.year}}</h3>
                 <img id="upcoming-pic" src={{up_book.image_link}} class="book2show"></img>
                 <div class="upcoming-container">
                   <div id="upcoming-date">Meeting date:</div>
-                  <div class="meeting-date"></div>
-                  <button class="meeting-btn searchBtn">Add date</button>
+                  <form class="add-date-container">
+                    <input type="date" class="meetingField" style="display: none" required>
+                    {% if not up_book.meeting_date %}
+                    <button class="meetingBtn">Add date</button>
+                    {% else %}
+                    <div class="meeting-date">{{up_book.meeting_date}}</div>
+                    {% endif %}
+                  </form>
                 </div>
               </div>
 
@@ -90,7 +96,7 @@
                 </thead>
                 <tbody>
                   {% for book in books %}
-                    {% if book.is_classic and not book.read %}
+                    {% if book.year <= 1973 and not book.read %}
                       <tr class="table-row clas-body book2show" data-bookid='{{book.bookid}}'>
                           <td class="book-cell book2show">{{book.title}}</td>
                           <td class="author-cell book2show">{{book.author}}</td>
@@ -115,7 +121,7 @@
                 </thead>
                 <tbody>
                   {% for book in books %}
-                    {% if not book.is_classic and not book.read %}
+                    {% if book.year > 1973 and not book.read %}
                       <tr class="table-row mod-body book2show" data-bookid='{{book.bookid}}'>
                           <td class="book-cell book2show">{{book.title}}</td>
                           <td class="author-cell book2show">{{book.author}}</td>
@@ -138,15 +144,26 @@
                   <div class="view-desc"></div>
                 </div>
 
-                <div class="modal">
+                <div class="modal-add">
                   <div class="modal-content">
                     <span class="close">&times;</span>
-                    <h2>To add a book to a reading list</h2>
-                    <h3>Please fill in:</h3>
-                    <form class="modal-form">
-                      <input type="text" id="year-input" placeholder="Year of publication" autofocus required>
-                      <input type="text" id="country-input" placeholder="Country" required>
+                    <h2 class="modal-text">Additional information:</h2>
+                    <form class="modal-form-add">
+                      <div>
+                        <input type="number" class="searchField" id="year-input" placeholder="Year of publication" autofocus required>
+                        <input type="text" class="searchField" id="country-input" placeholder="Country" required>
+                      </div>
                       <input type="submit" class="modal-btn" value="Add">
+                    </form>
+                  </div>
+                </div>
+
+                <div class="modal-remove">
+                  <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <h2 class="modal-text">Remove book from reading list?</h2>
+                    <form class="modal-form-remove">
+                      <input type="submit" class="modal-btn" value="Remove">
                     </form>
                   </div>
                 </div>

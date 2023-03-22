@@ -20,7 +20,6 @@ def index(request):
 
 
 def add_book(request, bookid, year, country):
-
     # TODO - get rid of the second API request for the same book
     try:
         url = f'https://www.googleapis.com/books/v1/volumes/{bookid}'
@@ -36,17 +35,14 @@ def add_book(request, bookid, year, country):
         return None
 
     info = book['volumeInfo']
-
-    # todo - remove 1973
-    if year <= 1973:
-        isClassic = True
-    else:
-        isClassic = False
-
     Book.objects.create(bookid=bookid, title=info.get("title"), author=info.get("authors")[0], year=year, country=country, pages=info.get("pageCount"),
-                        desc=info.get('description'), is_classic=isClassic, image_link=info['imageLinks'].get('smallThumbnail'))
+                        desc=info.get('description'), image_link=info['imageLinks'].get('smallThumbnail'))
 
-    # return index(request)
+    return HttpResponse(status=204)
+
+
+def remove_book(request, bookid):
+    print('removing', bookid)
     return HttpResponse(status=204)
 
 
