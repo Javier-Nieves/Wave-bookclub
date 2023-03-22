@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", function () {
   document.addEventListener("click", (e) => {
     const tar = e.target;
 
-    // get book id from data attribute in title div
+    // ? get book id from data attribute in title div => show this book
     if (tar.className.includes("book2show")) {
       if (
         tar.className.includes("container") ||
@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-  // ! What's the next book?
+  // ! What's the next book? Set page style accordingly
   let isClassic =
     document.querySelector(".upcoming-book-container").dataset.isclassic ===
     "True";
@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const switchBtn = document.querySelector(".switch");
   const classicTable = document.querySelector("#classicTable");
   const modernTable = document.querySelector("#modernTable");
-  switchBtn.addEventListener("click", () => {
+  switchBtn.onclick = () => {
     classicTable.classList.toggle("hidden-table");
     modernTable.classList.toggle("hidden-table");
     // for Modern view:
@@ -39,10 +39,23 @@ document.addEventListener("DOMContentLoaded", function () {
     } else {
       setStyle("classic");
     }
-  });
+  };
+
+  // ? add meeting date
+  const meetingBtn = document.querySelector(".meeting-btn");
+  const bookid = document.querySelector(".upcoming-book-container").dataset
+    .bookid;
+  meetingBtn.onclick = () => {
+    fetch(`/edit/${bookid}`, {
+      method: "PUT",
+      body: JSON.stringify({
+        meeting_date: "2023-03-23",
+      }),
+    });
+  };
 
   // ! search for the book
-  document.querySelector(".searchBtn").addEventListener("click", () => {
+  document.querySelector(".searchBtn").onclick = () => {
     let title = document.querySelector(".searchField").value;
     fetch(
       `https://www.googleapis.com/books/v1/volumes?q=+intitle:${title}&maxResults=10`
@@ -51,10 +64,10 @@ document.addEventListener("DOMContentLoaded", function () {
       .then((data) => {
         showSearchResults(data);
       });
-  });
+  };
 
   // ! add book to the reading list
-  document.querySelector(".add-btn").addEventListener("click", () => {
+  document.querySelector(".add-btn").onclick = () => {
     const bookToList = document.querySelector(".view-title").dataset.bookid;
     let form = document.querySelector(".modal-form");
     let close = document.querySelector(".close");
@@ -78,25 +91,20 @@ document.addEventListener("DOMContentLoaded", function () {
         window.location.reload();
       }, 500);
     };
-  });
+  };
 
   // ! Show history
   const histLink = document.querySelector("#history-link");
-  histLink.addEventListener("click", () => {
+  histLink.onclick = () => {
+    HideAll();
     showHistory();
-  });
+  };
 });
 
 function showBook(book) {
   // todo - show book from DB if it's already there
   // todo - description and cover shouldn't stay old when new ones are absent
-  document.querySelector(".upcoming-book-container").style.display = "none";
-  document.querySelector(".switch").style.display = "none";
-  document.querySelector("#classicTable").style.display = "none";
-  document.querySelector("#modernTable").style.display = "none";
-  document.querySelector(".switch").style.display = "none";
-  document.querySelector("#history-view").style.display = "none";
-  document.querySelector("#search-results").style.display = "none";
+  HideAll();
   document.querySelector("#book-view").style.display = "flex";
   const title = document.querySelector(".view-title");
   const author = document.querySelector(".view-author");
@@ -104,6 +112,7 @@ function showBook(book) {
   const image = document.querySelector(".view-image");
   const control = document.querySelector(".control-group");
   const pages = document.querySelector(".view-pages");
+  const removeBtn = document.querySelector(".remove-btn-container");
 
   fetch(`https://www.googleapis.com/books/v1/volumes/${book}`)
     .then((response) => response.json())
@@ -129,22 +138,26 @@ function showBook(book) {
       fetch(`/check/${book.id}`)
         .then((response) => response.json())
         .then((response) => {
+          // book was in lists?
           if (response.year !== null) {
             document.querySelector(".add-btn").style.display = "none";
             document.querySelector(".simple-text").innerHTML = `from the ${
               response.year <= 1973 ? "Classic" : "Modern"
             } reading list`;
-            document.querySelector(".remove-btn-container").style.display =
-              "flex";
+            removeBtn.style.display = "flex";
+            // book is upcoming?
             if (response.upcoming) {
               document.querySelector(".rate-btn-container").style.display =
                 "block";
-              document.querySelector(".remove-btn-container").style.display =
-                "none";
+              removeBtn.style.display = "none";
             }
+            // book was read?
+            if (response.read) {
+              removeBtn.style.display = "none";
+            }
+            // new book
           } else {
-            document.querySelector(".remove-btn-container").style.display =
-              "none";
+            removeBtn.style.display = "none";
             document.querySelector(".add-btn").style.display = "flex";
           }
         });
@@ -152,28 +165,53 @@ function showBook(book) {
 }
 
 function showHistory() {
-  document.querySelector(".switch").style.display = "none";
-  document.querySelector("#classicTable").style.display = "none";
-  document.querySelector("#modernTable").style.display = "none";
-  document.querySelector("#book-view").style.display = "none";
-  document.querySelector("#search-results").style.display = "none";
+  // todo - make function to insert year dates as rows into the table
+  const HistTable = document.querySelector(".history-table");
+  HistTable.innerHTML = "";
+  fetch("/history")
+    .then((response) => response.json())
+    .then((old_books) => {
+      old_books.forEach((item) => {
+        if (item.read) {
+          const row = HistTable.insertRow(0);
+          row.className = "table-row clas-body book2show";
+          row.dataset.bookid = item.bookid;
+          const cell1 = row.insertCell(0);
+          const cell2 = row.insertCell(1);
+          const cell3 = row.insertCell(2);
+          const cell4 = row.insertCell(3);
+          const cell5 = row.insertCell(4);
+          const cell6 = row.insertCell(5);
+          const CellList = [cell1, cell2, cell3, cell4, cell5, cell6];
+          for (let i = 0; i < 6; i++) {
+            try {
+              CellList[i].className = "book2show";
+            } catch {}
+          }
+          cell1.innerHTML = `${item.title}`;
+          cell2.innerHTML = `${item.author}`;
+          cell3.innerHTML = `${item.year}`;
+          cell4.innerHTML = `${item.country}`;
+          cell5.innerHTML = `${item.pages}`;
+          cell6.innerHTML = `${item.rating}`;
+        }
+      });
+    });
+
+  HideAll();
   document.querySelector("#history-view").style.display = "block";
+  document.querySelector(".upcoming-book-container").style.display = "block";
 }
 
 function showSearchResults(response) {
   // todo - don't show if no results to show
-  document.querySelector(".switch").style.display = "none";
-  document.querySelector("#classicTable").style.display = "none";
-  document.querySelector("#modernTable").style.display = "none";
-  document.querySelector("#book-view").style.display = "none";
-  document.querySelector("#history-view").style.display = "none";
+  HideAll();
   document.querySelector("#search-results").style.display = "block";
   const SearchTable = document.querySelector(".search-table");
 
   for (let i = 0; i < response.items.length; i++) {
     let link;
     let item = response.items[i];
-    // console.log(item.id);
     try {
       link = item.volumeInfo.imageLinks.smallThumbnail;
     } catch {
@@ -184,11 +222,11 @@ function showSearchResults(response) {
     let row = SearchTable.insertRow(0);
     row.className = "table-row clas-body book2show";
     row.dataset.bookid = item.id;
-    var cell1 = row.insertCell(0);
+    let cell1 = row.insertCell(0);
     cell1.dataset.bookid = item.id;
-    var cell2 = row.insertCell(1);
+    let cell2 = row.insertCell(1);
     cell2.className = "book2show";
-    var cell3 = row.insertCell(2);
+    let cell3 = row.insertCell(2);
     cell3.className = "book2show";
     cell1.innerHTML = `<img class='small-pic book2show' src=${link}>`;
     cell2.innerHTML = `${
@@ -205,7 +243,7 @@ function truncate(string, length) {
 }
 
 function setStyle(style) {
-  const links = document.querySelectorAll("a");
+  const links = document.querySelectorAll(".link");
   const switchBtn = document.querySelector(".switch");
   if (style === "modern") {
     classicTable.classList.add("hidden-table");
@@ -225,4 +263,16 @@ function setStyle(style) {
       item.classList.replace("brandNeon", "brand");
     });
   }
+}
+
+function HideAll() {
+  document.querySelector(".switch").style.display = "none";
+  document.querySelector(".upcoming-book-container").style.display = "none";
+  document.querySelector("#modernTable").style.display = "none";
+  document.querySelector("#classicTable").style.display = "none";
+  document.querySelector("#book-view").style.display = "none";
+  document.querySelector("#history-view").style.display = "none";
+  document.querySelector("#search-results").style.display = "none";
+  document.querySelector(".control-group").style.display = "none";
+  document.querySelector(".rate-btn-container").style.display = "none";
 }

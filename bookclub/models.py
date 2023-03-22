@@ -20,21 +20,27 @@ class Book(models.Model):
     upcoming = models.BooleanField(default=False)
     is_classic = models.BooleanField(default=False)
     rating = models.FloatField(null=True, blank=True)
-    meeting_date = models.DateTimeField(default=datetime.now, null=True)
-    # datetime.now().strftime('%Y-%m-%d')
+    meeting_date = models.DateField(null=True, blank=True)
 
     def __str__(self):
-        return f"{self.title} - {self.author}"
+        return f"{self.title} - {self.author} - {self.year}"
 
-    # def serialize(self):  # object.serialize() now will return a JSON object
-    # return {
-    #     "id": self.id,
-    #     "autor": self.autor.username,
-    #     "text": self.text,
-    #     "image": self.image_url,
-    #     "date": self.date.strftime("%d.%b.%Y, %I:%M %p"),
-    #     "likes": [user.username for user in self.likes.all()]
-    # }
+    def serialize(self):  # object.serialize() now will return a JSON object
+        return {
+            "bookid": self.bookid,
+            "title": self.title,
+            "author": self.author,
+            "country": self.country,
+            "pages": self.pages,
+            "desc": self.desc,
+            "image_link": self.image_link,
+            "year": self.year,
+            "read": self.read,
+            "upcoming": self.upcoming,
+            "is_classic": self.is_classic,
+            "rating": self.rating,
+            "meeting_date": self.meeting_date
+        }
 
 
 # TODO - book, history, autor?

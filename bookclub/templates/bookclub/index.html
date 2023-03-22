@@ -12,8 +12,8 @@
           <div id="main-view">
             <div class="main-left-part">
               <div class="navbar">
-                <a class="brandNeon" href="{% url 'index' %}">Reading List</a>
-                <button id='history-link' class="brandNeon" href="javascript:;">History</button>
+                <a class="link brandNeon" href="{% url 'index' %}">Reading List</a>
+                <button id='history-link' class="link brandNeon" href="javascript:;">History</button>
               </div>
 
               <div id="search-field-container">
@@ -26,7 +26,11 @@
                 <h1 id="upcoming-title" class="book2show">{{up_book.title}}</h1>
                 <h3 id="upcoming-autor" class="book2show">{{up_book.author}}, {{up_book.year}}</h3>
                 <img id="upcoming-pic" src={{up_book.image_link}} class="book2show"></img>
-                <div id="upcoming-date">Meeting date:</div>
+                <div class="upcoming-container">
+                  <div id="upcoming-date">Meeting date:</div>
+                  <div class="meeting-date"></div>
+                  <button class="meeting-btn searchBtn">Add date</button>
+                </div>
               </div>
 
               <div class="control-group">
@@ -71,18 +75,6 @@
                   </tr>
                 </thead>
                 <tbody class="history-table">
-                  {% for book in books %}
-                    {% if book.read %}
-                      <tr class="table-row clas-body book2show" data-bookid='{{book.bookid}}''>
-                          <td class="book-cell book2show">{{book.title}}</td>
-                          <td class="author-cell book2show">{{book.author}}</td>
-                          <td class="year-cell book2show">{{book.year}}</td>
-                          <td class="country-cell book2show">{{book.country}}</td>
-                          <td class="pages-cell book2show">{{book.pages}}</td>
-                          <td class="rating-cell book2show">{{book.rating}}</td>
-                      </tr>
-                    {% endif %}
-                  {% endfor %}
                 </tbody>
               </table>
 
@@ -99,7 +91,7 @@
                 <tbody>
                   {% for book in books %}
                     {% if book.is_classic and not book.read %}
-                      <tr class="table-row clas-body book2show" data-bookid='{{book.bookid}}''>
+                      <tr class="table-row clas-body book2show" data-bookid='{{book.bookid}}'>
                           <td class="book-cell book2show">{{book.title}}</td>
                           <td class="author-cell book2show">{{book.author}}</td>
                           <td class="year-cell book2show">{{book.year}}</td>

@@ -1,6 +1,8 @@
 import requests
+import json
 from django.shortcuts import render
-from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
+from django.http import HttpResponse, JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 
 from .models import User, Book
 
@@ -64,4 +66,22 @@ def book_check(request, bookid):
 
 
 def history_view(request):
-    pass
+    # Return books in reverse chronologial order
+    old_books = Book.objects.all().order_by("-meeting_date").all()
+    return JsonResponse([old_book.serialize() for old_book in old_books], safe=False)
+
+
+@csrf_exempt
+def edit_book(request, bookid):
+    try:
+        book = Book.objects.get(bookid=bookid)
+    except Book.DoesNotExist:
+        return JsonResponse({"error": "Book not found."}, status=404)
+    print(book)
+    if request.method == "PUT":
+        data = json.loads(request.body)
+        if data.get("meeting_date") is not None:
+            book.meeting_date = data["meeting_date"]
+        print(book)
+        book.save()
+        return HttpResponse(status=204)
