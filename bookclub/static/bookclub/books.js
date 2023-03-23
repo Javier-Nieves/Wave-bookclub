@@ -43,15 +43,15 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   };
 
-  // ? add meeting date
+  // ! add meeting date
   const meetingBtn = document.querySelector(".meetingBtn");
   const bookid = document.querySelector(".upcoming-book-container").dataset
     .bookid;
   try {
     meetingBtn.addEventListener("click", () => {
       document.querySelector(".meetingField").style.display = "block";
+      // input will appear on first click
       meetingBtn.addEventListener("click", () => {
-        // input will appear on first click
         const date = document.querySelector(".meetingField").value;
         document.querySelector(".add-date-container").onsubmit = () => {
           // second click will sent API
@@ -85,11 +85,15 @@ document.addEventListener("DOMContentLoaded", function () {
     const book2change = document.querySelector(".view-title").dataset.bookid;
     bookAction(book2change, "add");
   };
-
   // ! remove book from lists
   document.querySelector(".remove-btn").onclick = () => {
     const book2change = document.querySelector(".view-title").dataset.bookid;
     bookAction(book2change, "remove");
+  };
+  // ! rate book
+  document.querySelector(".rate-btn").onclick = () => {
+    const book2change = document.querySelector(".view-title").dataset.bookid;
+    bookAction(book2change, "rate");
   };
 
   // ! Show history
@@ -267,16 +271,19 @@ function setStyle(style) {
 
 function showModal(action) {
   const close = document.querySelector(".close");
-  const modal = document.querySelector(
-    `.modal-${action === "add" ? "add" : "remove"}`
-  );
+  const modal = document.querySelector(`.modal`);
   modal.style.display = "block";
+
+  document.querySelector(`#modal${action}`).style.display = "block";
+
   close.onclick = () => {
     modal.style.display = "none";
+    document.querySelector(`#modal${action}`).style.display = "none";
   };
   window.onclick = (event) => {
     if (event.target == modal) {
       modal.style.display = "none";
+      document.querySelector(`#modal${action}`).style.display = "none";
     }
   };
 }
@@ -294,9 +301,7 @@ function HideAll() {
 }
 
 function bookAction(book2change, action) {
-  let form = document.querySelector(
-    `.modal-form-${action === "add" ? "add" : "remove"}`
-  );
+  let form = document.querySelector(`.modal-form-${action}`);
   showModal(`${action}`);
   form.onsubmit = (e) => {
     e.preventDefault();
@@ -307,6 +312,9 @@ function bookAction(book2change, action) {
     }
     if (action === "remove") {
       fetch(`/${action}/${book2change}`);
+    }
+    if (action === "rate") {
+      console.log("rate");
     }
     setTimeout(function () {
       // give 0.5 s to Python to think about it

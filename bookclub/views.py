@@ -20,7 +20,7 @@ def index(request):
 
 
 def add_book(request, bookid, year, country):
-    # TODO - get rid of the second API request for the same book
+    # TODO - get rid of the second API request for the same book with OOP
     try:
         url = f'https://www.googleapis.com/books/v1/volumes/{bookid}'
         headers = {
@@ -42,7 +42,8 @@ def add_book(request, bookid, year, country):
 
 
 def remove_book(request, bookid):
-    print('removing', bookid)
+    book = Book.objects.get(bookid=bookid)
+    book.delete()
     return HttpResponse(status=204)
 
 

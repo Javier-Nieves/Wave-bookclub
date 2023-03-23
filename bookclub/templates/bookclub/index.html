@@ -144,35 +144,39 @@
                   <div class="view-desc"></div>
                 </div>
 
-                <div class="modal-add">
+                <div class="modal">
                   <div class="modal-content">
                     <span class="close">&times;</span>
-                    <h2 class="modal-text">Additional information:</h2>
-                    <form class="modal-form-add">
-                      <div>
-                        <input type="number" class="searchField" id="year-input" placeholder="Year of publication" autofocus required>
-                        <input type="text" class="searchField" id="country-input" placeholder="Country" required>
-                      </div>
-                      <input type="submit" class="modal-btn" value="Add">
-                    </form>
+
+                    <div id="modaladd">
+                      <h2 class="modal-text">Additional information:</h2>
+                      <form class="modal-form-add">
+                        <div>
+                          <input type="number" class="searchField" id="year-input" placeholder="Year of publication" autofocus required>
+                          <input type="text" class="searchField" id="country-input" placeholder="Country" required>
+                        </div>
+                        <input type="submit" class="modal-btn" value="Add">
+                      </form>
+                    </div>
+
+                    <div id="modalremove">
+                      <h2 class="modal-text">Remove book from reading list?</h2>
+                      <form class="modal-form-remove">
+                        <input type="submit" class="modal-btn" value="Remove">
+                      </form>
+                    </div>
+
+                    <div id="modalrate">
+                      <h2 class="modal-text">How good was this book?</h2>
+                      <form class="modal-form-rate">
+                        <input type="number" class="searchField rateField" id="rating-input" placeholder="Rating" autofocus required>
+                        <input type="submit" class="searchBtn goodBtn" value="Rate">
+                      </form>
+                    </div>
                   </div>
                 </div>
-
-                <div class="modal-remove">
-                  <div class="modal-content">
-                    <span class="close">&times;</span>
-                    <h2 class="modal-text">Remove book from reading list?</h2>
-                    <form class="modal-form-remove">
-                      <input type="submit" class="modal-btn" value="Remove">
-                    </form>
-                  </div>
-                </div>
-
+              </div>
             </div>
-
-            </div>
-
           </div>
-
 </body>
 </html>
