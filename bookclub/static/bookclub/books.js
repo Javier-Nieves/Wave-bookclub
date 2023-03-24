@@ -43,27 +43,12 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   };
 
-  // ! add meeting date
-  const meetingBtn = document.querySelector(".meetingBtn");
+  // ! add meeting dat
   const bookid = document.querySelector(".upcoming-book-container").dataset
     .bookid;
   try {
-    meetingBtn.addEventListener("click", () => {
-      document.querySelector(".meetingField").style.display = "block";
-      // input will appear on first click
-      meetingBtn.addEventListener("click", () => {
-        const date = document.querySelector(".meetingField").value;
-        document.querySelector(".add-date-container").onsubmit = () => {
-          // second click will sent API
-          fetch(`/edit/${bookid}`, {
-            method: "PUT",
-            body: JSON.stringify({
-              meeting_date: date,
-            }),
-          });
-          window.location.reload();
-        };
-      });
+    document.querySelector(".meetingBtn").addEventListener("click", () => {
+      makeChange2Book(bookid, "meeting");
     });
   } catch {}
 
@@ -95,6 +80,11 @@ document.addEventListener("DOMContentLoaded", function () {
     const book2change = document.querySelector(".view-title").dataset.bookid;
     bookAction(book2change, "rate");
   };
+  // ! next book selection
+  document.querySelector(".next-btn").onclick = () => {
+    const book2change = document.querySelector(".view-title").dataset.bookid;
+    makeChange2Book(book2change, "next");
+  };
 
   // ! Show history
   const histLink = document.querySelector("#history-link");
@@ -116,7 +106,6 @@ function showBook(book) {
   const image = document.querySelector(".view-image");
   const control = document.querySelector(".control-group");
   const pages = document.querySelector(".view-pages");
-  const removeBtn = document.querySelector(".remove-btn-container");
 
   fetch(`https://www.googleapis.com/books/v1/volumes/${book}`)
     .then((response) => response.json())
@@ -138,31 +127,20 @@ function showBook(book) {
       description.innerHTML = truncate(fullText, 3000);
 
       // ? manage book view buttons
-      // todo - remove button should be inactive in read books
       fetch(`/check/${book.id}`)
         .then((response) => response.json())
         .then((response) => {
-          // book was in lists?
+          // if book is in the DB is has Year
           if (response.year !== null) {
-            document.querySelector(".add-btn").style.display = "none";
-            document.querySelector(".simple-text").innerHTML = `from the ${
-              response.year <= today - 50 ? "Classic" : "Modern"
-            } reading list`;
-            removeBtn.style.display = "flex";
-            // book is upcoming?
             if (response.upcoming) {
-              document.querySelector(".rate-btn-container").style.display =
-                "block";
-              removeBtn.style.display = "none";
+              displayButtons(response, "rate");
+            } else if (response.read) {
+              displayButtons();
+            } else {
+              displayButtons(response, "remove");
             }
-            // book was read?
-            if (response.read) {
-              removeBtn.style.display = "none";
-            }
-            // new book
           } else {
-            removeBtn.style.display = "none";
-            document.querySelector(".add-btn").style.display = "flex";
+            displayButtons(response, "add");
           }
         });
     });
@@ -170,6 +148,8 @@ function showBook(book) {
 
 function showHistory() {
   // todo - make function to insert year dates as rows into the table
+  // todo - hide old results
+  // todo - clean code
   const HistTable = document.querySelector(".history-table");
   HistTable.innerHTML = "";
   fetch("/history")
@@ -314,11 +294,84 @@ function bookAction(book2change, action) {
       fetch(`/${action}/${book2change}`);
     }
     if (action === "rate") {
-      console.log("rate");
+      const rating = document.querySelector("#rating-input").value;
+      fetch(`/${action}/${book2change}/${rating}`);
+    }
+    if (action === "next") {
+      makeChange2Book(book2change, "next");
     }
     setTimeout(function () {
       // give 0.5 s to Python to think about it
       window.location.reload();
     }, 500);
   };
+}
+
+function displayButtons(response, ...buttons) {
+  const removeBtn = document.querySelector(".remove-btn-container");
+  const addBtn = document.querySelector(".add-btn");
+  const rateBtn = document.querySelector(".rate-btn-container");
+  const nextBtn = document.querySelector(".next-btn");
+  const nextBook = document.querySelector(".upcoming-book-container").dataset
+    .bookid;
+  removeBtn.style.display = "none";
+  addBtn.style.display = "none";
+  rateBtn.style.display = "none";
+  nextBtn.style.display = "none";
+
+  if (!response) {
+    console.log("History book");
+  } else if (buttons.includes("remove")) {
+    addBtn.style.display = "none";
+    document.querySelector(".simple-text").innerHTML = `from the ${
+      response.year <= today - 50 ? "Classic" : "Modern"
+    } reading list`;
+    removeBtn.style.display = "flex";
+    if (!nextBook) {
+      console.log("no next book");
+      nextBtn.style.display = "block";
+    }
+  } else if (buttons.includes("rate")) {
+    rateBtn.style.display = "block";
+  } else if (buttons.includes("add")) {
+    addBtn.style.display = "flex";
+  }
+}
+
+function makeChange2Book(bookid, action) {
+  // create meeting date
+  if (action === "meeting") {
+    const meetingBtn = document.querySelector(".meetingBtn");
+    document.querySelector(".meetingField").style.display = "block";
+    // input will appear on first click
+    meetingBtn.addEventListener("click", () => {
+      const date = document.querySelector(".meetingField").value;
+      document.querySelector(".add-date-container").onsubmit = (e) => {
+        e.preventDefault();
+        // second click will sent API
+        fetch(`/edit/${bookid}`, {
+          method: "PUT",
+          body: JSON.stringify({
+            meeting_date: date,
+          }),
+        });
+        setTimeout(function () {
+          window.location.reload();
+        }, 500);
+      };
+    });
+  }
+  // make book the next one in reading list
+  if (action === "next") {
+    console.log("next book");
+    fetch(`/edit/${bookid}`, {
+      method: "PUT",
+      body: JSON.stringify({
+        next: true,
+      }),
+    });
+    setTimeout(function () {
+      window.location.reload();
+    }, 500);
+  }
 }

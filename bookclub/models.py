@@ -18,7 +18,6 @@ class Book(models.Model):
     year = models.IntegerField(null=True, blank=True)
     read = models.BooleanField(default=False)
     upcoming = models.BooleanField(default=False)
-    # is_classic = models.BooleanField(default=False)
     rating = models.FloatField(null=True, blank=True)
     meeting_date = models.DateField(null=True, blank=True)
 

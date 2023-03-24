@@ -1,17 +1,19 @@
 from pathlib import Path
 import os
 from dotenv import load_dotenv, find_dotenv
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 load_dotenv(find_dotenv())
-SECRET_KEY = os.environ['SECRET_KEY']
+SECRET_KEY = os.environ.get(
+    'SECRET_KEY', default='django-insecure-tknr@dd+veaz=0w!axoi$_k56*4#=$bq7^l$sx4!*5t7-bw($)')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 AUTH_USER_MODEL = 'bookclub.user'
 
@@ -62,10 +64,14 @@ WSGI_APPLICATION = "Books.wsgi.application"
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
+    # ! Local
+    # "default": {
+    #     "ENGINE": "django.db.backends.sqlite3",
+    #     "NAME": BASE_DIR / "db.sqlite3",
+    # }
+    # ! for Development
+    'default': dj_database_url.parse(os.environ.get("DATABASE_URL"))
+
 }
 
 
@@ -87,7 +93,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = 'America/Bogota'
 
 USE_I18N = True
 
@@ -98,6 +104,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATIC_URL = "static/"
+# ! adds staticfiles folder and all it's content, allowing to have styles in development
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field

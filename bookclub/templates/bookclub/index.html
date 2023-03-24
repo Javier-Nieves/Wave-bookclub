@@ -23,6 +23,7 @@
 
               <div class="upcoming-book-container book2show" data-isclassic= "{{up_book.year}}" 
               data-bookid="{{up_book.bookid}}" class="book2show">
+              {% if up_book.bookid %}
                 <h1 id="upcoming-title" class="book2show">{{up_book.title}}</h1>
                 <h3 id="upcoming-autor" class="book2show">{{up_book.author}}, {{up_book.year}}</h3>
                 <img id="upcoming-pic" src={{up_book.image_link}} class="book2show"></img>
@@ -37,6 +38,9 @@
                     {% endif %}
                   </form>
                 </div>
+                {% else %}
+                <h1 id="upcoming-title">Select a book to read next</h1>
+                {% endif %}
               </div>
 
               <div class="control-group">
@@ -46,6 +50,7 @@
                   <button class="remove-btn">Remove</button>
                   <div class="simple-text"></div>
                 </div>
+                <button class="next-btn rate-btn">Next</button>
                 <div class="rate-btn-container" style="display: none;">
                   <div class="upcom-text">Reading now</div>
                   <button class="rate-btn">Rate</button>
@@ -69,20 +74,23 @@
                 </tbody>
               </table>
 
-              <table id="history-view" style="display: none;">
-                <thead>
-                  <tr id='history-head' class="clas-head">
-                      <th>Title</th>
-                      <th>Author</th>
-                      <th>Year</th>
-                      <th>Country</th>
-                      <th>Pages</th>
-                      <th>Rating</th>
-                  </tr>
-                </thead>
-                <tbody class="history-table">
-                </tbody>
-              </table>
+              <div id="history-view" style="display: none;">
+                <img src='static/bookclub/club2.png' style="width: 7vw; margin: 5px"></img>
+                <table>
+                  <thead>
+                    <tr id='history-head' class="clas-head">
+                        <th>Title</th>
+                        <th>Author</th>
+                        <th>Year</th>
+                        <th>Country</th>
+                        <th>Pages</th>
+                        <th>Rating</th>
+                    </tr>
+                  </thead>
+                  <tbody class="history-table">
+                  </tbody>
+                </table>
+              </div>
 
               <table id="classicTable" class="hidden-table">
                 <thead>
@@ -169,7 +177,7 @@
                     <div id="modalrate">
                       <h2 class="modal-text">How good was this book?</h2>
                       <form class="modal-form-rate">
-                        <input type="number" class="searchField rateField" id="rating-input" placeholder="Rating" autofocus required>
+                        <input type="number" class="searchField rateField" id="rating-input" placeholder="Rating" min="0" max="10" step="0.1" autofocus required>
                         <input type="submit" class="searchBtn goodBtn" value="Rate">
                       </form>
                     </div>

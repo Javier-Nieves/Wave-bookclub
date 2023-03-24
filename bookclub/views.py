@@ -11,7 +11,7 @@ def index(request):
     try:
         up_book = Book.objects.get(upcoming=True)
     except:
-        up_book = 'Add your first book'
+        up_book = None
 
     return render(request, 'bookclub/index.html', {
         'up_book': up_book,
@@ -41,9 +41,20 @@ def add_book(request, bookid, year, country):
     return HttpResponse(status=204)
 
 
+# todo - checks for next functions
 def remove_book(request, bookid):
     book = Book.objects.get(bookid=bookid)
     book.delete()
+    return HttpResponse(status=204)
+
+
+def rate_book(request, bookid, rating):
+    rating = float(rating)
+    book = Book.objects.get(bookid=bookid)
+    book.rating = rating
+    book.read = True
+    book.upcoming = False
+    book.save()
     return HttpResponse(status=204)
 
 
@@ -64,7 +75,7 @@ def book_check(request, bookid):
 
 def history_view(request):
     # Return books in reverse chronologial order
-    old_books = Book.objects.all().order_by("-meeting_date").all()
+    old_books = Book.objects.all().order_by("meeting_date").all()
     return JsonResponse([old_book.serialize() for old_book in old_books], safe=False)
 
 
@@ -74,11 +85,12 @@ def edit_book(request, bookid):
         book = Book.objects.get(bookid=bookid)
     except Book.DoesNotExist:
         return JsonResponse({"error": "Book not found."}, status=404)
-    print(book)
     if request.method == "PUT":
         data = json.loads(request.body)
         if data.get("meeting_date") is not None:
             book.meeting_date = data["meeting_date"]
-        print(book)
+        book.save()
+        if data.get("next") is not None:
+            book.upcoming = data["next"]
         book.save()
         return HttpResponse(status=204)
