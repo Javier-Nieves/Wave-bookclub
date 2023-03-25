@@ -118,7 +118,10 @@ function showBook(book) {
       pages.innerHTML = `Page count: ${volumeInfo.pageCount}`;
 
       // * image for book cover
-      const imgUrl = volumeInfo.imageLinks.thumbnail;
+      let imgUrl = "static/bookclub/club2.png";
+      try {
+        imgUrl = volumeInfo.imageLinks.thumbnail;
+      } catch {}
       control.style.display = "flex";
       image.src = imgUrl;
 
@@ -199,7 +202,7 @@ function showSearchResults(response) {
     try {
       link = item.volumeInfo.imageLinks.smallThumbnail;
     } catch {
-      link = "cover";
+      link = "static/bookclub/club2.png";
     }
     // todo - make table for search results. data-atr to table row. clear the table
     // creatig new row in table on 1st position

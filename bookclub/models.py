@@ -9,7 +9,7 @@ class User(AbstractUser):
 
 class Book(models.Model):
     bookid = models.CharField(max_length=20)
-    title = models.CharField(max_length=50)
+    title = models.CharField(max_length=200)
     author = models.CharField(max_length=50)
     country = models.CharField(max_length=50, default="Disc World")
     pages = models.IntegerField(null=True)

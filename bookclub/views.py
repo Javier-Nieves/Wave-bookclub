@@ -35,8 +35,12 @@ def add_book(request, bookid, year, country):
         return None
 
     info = book['volumeInfo']
+    try:
+        image_link = info['imageLinks'].get('smallThumbnail')
+    except:
+        image_link = "static/bookclub/club2.png"
     Book.objects.create(bookid=bookid, title=info.get("title"), author=info.get("authors")[0], year=year, country=country, pages=info.get("pageCount"),
-                        desc=info.get('description'), image_link=info['imageLinks'].get('smallThumbnail'))
+                        desc=info.get('description'), image_link=image_link)
 
     return HttpResponse(status=204)
 
