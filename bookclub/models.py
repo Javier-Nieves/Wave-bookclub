@@ -22,7 +22,7 @@ class Book(models.Model):
     meeting_date = models.DateField(null=True, blank=True)
 
     def __str__(self):
-        return f"{self.title} - {self.author} - {self.year}"
+        return f"{self.title} - {self.author}"
 
     def serialize(self):  # object.serialize() now will return a JSON object
         return {

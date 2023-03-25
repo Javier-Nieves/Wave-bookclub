@@ -57,7 +57,7 @@ document.addEventListener("DOMContentLoaded", function () {
   document.querySelector(".searchBtn").onclick = () => {
     let title = document.querySelector(".searchField").value;
     fetch(
-      `https://www.googleapis.com/books/v1/volumes?q=+intitle:${title}&maxResults=10`
+      `https://www.googleapis.com/books/v1/volumes?q=+intitle:${title}&maxResults=20`
     )
       .then((response) => response.json())
       .then((data) => {
@@ -97,7 +97,6 @@ document.addEventListener("DOMContentLoaded", function () {
 function showBook(book) {
   // todo - show book from DB if it's already there
   // todo - description and cover shouldn't stay old when new ones are absent
-  // todo - show some pic when real cover is unavailable
   HideAll();
   document.querySelector("#book-view").style.display = "flex";
   const title = document.querySelector(".view-title");
@@ -112,10 +111,14 @@ function showBook(book) {
     .then((book) => {
       const volumeInfo = book.volumeInfo;
 
-      title.innerHTML = volumeInfo.title;
+      title.innerHTML = volumeInfo.title || "no title";
       title.dataset.bookid = book.id;
-      author.innerHTML = volumeInfo.authors[0];
-      pages.innerHTML = `Page count: ${volumeInfo.pageCount}`;
+      // todo - place for improvement:
+      author.innerHTML = "no author";
+      try {
+        author.innerHTML = volumeInfo.authors[0];
+      } catch {}
+      pages.innerHTML = `Page count: ${volumeInfo.pageCount}` || "no pages";
 
       // * image for book cover
       let imgUrl = "static/bookclub/club2.png";
@@ -151,43 +154,20 @@ function showBook(book) {
 
 function showHistory() {
   // todo - make function to insert year dates as rows into the table
-  // todo - hide old results
-  // todo - clean code
-  const HistTable = document.querySelector(".history-table");
-  HistTable.innerHTML = "";
+  HideAll();
+  document.querySelector("#history-view").style.display = "block";
+  document.querySelector(".upcoming-book-container").style.display = "block";
+
+  let yearChange;
   fetch("/history")
     .then((response) => response.json())
     .then((old_books) => {
       old_books.forEach((item) => {
         if (item.read) {
-          const row = HistTable.insertRow(0);
-          row.className = "table-row clas-body book2show";
-          row.dataset.bookid = item.bookid;
-          const cell1 = row.insertCell(0);
-          const cell2 = row.insertCell(1);
-          const cell3 = row.insertCell(2);
-          const cell4 = row.insertCell(3);
-          const cell5 = row.insertCell(4);
-          const cell6 = row.insertCell(5);
-          const CellList = [cell1, cell2, cell3, cell4, cell5, cell6];
-          for (let i = 0; i < 6; i++) {
-            try {
-              CellList[i].className = "book2show";
-            } catch {}
-          }
-          cell1.innerHTML = `${item.title}`;
-          cell2.innerHTML = `${item.author}`;
-          cell3.innerHTML = `${item.year}`;
-          cell4.innerHTML = `${item.country}`;
-          cell5.innerHTML = `${item.pages}`;
-          cell6.innerHTML = `${item.rating}`;
+          addNewHistRow(item);
         }
       });
     });
-
-  HideAll();
-  document.querySelector("#history-view").style.display = "block";
-  document.querySelector(".upcoming-book-container").style.display = "block";
 }
 
 function showSearchResults(response) {
@@ -195,6 +175,7 @@ function showSearchResults(response) {
   HideAll();
   document.querySelector("#search-results").style.display = "block";
   const SearchTable = document.querySelector(".search-table");
+  SearchTable.innerHTML = "";
 
   for (let i = 0; i < response.items.length; i++) {
     let link;
@@ -204,7 +185,6 @@ function showSearchResults(response) {
     } catch {
       link = "static/bookclub/club2.png";
     }
-    // todo - make table for search results. data-atr to table row. clear the table
     // creatig new row in table on 1st position
     let row = SearchTable.insertRow(0);
     row.className = "table-row clas-body book2show";
@@ -376,5 +356,35 @@ function makeChange2Book(bookid, action) {
     setTimeout(function () {
       window.location.reload();
     }, 500);
+  }
+}
+
+function addNewHistRow(item) {
+  const HistTable = document.querySelector(".history-table");
+  const row = HistTable.insertRow(0);
+  row.className = "table-row clas-body book2show";
+  row.dataset.bookid = item.bookid;
+  const cell1 = row.insertCell(0);
+  const cell2 = row.insertCell(1);
+  const cell3 = row.insertCell(2);
+  const cell4 = row.insertCell(3);
+  const cell5 = row.insertCell(4);
+  const cell6 = row.insertCell(5);
+  const CellList = [cell1, cell2, cell3, cell4, cell5, cell6];
+  for (let i = 0; i < 6; i++) {
+    try {
+      CellList[i].className = "book2show";
+    } catch {}
+  }
+  let param = [
+    item.title,
+    item.author,
+    item.year,
+    item.country,
+    item.pages,
+    item.rating,
+  ];
+  for (let i = 0; i < param.length; i++) {
+    CellList[i].innerHTML = `${param[i]}`;
   }
 }
