@@ -36,7 +36,6 @@ class Book(models.Model):
             "year": self.year,
             "read": self.read,
             "upcoming": self.upcoming,
-            # "is_classic": self.is_classic,
             "rating": self.rating,
             "meeting_date": self.meeting_date
         }

@@ -11,8 +11,10 @@ document.addEventListener("DOMContentLoaded", function () {
         tar.className.includes("container") ||
         tar.className.includes("upcoming-book-container")
       ) {
+        loadScreen(true);
         showBook(tar.dataset.bookid);
       }
+      loadScreen(true);
       showBook(tar.parentElement.dataset.bookid);
     }
   });
@@ -43,7 +45,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   };
 
-  // ! add meeting dat
+  // ! add meeting date
   const bookid = document.querySelector(".upcoming-book-container").dataset
     .bookid;
   try {
@@ -55,6 +57,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // ! search for the book
   // todo - add search by title and author
   document.querySelector(".searchBtn").onclick = () => {
+    loadScreen(true);
     let title = document.querySelector(".searchField").value;
     fetch(
       `https://www.googleapis.com/books/v1/volumes?q=+intitle:${title}&maxResults=20`
@@ -76,10 +79,10 @@ document.addEventListener("DOMContentLoaded", function () {
     bookAction(book2change, "remove");
   };
   // ! rate book
-  document.querySelector(".rate-btn").onclick = () => {
+  document.querySelector(".rate-btn").addEventListener("click", () => {
     const book2change = document.querySelector(".view-title").dataset.bookid;
     bookAction(book2change, "rate");
-  };
+  });
   // ! next book selection
   document.querySelector(".next-btn").onclick = () => {
     const book2change = document.querySelector(".view-title").dataset.bookid;
@@ -90,6 +93,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const histLink = document.querySelector("#history-link");
   histLink.onclick = () => {
     HideAll();
+    loadScreen(true);
     showHistory();
   };
 });
@@ -105,6 +109,7 @@ function showBook(book) {
   const image = document.querySelector(".view-image");
   const control = document.querySelector(".control-group");
   const pages = document.querySelector(".view-pages");
+  const rating = document.querySelector(".view-rating");
 
   fetch(`https://www.googleapis.com/books/v1/volumes/${book}`)
     .then((response) => response.json())
@@ -148,12 +153,21 @@ function showBook(book) {
           } else {
             displayButtons(response, "add");
           }
+          loadScreen(false);
         });
+    });
+
+  fetch(`check/${book}`)
+    .then((response) => response.json())
+    .then((book) => {
+      if (book.rating) {
+        rating.style.display = "block";
+        rating.innerHTML = book.rating;
+      }
     });
 }
 
 function showHistory() {
-  // todo - make function to insert year dates as rows into the table
   HideAll();
   document.querySelector("#history-view").style.display = "block";
   document.querySelector(".upcoming-book-container").style.display = "block";
@@ -164,14 +178,27 @@ function showHistory() {
     .then((old_books) => {
       old_books.forEach((item) => {
         if (item.read) {
+          if (!yearChange) {
+            yearChange = item.meeting_date.slice(0, 4);
+          }
+          if (item.meeting_date.slice(0, 4) !== yearChange) {
+            let CellList = createRow();
+            CellList[0].innerHTML = `<b>${yearChange}</b>`;
+            for (let h = 0; h < CellList.length; h++) {
+              CellList[h].classList.add("yearRow");
+            }
+          }
+          yearChange = item.meeting_date.slice(0, 4);
           addNewHistRow(item);
         }
+        loadScreen(false);
       });
     });
 }
 
 function showSearchResults(response) {
   // todo - don't show if no results to show
+  // todo - clean code
   HideAll();
   document.querySelector("#search-results").style.display = "block";
   const SearchTable = document.querySelector(".search-table");
@@ -186,7 +213,7 @@ function showSearchResults(response) {
       link = "static/bookclub/club2.png";
     }
     // creatig new row in table on 1st position
-    let row = SearchTable.insertRow(0);
+    let row = SearchTable.insertRow();
     row.className = "table-row clas-body book2show";
     row.dataset.bookid = item.id;
     let cell1 = row.insertCell(0);
@@ -201,6 +228,7 @@ function showSearchResults(response) {
     }`;
     cell3.innerHTML = `${item.volumeInfo.title}`;
   }
+  loadScreen(false);
 }
 
 // ? -------------------------------------------------------------- helpers:
@@ -303,7 +331,6 @@ function displayButtons(response, ...buttons) {
   nextBtn.style.display = "none";
 
   if (!response) {
-    console.log("History book");
   } else if (buttons.includes("remove")) {
     addBtn.style.display = "none";
     document.querySelector(".simple-text").innerHTML = `from the ${
@@ -311,7 +338,6 @@ function displayButtons(response, ...buttons) {
     } reading list`;
     removeBtn.style.display = "flex";
     if (!nextBook) {
-      console.log("no next book");
       nextBtn.style.display = "block";
     }
   } else if (buttons.includes("rate")) {
@@ -346,7 +372,6 @@ function makeChange2Book(bookid, action) {
   }
   // make book the next one in reading list
   if (action === "next") {
-    console.log("next book");
     fetch(`/edit/${bookid}`, {
       method: "PUT",
       body: JSON.stringify({
@@ -360,17 +385,7 @@ function makeChange2Book(bookid, action) {
 }
 
 function addNewHistRow(item) {
-  const HistTable = document.querySelector(".history-table");
-  const row = HistTable.insertRow(0);
-  row.className = "table-row clas-body book2show";
-  row.dataset.bookid = item.bookid;
-  const cell1 = row.insertCell(0);
-  const cell2 = row.insertCell(1);
-  const cell3 = row.insertCell(2);
-  const cell4 = row.insertCell(3);
-  const cell5 = row.insertCell(4);
-  const cell6 = row.insertCell(5);
-  const CellList = [cell1, cell2, cell3, cell4, cell5, cell6];
+  let CellList = createRow(item);
   for (let i = 0; i < 6; i++) {
     try {
       CellList[i].className = "book2show";
@@ -382,9 +397,32 @@ function addNewHistRow(item) {
     item.year,
     item.country,
     item.pages,
-    item.rating,
+    item.rating || "-",
   ];
   for (let i = 0; i < param.length; i++) {
     CellList[i].innerHTML = `${param[i]}`;
   }
+}
+
+function createRow(item) {
+  const HistTable = document.querySelector(".history-table");
+  const row = HistTable.insertRow(0);
+  row.className = "table-row clas-body book2show";
+  try {
+    row.dataset.bookid = item.bookid;
+  } catch {}
+  const cell1 = row.insertCell(0);
+  const cell2 = row.insertCell(1);
+  const cell3 = row.insertCell(2);
+  const cell4 = row.insertCell(3);
+  const cell5 = row.insertCell(4);
+  const cell6 = row.insertCell(5);
+  const CellList = [cell1, cell2, cell3, cell4, cell5, cell6];
+  return CellList;
+}
+
+function loadScreen(bool) {
+  const loadScreen = document.querySelector("#load-screen");
+  if (bool) loadScreen.style.display = "block";
+  else loadScreen.style.display = "none";
 }

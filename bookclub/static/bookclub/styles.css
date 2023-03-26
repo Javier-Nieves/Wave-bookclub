@@ -211,7 +211,7 @@ h2 {
 .small-pic {
     width: 3vw;
 }
-.searchBtn, .add-btn, .remove-btn, .rate-btn, .meetingBtn, .modal-btn {
+.searchBtn, .add-btn, .remove-btn, .rate-btn, .meetingBtn, .modal-btn, .next-btn {
     color: rgba(201, 201, 201, 0.94);
     font-size: 18px;
     font-family: didot;
@@ -228,7 +228,7 @@ h2 {
     justify-content: center;
     align-items: center;
 }
-.rate-btn {
+.rate-btn, .next-btn {
     margin-top: 13px;
     width: 180px;
     height: 100px;
@@ -257,7 +257,7 @@ h2 {
     font-size: 21px;
     margin-right: 15px;
 }
-.rate-btn:hover {
+.rate-btn:hover, .next-btn {
     transform: scale(1.1);
     cursor: pointer;
     box-shadow: 0 0 15px yellow;
@@ -286,6 +286,12 @@ h2 {
     background-color: rgba(232, 232, 232, 0.8);
     border-radius: 10px;
 }
+.book-info-top {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 3vw;
+}
 .view-desc {
     font-size: 20px;
     border: 1px solid gray;
@@ -298,6 +304,21 @@ h2 {
 }
 .view-image {
     width: 15vw;
+}
+.view-rating {
+    display:none;
+    background-image: url('gif3.gif');
+    background-size: cover;
+    width: 9vw;
+    height: 8vw;
+    margin-right: 3vw;
+    border: 1px solid yellow;
+    border-radius: 10px;
+    color: rgba(198, 0, 0, 0.867);
+    font-size: 60px;
+    font-weight: 700;
+    font-family: Arial, Helvetica, sans-serif;
+    -webkit-text-stroke: 2px rgb(248, 248, 248);
 }
 .simple-text, .upcom-text, .meeting-date {
     font-size: 20px;
@@ -335,6 +356,10 @@ h2 {
     border: 1px solid #888;
     border-radius: 15px;
     width: 30%;
+  }
+  .load-screen-gif {
+    width: 25vw;
+    margin: 20vh 38vw;
   }
   #modaladd, #modalremove, #modalrate {
     display: none;
@@ -438,4 +463,9 @@ th, td {
 #history-link {
     background-color: transparent;
     border: none;
+}
+.yearRow {
+    font-size: 25px;
+    background-color: rgba(2, 167, 167, 0.85);
+    color: black;
 }

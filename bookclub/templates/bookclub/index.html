@@ -50,7 +50,7 @@
                   <button class="remove-btn">Remove</button>
                   <div class="simple-text"></div>
                 </div>
-                <button class="next-btn rate-btn">Next</button>
+                <button class="next-btn">Next</button>
                 <div class="rate-btn-container" style="display: none;">
                   <div class="upcom-text">Reading now</div>
                   <button class="rate-btn">Rate</button>
@@ -146,9 +146,14 @@
               <div id="book-view" style="display: none;">
 
                 <div class="book-info">
-                  <h1 class="view-title"></h1>
-                  <h2 class="view-author"></h2>
-                  <div class="view-pages"></div>
+                  <div class="book-info-top">
+                    <div>
+                      <h1 class="view-title"></h1>
+                      <h2 class="view-author"></h2>
+                      <div class="view-pages"></div>
+                    </div>
+                    <button class="view-rating"></button>
+                  </div>
                   <div class="view-desc"></div>
                 </div>
 
@@ -185,6 +190,9 @@
                 </div>
               </div>
             </div>
+          </div>
+          <div class='modal' id="load-screen">
+            <img src='static/bookclub/gif4.gif' class="load-screen-gif"></img>
           </div>
 </body>
 </html>
