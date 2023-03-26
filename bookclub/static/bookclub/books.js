@@ -289,6 +289,7 @@ function HideAll() {
   document.querySelector("#search-results").style.display = "none";
   document.querySelector(".control-group").style.display = "none";
   document.querySelector(".rate-btn-container").style.display = "none";
+  document.querySelector(".view-rating").style.display = "none";
 }
 
 function bookAction(book2change, action) {
