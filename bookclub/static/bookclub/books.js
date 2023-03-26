@@ -2,6 +2,21 @@
 let today = new Date().toISOString().slice(0, 4);
 
 document.addEventListener("DOMContentLoaded", function () {
+  // ! put all books in the tables
+  loadScreen(true);
+  fetch("allbooks/all")
+    .then((response) => response.json())
+    .then((books) => {
+      books.forEach((book) => {
+        if (book.year <= today - 50 && !book.read) {
+          fillTableRow(book, "classic");
+        } else if (book.year > today - 50 && !book.read) {
+          fillTableRow(book, "modern");
+        }
+      });
+      loadScreen(false);
+    });
+
   document.addEventListener("click", (e) => {
     const tar = e.target;
 
@@ -165,6 +180,58 @@ function showBook(book) {
         rating.innerHTML = book.rating;
       }
     });
+
+  // // ! sorting
+  // document.addEventListener('click', event => {
+  //   let table, rows, switching, i, x, y, shouldSwitch;
+  //   const sortTar = event.target;
+  //   // which parameter will sort the table
+  //   const whichSort = sortTar.className;
+  //   table = document.getElementById("mainTable");
+  //   switching = true;
+  //   while (switching) {
+  //     switching = false;
+  //     rows = table.rows;
+  //     for (i = 1; i < (rows.length - 1); i++) {
+  //       shouldSwitch = false;
+  //       // * parameter determination
+  //       if (whichSort.includes('sortSigma')) {
+  //         x = rows[i].querySelector(".sigma-row").innerHTML;
+  //         y = rows[i + 1].querySelector(".sigma-row").innerHTML;
+  //       }
+  //       else if (whichSort.includes('sortChange')) {
+  //         x = rows[i].querySelector("#change-field").innerHTML;
+  //         y = rows[i + 1].querySelector("#change-field").innerHTML;
+  //       }
+  //       else if (whichSort.includes('sortDay')) {
+  //         x = rows[i].querySelector("#day-one").innerHTML;
+  //         y = rows[i + 1].querySelector("#day-one").innerHTML;
+  //       }
+
+  //       // * direction determination
+  //       if (whichSort.includes('Up')) {
+  //         if (parseFloat(x) < parseFloat(y)) {
+  //           shouldSwitch = true;
+  //           break;
+  //         }
+  //       }
+  //       else if (whichSort.includes('Down')) {
+  //         if (parseFloat(x) > parseFloat(y)) {
+  //           shouldSwitch = true;
+  //           break;
+  //         }
+  //       }
+
+  //     }
+  //     if (shouldSwitch) {
+  //       rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+  //       switching = true;
+  //     }
+  //   }
+  //   // * switch class after sorting in main table
+  //   if (whichSort.includes('Up')) sortTar.classList.replace("Up", "Down");
+  //   else sortTar.classList.replace("Down", "Up");
+  // })
 }
 
 function showHistory() {
@@ -173,7 +240,7 @@ function showHistory() {
   document.querySelector(".upcoming-book-container").style.display = "block";
 
   let yearChange;
-  fetch("/history")
+  fetch("allbooks/history")
     .then((response) => response.json())
     .then((old_books) => {
       old_books.forEach((item) => {
@@ -182,14 +249,14 @@ function showHistory() {
             yearChange = item.meeting_date.slice(0, 4);
           }
           if (item.meeting_date.slice(0, 4) !== yearChange) {
-            let CellList = createRow();
+            let CellList = createRow(item, "history");
             CellList[0].innerHTML = `<b>${yearChange}</b>`;
             for (let h = 0; h < CellList.length; h++) {
               CellList[h].classList.add("yearRow");
             }
           }
           yearChange = item.meeting_date.slice(0, 4);
-          addNewHistRow(item);
+          fillTableRow(item, "history");
         }
         loadScreen(false);
       });
@@ -385,29 +452,35 @@ function makeChange2Book(bookid, action) {
   }
 }
 
-function addNewHistRow(item) {
-  let CellList = createRow(item);
+function fillTableRow(item, where) {
+  let CellList = createRow(item, `${where}`);
   for (let i = 0; i < 6; i++) {
     try {
       CellList[i].className = "book2show";
     } catch {}
   }
-  let param = [
-    item.title,
-    item.author,
-    item.year,
-    item.country,
-    item.pages,
-    item.rating || "-",
-  ];
+  let param = [item.title, item.author, item.year, item.country, item.pages];
+  // history table includes 1 more column - rating
+  if (where === "history") {
+    param.push(item.rating || "-");
+  }
   for (let i = 0; i < param.length; i++) {
     CellList[i].innerHTML = `${param[i]}`;
   }
 }
 
-function createRow(item) {
-  const HistTable = document.querySelector(".history-table");
-  const row = HistTable.insertRow(0);
+function createRow(item, where) {
+  let Table;
+  if (where === "history") {
+    Table = document.querySelector(".history-table");
+  }
+  if (where === "classic") {
+    Table = document.querySelector(".clas-table");
+  }
+  if (where === "modern") {
+    Table = document.querySelector(".mod-table");
+  }
+  const row = Table.insertRow(0);
   row.className = "table-row clas-body book2show";
   try {
     row.dataset.bookid = item.bookid;
@@ -417,8 +490,11 @@ function createRow(item) {
   const cell3 = row.insertCell(2);
   const cell4 = row.insertCell(3);
   const cell5 = row.insertCell(4);
-  const cell6 = row.insertCell(5);
-  const CellList = [cell1, cell2, cell3, cell4, cell5, cell6];
+  const CellList = [cell1, cell2, cell3, cell4, cell5];
+  if (where === "history") {
+    const cell6 = row.insertCell(5);
+    CellList.push(cell6);
+  }
   return CellList;
 }
 

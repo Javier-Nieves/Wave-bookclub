@@ -13,7 +13,7 @@ urlpatterns = [
     path("rate/<str:bookid>/<str:rating>",
          views.rate_book, name="rate book"),
     path('check/<str:bookid>', views.book_check, name='book check'),
-    path('history/', views.history_view, name='history'),
+    path('allbooks/<str:field>', views.all_books_view, name='all books'),
     path("edit/<str:bookid>",
          views.edit_book, name="edit book info")
     # todo - change Book entry

@@ -102,18 +102,7 @@
                         <th class="sortPages Up">Pages</th>
                     </tr>
                 </thead>
-                <tbody>
-                  {% for book in books %}
-                    {% if book.year <= 1973 and not book.read %}
-                      <tr class="table-row clas-body book2show" data-bookid='{{book.bookid}}'>
-                          <td class="book-cell book2show">{{book.title}}</td>
-                          <td class="author-cell book2show">{{book.author}}</td>
-                          <td class="year-cell book2show">{{book.year}}</td>
-                          <td class="country-cell book2show">{{book.country}}</td>
-                          <td class="pages-cell book2show">{{book.pages}}</td>
-                      </tr>
-                    {% endif %}
-                  {% endfor %}
+                <tbody class="clas-table">
                 </tbody>
               </table>
 
@@ -127,18 +116,7 @@
                         <th class="sortPages Up">Pages</th>
                     </tr>
                 </thead>
-                <tbody>
-                  {% for book in books %}
-                    {% if book.year > 1973 and not book.read %}
-                      <tr class="table-row mod-body book2show" data-bookid='{{book.bookid}}'>
-                          <td class="book-cell book2show">{{book.title}}</td>
-                          <td class="author-cell book2show">{{book.author}}</td>
-                          <td class="year-cell book2show">{{book.year}}</td>
-                          <td class="country-cell book2show">{{book.country}}</td>
-                          <td class="pages-cell book2show">{{book.pages}}</td>
-                      </tr>
-                    {% endif %}
-                  {% endfor %}
+                <tbody class="mod-table">
                 </tbody>
               </table>
 

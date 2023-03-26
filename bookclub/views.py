@@ -15,7 +15,7 @@ def index(request):
 
     return render(request, 'bookclub/index.html', {
         'up_book': up_book,
-        'books': Book.objects.all().order_by('year')
+        # 'books': Book.objects.all().order_by('year')
     })
 
 
@@ -77,10 +77,15 @@ def book_check(request, bookid):
         }, status=200)
 
 
-def history_view(request):
-    # Return books in reverse chronologial order
-    old_books = Book.objects.all().order_by("meeting_date").all()
-    return JsonResponse([old_book.serialize() for old_book in old_books], safe=False)
+def all_books_view(request, field):
+    if field == 'history':
+        # Return books in reverse chronologial order
+        old_books = Book.objects.all().order_by("meeting_date").all()
+        return JsonResponse([old_book.serialize() for old_book in old_books], safe=False)
+    elif field == 'all':
+        print(field)
+        books = Book.objects.all().order_by('-year')
+        return JsonResponse([book.serialize() for book in books], safe=False)
 
 
 @csrf_exempt
