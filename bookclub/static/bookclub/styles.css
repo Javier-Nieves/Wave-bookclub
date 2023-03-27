@@ -457,6 +457,21 @@ th, td {
     text-shadow:
     0 0 2px #fff;
 }
+.history-head {
+    background-color: rgba(2, 167, 167, 0.85);
+    color: black;
+}
+.history-body:nth-of-type(odd) {
+    background-color: rgba(247, 214, 142, 0.603);
+}
+.history-body:nth-of-type(even) {
+    background-color: rgba(124, 207, 252, 0.451);
+    color: rgb(237, 237, 237);
+}
+.history-body:hover {
+    background-color: rgba(250, 196, 70, 0.83);
+    cursor: pointer;
+}
 .upcom-book {
     background-color: rgba(8, 254, 200, 0.774);
     color: #050801;
