@@ -180,64 +180,69 @@ function showBook(book) {
         rating.innerHTML = book.rating;
       }
     });
-
-  // // ! sorting
-  // document.addEventListener('click', event => {
-  //   let table, rows, switching, i, x, y, shouldSwitch;
-  //   const sortTar = event.target;
-  //   // which parameter will sort the table
-  //   const whichSort = sortTar.className;
-  //   table = document.getElementById("mainTable");
-  //   switching = true;
-  //   while (switching) {
-  //     switching = false;
-  //     rows = table.rows;
-  //     for (i = 1; i < (rows.length - 1); i++) {
-  //       shouldSwitch = false;
-  //       // * parameter determination
-  //       if (whichSort.includes('sortSigma')) {
-  //         x = rows[i].querySelector(".sigma-row").innerHTML;
-  //         y = rows[i + 1].querySelector(".sigma-row").innerHTML;
-  //       }
-  //       else if (whichSort.includes('sortChange')) {
-  //         x = rows[i].querySelector("#change-field").innerHTML;
-  //         y = rows[i + 1].querySelector("#change-field").innerHTML;
-  //       }
-  //       else if (whichSort.includes('sortDay')) {
-  //         x = rows[i].querySelector("#day-one").innerHTML;
-  //         y = rows[i + 1].querySelector("#day-one").innerHTML;
-  //       }
-
-  //       // * direction determination
-  //       if (whichSort.includes('Up')) {
-  //         if (parseFloat(x) < parseFloat(y)) {
-  //           shouldSwitch = true;
-  //           break;
-  //         }
-  //       }
-  //       else if (whichSort.includes('Down')) {
-  //         if (parseFloat(x) > parseFloat(y)) {
-  //           shouldSwitch = true;
-  //           break;
-  //         }
-  //       }
-
-  //     }
-  //     if (shouldSwitch) {
-  //       rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
-  //       switching = true;
-  //     }
-  //   }
-  //   // * switch class after sorting in main table
-  //   if (whichSort.includes('Up')) sortTar.classList.replace("Up", "Down");
-  //   else sortTar.classList.replace("Down", "Up");
-  // })
 }
+
+// ! sorting
+document.addEventListener("click", (event) => {
+  let table, rows, switching, i, x, y, shouldSwitch;
+  const sortTar = event.target;
+  // which cell will sort the table
+  const whichSort = sortTar.className;
+  const label = sortTar.parentElement.dataset.table;
+  table = document.querySelector(`.${label}-table`);
+
+  if (whichSort.includes("Up") || whichSort.includes("Down")) {
+    switching = true;
+    while (switching) {
+      switching = false;
+      rows = table.rows;
+
+      // delete all year rows from table
+      for (i = 0; i < rows.length - 1; i++) {
+        if (rows[i].cells[0].className.includes("yearRow")) {
+          rows[i].remove();
+        }
+      }
+
+      for (i = 0; i < rows.length - 1; i++) {
+        shouldSwitch = false;
+        // * parameter determination
+        // todo - get rid of hardcoding the number of cell
+        if (whichSort.includes("3")) {
+          x = rows[i].cells[3].innerHTML;
+          y = rows[i + 1].cells[3].innerHTML;
+        }
+
+        // * direction determination
+        if (whichSort.includes("Up")) {
+          if (x < y) {
+            shouldSwitch = true;
+            break;
+          }
+        } else if (whichSort.includes("Down")) {
+          if (x > y) {
+            shouldSwitch = true;
+            break;
+          }
+        }
+      }
+
+      if (shouldSwitch) {
+        rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+        switching = true;
+      }
+    }
+  }
+  // * switch class after sorting in main table
+  if (whichSort.includes("Up")) sortTar.classList.replace("Up", "Down");
+  else sortTar.classList.replace("Down", "Up");
+});
 
 function showHistory() {
   HideAll();
   document.querySelector("#history-view").style.display = "block";
   document.querySelector(".upcoming-book-container").style.display = "block";
+  document.querySelector(".history-table").innerHTML = "";
 
   let yearChange;
   fetch("allbooks/history")
@@ -251,6 +256,7 @@ function showHistory() {
           if (item.meeting_date.slice(0, 4) !== yearChange) {
             let CellList = createRow(item, "history");
             CellList[0].innerHTML = `<b>${yearChange}</b>`;
+            // add separator Year-row if new year has started
             for (let h = 0; h < CellList.length; h++) {
               CellList[h].classList.add("yearRow");
             }
@@ -457,6 +463,9 @@ function fillTableRow(item, where) {
   for (let i = 0; i < 6; i++) {
     try {
       CellList[i].className = "book2show";
+      if (item.upcoming) {
+        CellList[i].classList.add("upcom-book");
+      }
     } catch {}
   }
   let param = [item.title, item.author, item.year, item.country, item.pages];

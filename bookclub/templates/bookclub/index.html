@@ -78,13 +78,13 @@
                 <img src='static/bookclub/club2.png' style="width: 7vw; margin: 5px"></img>
                 <table>
                   <thead>
-                    <tr id='history-head' class="clas-head">
+                    <tr id='history-head' class="clas-head" data-table="history">
                         <th>Title</th>
                         <th>Author</th>
-                        <th>Year</th>
-                        <th>Country</th>
-                        <th>Pages</th>
-                        <th>Rating</th>
+                        <th class="2 Up">Year</th>
+                        <th class="3 Up">Country</th>
+                        <th class="4 Up">Pages</th>
+                        <th class="5 Up">Rating</th>
                     </tr>
                   </thead>
                   <tbody class="history-table">
@@ -92,7 +92,7 @@
                 </table>
               </div>
 
-              <table id="classicTable" class="hidden-table">
+              <table id="classicTable" data-table="clas">
                 <thead>
                     <tr class="clas-head">
                         <th >Book</th>
@@ -106,7 +106,7 @@
                 </tbody>
               </table>
 
-              <table id="modernTable">
+              <table id="modernTable" data-table="mod">
                 <thead>
                     <tr class="mod-head">
                         <th>Book</th>
