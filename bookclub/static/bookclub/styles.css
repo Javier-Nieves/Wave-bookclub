@@ -420,16 +420,16 @@ th, td {
     background-color: rgba(255, 38, 0, 0.4);
     color: whitesmoke;
 }
-.clas-body:nth-of-type(odd) {
+.classic-body:nth-of-type(odd) {
     background-color: rgba(236, 235, 235, 0.732);
     transition: transform 0.3s ease-in-out;
 }
-.clas-body:nth-of-type(even) {
+.classic-body:nth-of-type(even) {
     background-color: rgba(255, 85, 0, 0.3);
     transition: transform 0.3s ease-in-out;
     color: whitesmoke;
 }
-.clas-body:hover {
+.classic-body:hover {
     background-color: rgba(29, 238, 253, 0.3);
     box-shadow: 0 0 10px #fcfdf7;
     cursor: pointer;
@@ -440,17 +440,17 @@ th, td {
     color: #050801;
     box-shadow: 0 0 5px #03e9f4, 0 0 20px #03e9f4, 0 0 40px #03e9f4, 0 0 160px #03e9f4;
 }
-.mod-body:nth-of-type(odd) {
+.modern-body:nth-of-type(odd) {
     background-color: rgba(101, 100, 100, 0.5);
     color: #fefefe;
     filter: hue-rotate(110deg);
 }
-.mod-body:nth-of-type(even) {
+.modern-body:nth-of-type(even) {
     background-color: rgba(251, 36, 222, 0.35);
     color: #fefefe;
     filter: hue-rotate(270deg);
 }
-.mod-body:hover {
+.modern-body:hover {
     background-color: rgba(25, 62, 62, 0.83);
     cursor: pointer;
     box-shadow: 0 0 5px #f403c89b, 0 0 25px #27e7f8, 0 0 50px #03e9f4, 0 0 200px #03e9f4;

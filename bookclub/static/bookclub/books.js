@@ -490,7 +490,7 @@ function createRow(item, where) {
     Table = document.querySelector(".mod-table");
   }
   const row = Table.insertRow(0);
-  row.className = "table-row clas-body book2show";
+  row.className = `table-row ${where}-body book2show`;
   try {
     row.dataset.bookid = item.bookid;
   } catch {}
