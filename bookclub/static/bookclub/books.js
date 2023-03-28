@@ -79,7 +79,10 @@ document.addEventListener("DOMContentLoaded", function () {
     )
       .then((response) => response.json())
       .then((data) => {
-        showSearchResults(data);
+        console.log(data);
+        if (data.totalItems !== 0) {
+          showSearchResults(data);
+        } else loadScreen(false);
       });
   };
 
@@ -247,7 +250,7 @@ function showSearchResults(response) {
     }
     // creatig new row in table on 1st position
     let row = SearchTable.insertRow();
-    row.className = "table-row clas-body book2show";
+    row.className = "table-row classic-body book2show";
     row.dataset.bookid = item.id;
     let cell1 = row.insertCell(0);
     cell1.dataset.bookid = item.id;
@@ -289,7 +292,7 @@ function setStyle(style) {
 
 function showModal(action) {
   const close = document.querySelector(".close");
-  const modal = document.querySelector(`.modal`);
+  const modal = document.querySelector(".modal");
   modal.style.display = "block";
 
   document.querySelector(`#modal${action}`).style.display = "block";
@@ -486,7 +489,7 @@ function sortTable(table, whichSort) {
           y = rows[i + 1].cells[p].innerHTML;
         }
       }
-      // * direction determination
+      // * direction determination. 4 - is a number of "pages" column, which is sorted wrong otherwise..
       if (whichSort.includes("Up")) {
         if ((mem === 4 ? parseInt(x) : x) < (mem === 4 ? parseInt(y) : y)) {
           shouldSwitch = true;
@@ -507,7 +510,6 @@ function sortTable(table, whichSort) {
 }
 
 function deleteYearRows(rows) {
-  // delete all year rows from table
   for (let i = 0; i < rows.length - 1; i++) {
     if (rows[i].cells[0].className.includes("yearRow")) {
       rows[i].remove();
