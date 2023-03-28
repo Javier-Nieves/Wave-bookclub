@@ -19,7 +19,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
   document.addEventListener("click", (e) => {
     const tar = e.target;
-
     // ? get book id from data attribute in title div => show this book
     if (tar.className.includes("book2show")) {
       if (
@@ -79,7 +78,10 @@ document.addEventListener("DOMContentLoaded", function () {
     )
       .then((response) => response.json())
       .then((data) => {
-        showSearchResults(data);
+        console.log(data);
+        if (data.totalItems !== 0) {
+          showSearchResults(data);
+        } else loadScreen(false);
       });
   };
 
@@ -115,7 +117,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 function showBook(book) {
   // todo - show book from DB if it's already there
-  // todo - description and cover shouldn't stay old when new ones are absent
   HideAll();
   document.querySelector("#book-view").style.display = "flex";
   const title = document.querySelector(".view-title");
@@ -150,7 +151,7 @@ function showBook(book) {
 
       // * description:
       const fullText = volumeInfo.description || "no description available";
-      description.innerHTML = truncate(fullText, 3000);
+      description.innerHTML = fullText;
 
       // ? manage book view buttons
       fetch(`/check/${book.id}`)
@@ -184,56 +185,17 @@ function showBook(book) {
 
 // ! sorting
 document.addEventListener("click", (event) => {
-  let table, rows, switching, i, x, y, shouldSwitch;
   const sortTar = event.target;
-  // which cell will sort the table
   const whichSort = sortTar.className;
   const label = sortTar.parentElement.dataset.table;
-  table = document.querySelector(`.${label}-table`);
+  // which table will be sorted
+  let table = document.querySelector(`.${label}-table`);
 
   if (whichSort.includes("Up") || whichSort.includes("Down")) {
-    switching = true;
-    while (switching) {
-      switching = false;
-      rows = table.rows;
-
-      // delete all year rows from table
-      for (i = 0; i < rows.length - 1; i++) {
-        if (rows[i].cells[0].className.includes("yearRow")) {
-          rows[i].remove();
-        }
-      }
-
-      for (i = 0; i < rows.length - 1; i++) {
-        shouldSwitch = false;
-        // * parameter determination
-        // todo - get rid of hardcoding the number of cell
-        if (whichSort.includes("3")) {
-          x = rows[i].cells[3].innerHTML;
-          y = rows[i + 1].cells[3].innerHTML;
-        }
-
-        // * direction determination
-        if (whichSort.includes("Up")) {
-          if (x < y) {
-            shouldSwitch = true;
-            break;
-          }
-        } else if (whichSort.includes("Down")) {
-          if (x > y) {
-            shouldSwitch = true;
-            break;
-          }
-        }
-      }
-
-      if (shouldSwitch) {
-        rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
-        switching = true;
-      }
-    }
+    loadScreen(true);
+    sortTable(table, whichSort);
   }
-  // * switch class after sorting in main table
+  //  switch class after sorting table
   if (whichSort.includes("Up")) sortTar.classList.replace("Up", "Down");
   else sortTar.classList.replace("Down", "Up");
 });
@@ -270,8 +232,6 @@ function showHistory() {
 }
 
 function showSearchResults(response) {
-  // todo - don't show if no results to show
-  // todo - clean code
   HideAll();
   document.querySelector("#search-results").style.display = "block";
   const SearchTable = document.querySelector(".search-table");
@@ -287,7 +247,7 @@ function showSearchResults(response) {
     }
     // creatig new row in table on 1st position
     let row = SearchTable.insertRow();
-    row.className = "table-row clas-body book2show";
+    row.className = "table-row classic-body book2show";
     row.dataset.bookid = item.id;
     let cell1 = row.insertCell(0);
     cell1.dataset.bookid = item.id;
@@ -304,12 +264,6 @@ function showSearchResults(response) {
   loadScreen(false);
 }
 
-// ? -------------------------------------------------------------- helpers:
-function truncate(string, length) {
-  // conditional (ternary) operator is like If-Else statement. [condition ? (ifTrue); : (else);]
-  return string.length > length ? `${string.substr(0, length)}...` : string;
-}
-
 function setStyle(style) {
   const links = document.querySelectorAll(".link");
   const switchBtn = document.querySelector(".switch");
@@ -317,7 +271,7 @@ function setStyle(style) {
     classicTable.classList.add("hidden-table");
     modernTable.classList.remove("hidden-table");
     document.body.style.backgroundImage = "url('/static/bookclub/13.jpeg')";
-    switchBtn.style.backgroundImage = "url('/static/bookclub/Classic2.png')";
+    switchBtn.style.backgroundImage = "url('/static/bookclub/classic2.png')";
     links.forEach((item) => {
       item.classList.replace("brand", "brandNeon");
     });
@@ -335,7 +289,7 @@ function setStyle(style) {
 
 function showModal(action) {
   const close = document.querySelector(".close");
-  const modal = document.querySelector(`.modal`);
+  const modal = document.querySelector(".modal");
   modal.style.display = "block";
 
   document.querySelector(`#modal${action}`).style.display = "block";
@@ -484,10 +438,10 @@ function createRow(item, where) {
     Table = document.querySelector(".history-table");
   }
   if (where === "classic") {
-    Table = document.querySelector(".clas-table");
+    Table = document.querySelector(".classic-table");
   }
   if (where === "modern") {
-    Table = document.querySelector(".mod-table");
+    Table = document.querySelector(".modern-table");
   }
   const row = Table.insertRow(0);
   row.className = `table-row ${where}-body book2show`;
@@ -511,4 +465,52 @@ function loadScreen(bool) {
   const loadScreen = document.querySelector("#load-screen");
   if (bool) loadScreen.style.display = "block";
   else loadScreen.style.display = "none";
+}
+
+function sortTable(table, whichSort) {
+  let rows, switching, i, x, y, mem, shouldSwitch;
+  switching = true;
+  deleteYearRows(table.rows);
+
+  while (switching) {
+    switching = false;
+    rows = table.rows;
+
+    for (i = 0; i < rows.length - 1; i++) {
+      shouldSwitch = false;
+      // * sorting parameter determination
+      for (let p = 0; p < 6; p++) {
+        if (whichSort.includes(`${p}`)) {
+          mem = p;
+          x = rows[i].cells[p].innerHTML;
+          y = rows[i + 1].cells[p].innerHTML;
+        }
+      }
+      // * direction determination. 4 - is a number of "pages" column, which is sorted wrong otherwise..
+      if (whichSort.includes("Up")) {
+        if ((mem === 4 ? parseInt(x) : x) < (mem === 4 ? parseInt(y) : y)) {
+          shouldSwitch = true;
+          break;
+        }
+      } else if (whichSort.includes("Down")) {
+        if ((mem === 4 ? parseInt(x) : x) > (mem === 4 ? parseInt(y) : y)) {
+          shouldSwitch = true;
+          break;
+        }
+      }
+    }
+    if (shouldSwitch) {
+      rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+      switching = true;
+    }
+  }
+  loadScreen(false);
+}
+
+function deleteYearRows(rows) {
+  for (let i = 0; i < rows.length - 1; i++) {
+    if (rows[i].cells[0].className.includes("yearRow")) {
+      rows[i].remove();
+    }
+  }
 }
