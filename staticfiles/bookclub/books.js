@@ -271,7 +271,7 @@ function setStyle(style) {
     classicTable.classList.add("hidden-table");
     modernTable.classList.remove("hidden-table");
     document.body.style.backgroundImage = "url('/static/bookclub/13.jpeg')";
-    switchBtn.style.backgroundImage = "url('/static/bookclub/classic2.png')";
+    switchBtn.style.backgroundImage = "url('/static/bookclub/Classic2.png')";
     links.forEach((item) => {
       item.classList.replace("brand", "brandNeon");
     });
