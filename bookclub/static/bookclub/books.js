@@ -270,8 +270,8 @@ function setStyle(style) {
   if (style === "modern") {
     classicTable.classList.add("hidden-table");
     modernTable.classList.remove("hidden-table");
-    document.body.style.backgroundImage = "url('/static/bookclub/13.jpeg')";
-    switchBtn.style.backgroundImage = "url('/static/bookclub/Classic2.png')";
+    document.body.style.backgroundImage = '{% static "bookclub/13.jpeg" %}';
+    switchBtn.style.backgroundImage = '{% static "bookclub/classic2.png" %}'; // "url('/static/bookclub/classic2.png')";
     links.forEach((item) => {
       item.classList.replace("brand", "brandNeon");
     });
@@ -279,8 +279,8 @@ function setStyle(style) {
   if (style === "classic") {
     classicTable.classList.remove("hidden-table");
     modernTable.classList.add("hidden-table");
-    document.body.style.backgroundImage = "url('/static/bookclub/back2.jpeg')";
-    switchBtn.style.backgroundImage = "url('/static/bookclub/Modern2.png')";
+    document.body.style.backgroundImage = '{% static "bookclub/back2.jpeg" %}';
+    switchBtn.style.backgroundImage = '{% static "bookclub/Modern2.png" %}';
     links.forEach((item) => {
       item.classList.replace("brandNeon", "brand");
     });
