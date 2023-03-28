@@ -3,15 +3,13 @@ import os
 from dotenv import load_dotenv, find_dotenv
 import dj_database_url
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 load_dotenv(find_dotenv())
 SECRET_KEY = os.environ.get(
     'SECRET_KEY', default='django-insecure-tknr@dd+veaz=0w!axoi$_k56*4#=$bq7^l$sx4!*5t7-bw($)')
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ["*"]
 

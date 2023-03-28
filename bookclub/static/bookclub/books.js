@@ -19,7 +19,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
   document.addEventListener("click", (e) => {
     const tar = e.target;
-
     // ? get book id from data attribute in title div => show this book
     if (tar.className.includes("book2show")) {
       if (
@@ -118,7 +117,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 function showBook(book) {
   // todo - show book from DB if it's already there
-  // todo - description and cover shouldn't stay old when new ones are absent
   HideAll();
   document.querySelector("#book-view").style.display = "flex";
   const title = document.querySelector(".view-title");
@@ -194,6 +192,7 @@ document.addEventListener("click", (event) => {
   let table = document.querySelector(`.${label}-table`);
 
   if (whichSort.includes("Up") || whichSort.includes("Down")) {
+    loadScreen(true);
     sortTable(table, whichSort);
   }
   //  switch class after sorting table
@@ -233,8 +232,6 @@ function showHistory() {
 }
 
 function showSearchResults(response) {
-  // todo - don't show if no results to show
-  // todo - clean code
   HideAll();
   document.querySelector("#search-results").style.display = "block";
   const SearchTable = document.querySelector(".search-table");
@@ -507,6 +504,7 @@ function sortTable(table, whichSort) {
       switching = true;
     }
   }
+  loadScreen(false);
 }
 
 function deleteYearRows(rows) {
