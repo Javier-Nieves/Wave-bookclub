@@ -83,7 +83,6 @@ def all_books_view(request, field):
         old_books = Book.objects.all().order_by("meeting_date").all()
         return JsonResponse([old_book.serialize() for old_book in old_books], safe=False)
     elif field == 'all':
-        print(field)
         books = Book.objects.all().order_by('-year')
         return JsonResponse([book.serialize() for book in books], safe=False)
 

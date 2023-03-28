@@ -150,7 +150,7 @@ function showBook(book) {
 
       // * description:
       const fullText = volumeInfo.description || "no description available";
-      description.innerHTML = truncate(fullText, 3000);
+      description.innerHTML = fullText;
 
       // ? manage book view buttons
       fetch(`/check/${book.id}`)
@@ -184,56 +184,16 @@ function showBook(book) {
 
 // ! sorting
 document.addEventListener("click", (event) => {
-  let table, rows, switching, i, x, y, shouldSwitch;
   const sortTar = event.target;
-  // which cell will sort the table
   const whichSort = sortTar.className;
   const label = sortTar.parentElement.dataset.table;
-  table = document.querySelector(`.${label}-table`);
+  // which table will be sorted
+  let table = document.querySelector(`.${label}-table`);
 
   if (whichSort.includes("Up") || whichSort.includes("Down")) {
-    switching = true;
-    while (switching) {
-      switching = false;
-      rows = table.rows;
-
-      // delete all year rows from table
-      for (i = 0; i < rows.length - 1; i++) {
-        if (rows[i].cells[0].className.includes("yearRow")) {
-          rows[i].remove();
-        }
-      }
-
-      for (i = 0; i < rows.length - 1; i++) {
-        shouldSwitch = false;
-        // * parameter determination
-        // todo - get rid of hardcoding the number of cell
-        if (whichSort.includes("3")) {
-          x = rows[i].cells[3].innerHTML;
-          y = rows[i + 1].cells[3].innerHTML;
-        }
-
-        // * direction determination
-        if (whichSort.includes("Up")) {
-          if (x < y) {
-            shouldSwitch = true;
-            break;
-          }
-        } else if (whichSort.includes("Down")) {
-          if (x > y) {
-            shouldSwitch = true;
-            break;
-          }
-        }
-      }
-
-      if (shouldSwitch) {
-        rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
-        switching = true;
-      }
-    }
+    sortTable(table, whichSort);
   }
-  // * switch class after sorting in main table
+  //  switch class after sorting table
   if (whichSort.includes("Up")) sortTar.classList.replace("Up", "Down");
   else sortTar.classList.replace("Down", "Up");
 });
@@ -302,12 +262,6 @@ function showSearchResults(response) {
     cell3.innerHTML = `${item.volumeInfo.title}`;
   }
   loadScreen(false);
-}
-
-// ? -------------------------------------------------------------- helpers:
-function truncate(string, length) {
-  // conditional (ternary) operator is like If-Else statement. [condition ? (ifTrue); : (else);]
-  return string.length > length ? `${string.substr(0, length)}...` : string;
 }
 
 function setStyle(style) {
@@ -484,10 +438,10 @@ function createRow(item, where) {
     Table = document.querySelector(".history-table");
   }
   if (where === "classic") {
-    Table = document.querySelector(".clas-table");
+    Table = document.querySelector(".classic-table");
   }
   if (where === "modern") {
-    Table = document.querySelector(".mod-table");
+    Table = document.querySelector(".modern-table");
   }
   const row = Table.insertRow(0);
   row.className = `table-row ${where}-body book2show`;
@@ -511,4 +465,52 @@ function loadScreen(bool) {
   const loadScreen = document.querySelector("#load-screen");
   if (bool) loadScreen.style.display = "block";
   else loadScreen.style.display = "none";
+}
+
+function sortTable(table, whichSort) {
+  let rows, switching, i, x, y, mem, shouldSwitch;
+  switching = true;
+  deleteYearRows(table.rows);
+
+  while (switching) {
+    switching = false;
+    rows = table.rows;
+
+    for (i = 0; i < rows.length - 1; i++) {
+      shouldSwitch = false;
+      // * sorting parameter determination
+      for (let p = 0; p < 6; p++) {
+        if (whichSort.includes(`${p}`)) {
+          mem = p;
+          x = rows[i].cells[p].innerHTML;
+          y = rows[i + 1].cells[p].innerHTML;
+        }
+      }
+      // * direction determination
+      if (whichSort.includes("Up")) {
+        if ((mem === 4 ? parseInt(x) : x) < (mem === 4 ? parseInt(y) : y)) {
+          shouldSwitch = true;
+          break;
+        }
+      } else if (whichSort.includes("Down")) {
+        if ((mem === 4 ? parseInt(x) : x) > (mem === 4 ? parseInt(y) : y)) {
+          shouldSwitch = true;
+          break;
+        }
+      }
+    }
+    if (shouldSwitch) {
+      rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+      switching = true;
+    }
+  }
+}
+
+function deleteYearRows(rows) {
+  // delete all year rows from table
+  for (let i = 0; i < rows.length - 1; i++) {
+    if (rows[i].cells[0].className.includes("yearRow")) {
+      rows[i].remove();
+    }
+  }
 }
