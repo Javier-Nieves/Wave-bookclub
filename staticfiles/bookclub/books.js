@@ -118,68 +118,79 @@ function showBook(book) {
   // todo - show book from DB if it's already there
   HideAll();
   document.querySelector("#book-view").style.display = "flex";
+  const rating = document.querySelector(".view-rating");
+
+  fetch(`/check/${book}`)
+    .then((response) => response.json())
+    .then((response) => {
+      if (response.year !== undefined) {
+        // if DB entry for the book already exists - show data
+        fillData(response, "DB");
+      } else {
+        // if book isn't already in the DB - send API to get data
+        fillData(book, "API");
+      }
+
+      // manage buttons on page
+      if (response.year !== undefined) {
+        if (response.rating) {
+          rating.style.display = "block";
+          rating.innerHTML = response.rating;
+        }
+        if (response.upcoming) {
+          displayButtons(response, "rate");
+        } else if (response.read) {
+          displayButtons();
+        } else {
+          displayButtons(response, "remove");
+        }
+      } else {
+        displayButtons(response, "add");
+      }
+      loadScreen(false);
+    });
+}
+
+function fillData(book, source) {
   const title = document.querySelector(".view-title");
   const author = document.querySelector(".view-author");
   const description = document.querySelector(".view-desc");
   const image = document.querySelector(".view-image");
   const control = document.querySelector(".control-group");
   const pages = document.querySelector(".view-pages");
-  const rating = document.querySelector(".view-rating");
-
-  fetch(`https://www.googleapis.com/books/v1/volumes/${book}`)
-    .then((response) => response.json())
-    .then((book) => {
-      const volumeInfo = book.volumeInfo;
-
-      title.innerHTML = volumeInfo.title || "no title";
-      title.dataset.bookid = book.id;
-      // todo - place for improvement:
-      author.innerHTML = "no author";
-      try {
-        author.innerHTML = volumeInfo.authors[0];
-      } catch {}
-      pages.innerHTML = `Page count: ${volumeInfo.pageCount}` || "no pages";
-
-      // * image for book cover
-      let imgUrl = "static/bookclub/club2.png";
-      try {
-        imgUrl = volumeInfo.imageLinks.thumbnail;
-      } catch {}
-      control.style.display = "flex";
-      image.src = imgUrl;
-
-      // * description:
-      const fullText = volumeInfo.description || "no description available";
-      description.innerHTML = fullText;
-
-      // ? manage book view buttons
-      fetch(`/check/${book.id}`)
-        .then((response) => response.json())
-        .then((response) => {
-          // if book is in the DB is has Year
-          if (response.year !== null) {
-            if (response.upcoming) {
-              displayButtons(response, "rate");
-            } else if (response.read) {
-              displayButtons();
-            } else {
-              displayButtons(response, "remove");
-            }
-          } else {
-            displayButtons(response, "add");
-          }
-          loadScreen(false);
-        });
-    });
-
-  fetch(`check/${book}`)
-    .then((response) => response.json())
-    .then((book) => {
-      if (book.rating) {
-        rating.style.display = "block";
-        rating.innerHTML = book.rating;
-      }
-    });
+  if (source === "DB") {
+    control.style.display = "flex";
+    title.innerHTML = book.title;
+    author.innerHTML = book.author;
+    pages.innerHTML = `Page count: ${book.pages}`;
+    description.innerHTML = book.desc;
+    image.src = book.image_link;
+  }
+  if (source === "API") {
+    fetch(`https://www.googleapis.com/books/v1/volumes/${book}`)
+      .then((response) => response.json())
+      .then((book) => {
+        const volumeInfo = book.volumeInfo;
+        title.innerHTML = volumeInfo.title || "no title";
+        title.dataset.bookid = book.id;
+        // todo - place for improvement:
+        author.innerHTML = "no author";
+        try {
+          author.innerHTML = volumeInfo.authors[0];
+        } catch {}
+        pages.innerHTML = `Page count: ${volumeInfo.pageCount}` || "no pages";
+        // * image for book cover
+        let imgUrl = "static/bookclub/club2.png";
+        try {
+          imgUrl = volumeInfo.imageLinks.thumbnail;
+        } catch {}
+        control.style.display = "flex";
+        image.src = imgUrl;
+        // * description:
+        const fullText = volumeInfo.description || "no description available";
+        description.innerHTML = fullText;
+      });
+  }
 }
 
 // ! sorting
@@ -348,7 +359,6 @@ function bookAction(book2change, action) {
           pages: pages,
         }),
       });
-      // fetch(`/add/${book2change}/${year}/${country}`);
     }
     if (action === "remove") {
       fetch(`/${action}/${book2change}`);

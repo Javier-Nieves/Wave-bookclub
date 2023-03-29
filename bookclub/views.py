@@ -39,9 +39,7 @@ def book_check(request, bookid):
         check_book = Book.objects.get(bookid=bookid)
         return JsonResponse(check_book.serialize(), status=200)
     except:
-        return JsonResponse({
-            "year": None
-        }, status=200)
+        return JsonResponse({'message': 'not in DB'}, status=200)
 
 
 def all_books_view(request, field):
