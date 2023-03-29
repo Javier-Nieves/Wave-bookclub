@@ -78,7 +78,6 @@ document.addEventListener("DOMContentLoaded", function () {
     )
       .then((response) => response.json())
       .then((data) => {
-        console.log(data);
         if (data.totalItems !== 0) {
           showSearchResults(data);
         } else loadScreen(false);
@@ -185,9 +184,12 @@ function showBook(book) {
 
 // ! sorting
 document.addEventListener("click", (event) => {
+  let label;
   const sortTar = event.target;
   const whichSort = sortTar.className;
-  const label = sortTar.parentElement.dataset.table;
+  try {
+    label = sortTar.parentElement.dataset.table;
+  } catch {}
   // which table will be sorted
   let table = document.querySelector(`.${label}-table`);
 
@@ -327,22 +329,39 @@ function bookAction(book2change, action) {
     if (action === "add") {
       const year = document.querySelector("#year-input").value;
       const country = document.querySelector("#country-input").value;
-      fetch(`/add/${book2change}/${year}/${country}`);
+      const title = document.querySelector(".view-title").innerHTML;
+      const author = document.querySelector(".view-author").innerHTML;
+      const desc = document.querySelector(".view-desc").innerHTML;
+      const image = document.querySelector(".view-image").src;
+      let pages = document.querySelector(".view-pages").innerHTML;
+      pages = pages.replace(/[^0-9]/g, "");
+
+      fetch(`/add/${book2change}`, {
+        method: "POST",
+        body: JSON.stringify({
+          year: year,
+          country: country,
+          title: title,
+          author: author,
+          desc: desc,
+          image: image,
+          pages: pages,
+        }),
+      });
+      // fetch(`/add/${book2change}/${year}/${country}`);
     }
     if (action === "remove") {
       fetch(`/${action}/${book2change}`);
     }
     if (action === "rate") {
       const rating = document.querySelector("#rating-input").value;
-      fetch(`/${action}/${book2change}/${rating}`);
+      makeChange2Book(book2change, "rate", rating);
+      // fetch(`/${action}/${book2change}/${rating}`);
     }
     if (action === "next") {
       makeChange2Book(book2change, "next");
     }
-    setTimeout(function () {
-      // give 0.5 s to Python to think about it
-      window.location.reload();
-    }, 500);
+    waitNreload();
   };
 }
 
@@ -375,7 +394,7 @@ function displayButtons(response, ...buttons) {
   }
 }
 
-function makeChange2Book(bookid, action) {
+function makeChange2Book(bookid, action, rating) {
   // create meeting date
   if (action === "meeting") {
     const meetingBtn = document.querySelector(".meetingBtn");
@@ -392,12 +411,11 @@ function makeChange2Book(bookid, action) {
             meeting_date: date,
           }),
         });
-        setTimeout(function () {
-          window.location.reload();
-        }, 500);
+        waitNreload();
       };
     });
   }
+
   // make book the next one in reading list
   if (action === "next") {
     fetch(`/edit/${bookid}`, {
@@ -406,9 +424,17 @@ function makeChange2Book(bookid, action) {
         next: true,
       }),
     });
-    setTimeout(function () {
-      window.location.reload();
-    }, 500);
+    waitNreload();
+  }
+
+  if (action === "rate") {
+    fetch(`/edit/${bookid}`, {
+      method: "PUT",
+      body: JSON.stringify({
+        rating: rating,
+      }),
+    });
+    waitNreload();
   }
 }
 
@@ -513,4 +539,10 @@ function deleteYearRows(rows) {
       rows[i].remove();
     }
   }
+}
+
+function waitNreload() {
+  setTimeout(function () {
+    window.location.reload();
+  }, 500);
 }

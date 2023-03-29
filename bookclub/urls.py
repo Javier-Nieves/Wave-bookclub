@@ -7,11 +7,9 @@ urlpatterns = [
     path("", views.index, name="index"),
 
     # API Routes
-    path("add/<str:bookid>/<int:year>/<str:country>",
-         views.add_book, name="to reading list"),
+    path("add/<str:bookid>",
+         views.add_book, name="to reading list"),  # /<int:year>/<str:country>
     path("remove/<str:bookid>", views.remove_book, name="remove book"),
-    path("rate/<str:bookid>/<str:rating>",
-         views.rate_book, name="rate book"),
     path('check/<str:bookid>', views.book_check, name='book check'),
     path('allbooks/<str:field>', views.all_books_view, name='all books'),
     path("edit/<str:bookid>",
