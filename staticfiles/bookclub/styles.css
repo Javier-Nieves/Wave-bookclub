@@ -1,3 +1,4 @@
+
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
   -webkit-appearance: none;
@@ -73,7 +74,6 @@ h2 {
     0 0 4px #fff,
     0 0 11px #fff;
     font-size: 30px;
-    /* font-family: 'Snell Roundhand', sans-serif; */
     font-family: cursive, sans-serif;
     color: rgba(252, 249, 252, 0.802);
 }
@@ -441,17 +441,17 @@ th, td {
     box-shadow: 0 0 5px #03e9f4, 0 0 20px #03e9f4, 0 0 40px #03e9f4, 0 0 160px #03e9f4;
 }
 .modern-body:nth-of-type(odd) {
-    background-color: rgba(101, 100, 100, 0.5);
+    background-color: #65646480;
     color: #fefefe;
     filter: hue-rotate(110deg);
 }
 .modern-body:nth-of-type(even) {
-    background-color: rgba(251, 36, 222, 0.35);
+    background-color: #fb24de59;
     color: #fefefe;
     filter: hue-rotate(270deg);
 }
 .modern-body:hover {
-    background-color: rgba(25, 62, 62, 0.83);
+    background-color: #193e3ed4;
     cursor: pointer;
     box-shadow: 0 0 5px #f403c89b, 0 0 25px #27e7f8, 0 0 50px #03e9f4, 0 0 200px #03e9f4;
     text-shadow:
@@ -492,4 +492,36 @@ th, td {
 }
 .Up:hover, .Down:hover {
     cursor: pointer;
+}
+
+@media screen and (max-width: 800px) {
+
+#main-view {
+    flex-direction: column;
+    gap: 10px;
+}
+.main-left-part, .main-right-part {
+    width: 100%;
+}
+.searchField {
+    width: 40vw;
+}
+.searchBtn {
+    width: 20vw;
+}
+.upcoming-book-container {
+    width: 80vw;
+}
+#upcoming-pic {
+    width: 30vw;
+}
+.switch{
+    margin: 10px;
+    width: 26vw;
+    height: 23vw;
+}
+.cl3, .cl4 {
+display: none;
+}
+
 }

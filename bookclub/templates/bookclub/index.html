@@ -4,6 +4,7 @@
 <html lang="en">
     <head>
         <title>Wave Bookclub</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
         <link href="{% static 'bookclub/styles.css' %}" rel="stylesheet">
         <link href="{% static 'bookclub/favicon.ico' %}" rel="icon">
         <script src="{% static 'bookclub/books.js' %}"></script>
@@ -79,12 +80,12 @@
                 <table>
                   <thead>
                     <tr id='history-head' class="history-head" data-table="history">
-                        <th class="0 Up">Title</th>
-                        <th class="1 Up">Author</th>
-                        <th class="2 Up">Year</th>
-                        <th class="3 Up">Country</th>
-                        <th class="4 Up">Pages</th>
-                        <th class="5 Up">Rating</th>
+                        <th class="cl0 Up">Title</th>
+                        <th class="cl1 Up">Author</th>
+                        <th class="cl2 Up">Year</th>
+                        <th class="cl3 Up">Country</th>
+                        <th class="cl4 Up">Pages</th>
+                        <th class="cl5 Up">Rating</th>
                     </tr>
                   </thead>
                   <tbody class="history-table">
@@ -97,9 +98,9 @@
                     <tr class="clas-head" data-table="classic">
                         <th>Book</th>
                         <th>Author</th>
-                        <th class="2 Up">Year</th>
-                        <th class="3 Up">Country</th>
-                        <th class="4 Up">Pages</th>
+                        <th class="cl2 Up">Year</th>
+                        <th class="cl3 Up">Country</th>
+                        <th class="cl4 Up">Pages</th>
                     </tr>
                 </thead>
                 <tbody class="classic-table">
@@ -111,9 +112,9 @@
                     <tr class="mod-head" data-table="modern">
                         <th>Book</th>
                         <th>Author</th>
-                        <th class="2 Up">Year</th>
-                        <th class="3 Up">Country</th>
-                        <th class="4 Up">Pages</th>
+                        <th class="cl2 Up">Year</th>
+                        <th class="cl3 Up">Country</th>
+                        <th class="cl4 Up">Pages</th>
                     </tr>
                 </thead>
                 <tbody class="modern-table">

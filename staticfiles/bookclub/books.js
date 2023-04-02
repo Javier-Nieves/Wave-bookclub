@@ -452,7 +452,7 @@ function fillTableRow(item, where) {
   let CellList = createRow(item, `${where}`);
   for (let i = 0; i < 6; i++) {
     try {
-      CellList[i].className = "book2show";
+      CellList[i].className = `cl${i} book2show`;
       if (item.upcoming) {
         CellList[i].classList.add("upcom-book");
       }
@@ -516,7 +516,7 @@ function sortTable(table, whichSort) {
       shouldSwitch = false;
       // * sorting parameter determination
       for (let p = 0; p < 6; p++) {
-        if (whichSort.includes(`${p}`)) {
+        if (whichSort.includes(`cl${p}`)) {
           mem = p;
           x = rows[i].cells[p].innerHTML;
           y = rows[i + 1].cells[p].innerHTML;
