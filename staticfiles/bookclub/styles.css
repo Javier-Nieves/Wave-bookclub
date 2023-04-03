@@ -501,7 +501,10 @@ th, td {
     gap: 10px;
 }
 .main-left-part, .main-right-part {
-    width: 100%;
+    width: 98%;
+}
+.main-right-part {
+    margin: 5px;
 }
 .searchField {
     width: 40vw;
@@ -520,8 +523,16 @@ th, td {
     width: 26vw;
     height: 23vw;
 }
-.cl3, .cl4 {
+.cl3, .cl4, .yearRow {
 display: none;
 }
-
+.load-screen-gif {
+    width: 45vw;
+}
+.modal-content {
+    width: 50%;
+}
+.view-image {
+    width: 25vw;
+}
 }
