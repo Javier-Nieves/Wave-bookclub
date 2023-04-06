@@ -10,6 +10,7 @@
         <script src="{% static 'bookclub/books.js' %}"></script>
     </head>
     <body>
+      <button class="enter-btn">Enter your Bookclub</button>
           <div id="main-view">
             <div class="main-left-part">
               <div class="navbar">
@@ -18,8 +19,10 @@
               </div>
 
               <div id="search-field-container">
-                <input type="text" class="searchField" placeholder="Search for books">
-                <button class="searchBtn">Search</button>
+                <form class="search-form">
+                  <input type="text" class="searchField" placeholder="Search for books">
+                  <button class="searchBtn">Search</button>
+                </form>
               </div>
 
               <div class="upcoming-book-container book2show" data-isclassic= "{{up_book.year}}" 
@@ -135,41 +138,54 @@
                   </div>
                   <div class="view-desc"></div>
                 </div>
+              </div>
 
-                <div class="modal">
-                  <div class="modal-content">
-                    <span class="close">&times;</span>
+            </div>
+          </div>
 
-                    <div id="modaladd">
-                      <h2 class="modal-text">Additional information:</h2>
-                      <form class="modal-form-add">
-                        <div>
-                          <input type="number" class="searchField" id="year-input" placeholder="Year of publication" autofocus required>
-                          <input type="text" class="searchField" id="country-input" placeholder="Country" required>
-                        </div>
-                        <input type="submit" class="modal-btn" value="Add">
-                      </form>
-                    </div>
+          <div class="modal">
+            <div class="modal-content">
+              <span class="close">&times;</span>
 
-                    <div id="modalremove">
-                      <h2 class="modal-text">Remove book from reading list?</h2>
-                      <form class="modal-form-remove">
-                        <input type="submit" class="modal-btn" value="Remove">
-                      </form>
-                    </div>
-
-                    <div id="modalrate">
-                      <h2 class="modal-text">How good was this book?</h2>
-                      <form class="modal-form-rate">
-                        <input type="number" class="searchField rateField" id="rating-input" placeholder="Rating" min="0" max="10" step="0.1" autofocus required>
-                        <input type="submit" class="searchBtn goodBtn" value="Rate">
-                      </form>
-                    </div>
+              <div id="modalenter">
+                <h2 class="modal-text">Your bookclub:</h2>
+                <form class="modal-form-enter">
+                  <div>
+                    <input type="text" class="searchField" id="club-name" placeholder="Club Name" autofocus required>
+                    <input type="password" class="searchField" id="club-password" placeholder="Password" required>
                   </div>
-                </div>
+                  <input type="submit" class="modal-btn" value="Enter">
+                </form>
+              </div>
+
+              <div id="modaladd">
+                <h2 class="modal-text">Additional information:</h2>
+                <form class="modal-form-add">
+                  <div>
+                    <input type="number" class="searchField" id="year-input" placeholder="Year of publication" autofocus required>
+                    <input type="text" class="searchField" id="country-input" placeholder="Country" required>
+                  </div>
+                  <input type="submit" class="modal-btn" value="Add">
+                </form>
+              </div>
+
+              <div id="modalremove">
+                <h2 class="modal-text">Remove book from reading list?</h2>
+                <form class="modal-form-remove">
+                  <input type="submit" class="modal-btn" value="Remove">
+                </form>
+              </div>
+
+              <div id="modalrate">
+                <h2 class="modal-text">How good was this book?</h2>
+                <form class="modal-form-rate">
+                  <input type="number" class="searchField rateField" id="rating-input" placeholder="Rating" min="0" max="10" step="0.1" autofocus required>
+                  <input type="submit" class="searchBtn goodBtn" value="Rate">
+                </form>
               </div>
             </div>
           </div>
+
           <div class='modal' id="load-screen">
             <img src='static/bookclub/gif4.gif' class="load-screen-gif"></img>
           </div>

@@ -211,7 +211,7 @@ h2 {
 .small-pic {
     width: 3vw;
 }
-.searchBtn, .add-btn, .remove-btn, .rate-btn, .meetingBtn, .modal-btn, .next-btn {
+.searchBtn, .add-btn, .remove-btn, .rate-btn, .meetingBtn, .modal-btn, .next-btn, .enter-btn {
     color: rgba(201, 201, 201, 0.94);
     font-size: 18px;
     font-family: didot;
@@ -257,6 +257,13 @@ h2 {
     font-size: 21px;
     margin-right: 15px;
 }
+.enter-btn {
+    position: absolute;
+    right: 2vw;
+    top: 2vh;
+    border: 1px solid yellow;
+    transition: transform 0.5s ease-in-out;
+}
 .rate-btn:hover, .next-btn {
     transform: scale(1.1);
     cursor: pointer;
@@ -271,7 +278,16 @@ h2 {
     background-color: rgba(5, 8, 1, 0.91);
     box-shadow: 0 0 55px #f9f9f9d2;
     transform: scale(1.1);
+    cursor: pointer;
 }
+.enter-btn:hover  {
+    background-color: rgba(254, 236, 39, 0.806);
+    box-shadow: 0 0 55px #f9f9f9d2;
+    transform: scale(1.1);
+    color: #050801;
+    cursor: pointer;
+}
+
 
 /* ? book view */
 #book-view {
@@ -361,11 +377,12 @@ h2 {
     width: 25vw;
     margin: 20vh 38vw;
   }
-  #modaladd, #modalremove, #modalrate {
+  #modaladd, #modalremove, #modalrate, #modalenter {
     display: none;
   }
   .modal-text {
     font-family: Didot, sans-serif;
+    text-align: center;
     color: whitesmoke;
   }
   .close {

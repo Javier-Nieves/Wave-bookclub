@@ -70,20 +70,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // ! search for the book
   // todo - add search by title and author
-  document.querySelector(".searchBtn").onclick = () => {
+  document.querySelector(".search-form").onsubmit = (e) => {
+    e.preventDefault();
     loadScreen(true);
-    let title = document.querySelector(".searchField").value;
-    fetch(
-      `https://www.googleapis.com/books/v1/volumes?q=+intitle:${title}&maxResults=20`
-    )
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.totalItems !== 0) {
-          showSearchResults(data);
-        } else loadScreen(false);
-      });
+    searchBook();
   };
 
+  // ! Enter to your bookclub
+  document.querySelector(".enter-btn").onclick = () => {
+    const book2change = document.querySelector(".view-title").dataset.bookid;
+    console.log(book2change);
+    bookAction(book2change, "enter");
+  };
   // ! add book to the reading list
   document.querySelector(".add-btn").onclick = () => {
     const book2change = document.querySelector(".view-title").dataset.bookid;
@@ -161,6 +159,7 @@ function fillData(book, source) {
   if (source === "DB") {
     control.style.display = "flex";
     title.innerHTML = book.title;
+    title.dataset.bookid = book.bookid;
     author.innerHTML = book.author;
     pages.innerHTML = `Page count: ${book.pages}`;
     description.innerHTML = book.desc;
@@ -301,6 +300,7 @@ function setStyle(style) {
 }
 
 function showModal(action) {
+  console.log(action, "showModal");
   const close = document.querySelector(".close");
   const modal = document.querySelector(".modal");
   modal.style.display = "block";
@@ -541,6 +541,19 @@ function sortTable(table, whichSort) {
     }
   }
   loadScreen(false);
+}
+
+function searchBook() {
+  let title = document.querySelector(".searchField").value;
+  fetch(
+    `https://www.googleapis.com/books/v1/volumes?q=+intitle:${title}&maxResults=20`
+  )
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.totalItems !== 0) {
+        showSearchResults(data);
+      } else loadScreen(false);
+    });
 }
 
 function deleteYearRows(rows) {
