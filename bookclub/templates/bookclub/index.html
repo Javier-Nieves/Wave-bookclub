@@ -14,8 +14,8 @@
           <div id="main-view">
             <div class="main-left-part">
               <div class="navbar">
-                <a class="link brandNeon" href="{% url 'index' %}">Reading List</a>
-                <button id='history-link' class="link brandNeon" href="javascript:;">History</button>
+                <button id='reading-link' class="link brandNeon">Reading List</button>
+                <button id='history-link' class="link brandNeon">History</button>
               </div>
 
               <div id="search-field-container">
@@ -188,6 +188,10 @@
 
           <div class='modal' id="load-screen">
             <img src='static/bookclub/gif4.gif' class="load-screen-gif"></img>
+          </div>
+
+          <div class='modal' id="modalmessage">
+            <div class="message-text"></div>
           </div>
 </body>
 </html>

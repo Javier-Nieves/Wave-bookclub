@@ -2,20 +2,12 @@
 let today = new Date().toISOString().slice(0, 4);
 
 document.addEventListener("DOMContentLoaded", function () {
+  // todo - reading list to main page w\o reload
   // ! put all books in the tables
-  loadScreen(true);
-  fetch("allbooks/all")
-    .then((response) => response.json())
-    .then((books) => {
-      books.forEach((book) => {
-        if (book.year <= today - 50 && !book.read) {
-          fillTableRow(book, "classic");
-        } else if (book.year > today - 50 && !book.read) {
-          fillTableRow(book, "modern");
-        }
-      });
-      loadScreen(false);
-    });
+  const switchBtn = document.querySelector(".switch");
+  const classicTable = document.querySelector("#classicTable");
+  const modernTable = document.querySelector("#modernTable");
+  showAllBooks();
 
   document.addEventListener("click", (e) => {
     const tar = e.target;
@@ -33,26 +25,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-  // ! What's the next book? Set page style accordingly
-  // today gives year:
-  let isClassic =
-    document.querySelector(".upcoming-book-container").dataset.isclassic <
-    today - 50;
-  if (isClassic) {
-    setStyle("modern");
-  } else {
-    setStyle("classic");
-  }
-
   // ! Switch classic and modern tables and styles
-  const switchBtn = document.querySelector(".switch");
-  const classicTable = document.querySelector("#classicTable");
-  const modernTable = document.querySelector("#modernTable");
   switchBtn.onclick = () => {
-    classicTable.classList.toggle("hidden-table");
-    modernTable.classList.toggle("hidden-table");
-    // for Modern view:
-    if (classicTable.classList.contains("hidden-table")) {
+    if (classicTable.style.display !== "none") {
       setStyle("modern");
     } else {
       setStyle("classic");
@@ -76,10 +51,9 @@ document.addEventListener("DOMContentLoaded", function () {
     searchBook();
   };
 
-  // ! Enter to your bookclub
+  // ! Enter your bookclub
   document.querySelector(".enter-btn").onclick = () => {
     const book2change = document.querySelector(".view-title").dataset.bookid;
-    console.log(book2change);
     bookAction(book2change, "enter");
   };
   // ! add book to the reading list
@@ -103,6 +77,11 @@ document.addEventListener("DOMContentLoaded", function () {
     makeChange2Book(book2change, "next");
   };
 
+  // ! Show reading list
+  const readLink = document.querySelector("#reading-link");
+  readLink.onclick = () => {
+    showAllBooks();
+  };
   // ! Show history
   const histLink = document.querySelector("#history-link");
   histLink.onclick = () => {
@@ -111,6 +90,41 @@ document.addEventListener("DOMContentLoaded", function () {
     showHistory();
   };
 });
+
+function showAllBooks() {
+  HideAll();
+  loadScreen(true);
+  document.querySelector(".classic-table").innerHTML = "";
+  document.querySelector(".modern-table").innerHTML = "";
+  document.querySelector(".upcoming-book-container").style.display = "block";
+
+  fetch("allbooks/all")
+    .then((response) => response.json())
+    .then((books) => {
+      books.forEach((book) => {
+        if (book.year <= today - 50 && !book.read) {
+          fillTableRow(book, "classic");
+        } else if (book.year > today - 50 && !book.read) {
+          fillTableRow(book, "modern");
+        }
+      });
+      loadScreen(false);
+    });
+  // ! What's the next book? Set page style accordingly
+  // today gives year
+  let isClassic;
+  // todo - check this catch. what if there isn't a new book?
+  try {
+    isClassic =
+      document.querySelector(".upcoming-book-container").dataset.isclassic <
+      today - 50;
+  } catch {}
+  if (isClassic) {
+    setStyle("modern");
+  } else {
+    setStyle("classic");
+  }
+}
 
 function showBook(book) {
   // todo - show book from DB if it's already there
@@ -279,9 +293,10 @@ function showSearchResults(response) {
 function setStyle(style) {
   const links = document.querySelectorAll(".link");
   const switchBtn = document.querySelector(".switch");
+  switchBtn.style.display = "block";
   if (style === "modern") {
-    classicTable.classList.add("hidden-table");
-    modernTable.classList.remove("hidden-table");
+    classicTable.style.display = "none";
+    modernTable.style.display = "block";
     document.body.style.backgroundImage = 'URL("/static/bookclub/13.jpeg")';
     switchBtn.style.backgroundImage = 'URL("/static/bookclub/classic2.png")';
     links.forEach((item) => {
@@ -289,8 +304,8 @@ function setStyle(style) {
     });
   }
   if (style === "classic") {
-    classicTable.classList.remove("hidden-table");
-    modernTable.classList.add("hidden-table");
+    classicTable.style.display = "block";
+    modernTable.style.display = "none";
     document.body.style.backgroundImage = 'URL("/static/bookclub/back2.jpeg")';
     switchBtn.style.backgroundImage = 'URL("/static/bookclub/Modern2.png")';
     links.forEach((item) => {
@@ -300,7 +315,6 @@ function setStyle(style) {
 }
 
 function showModal(action) {
-  console.log(action, "showModal");
   const close = document.querySelector(".close");
   const modal = document.querySelector(".modal");
   modal.style.display = "block";
@@ -333,6 +347,7 @@ function HideAll() {
 }
 
 function bookAction(book2change, action) {
+  let message;
   let form = document.querySelector(`.modal-form-${action}`);
   showModal(`${action}`);
   form.onsubmit = (e) => {
@@ -345,6 +360,7 @@ function bookAction(book2change, action) {
       const desc = document.querySelector(".view-desc").innerHTML;
       const image = document.querySelector(".view-image").src;
       let pages = document.querySelector(".view-pages").innerHTML;
+      // figure out
       pages = pages.replace(/[^0-9]/g, "");
 
       fetch(`/add/${book2change}`, {
@@ -359,19 +375,22 @@ function bookAction(book2change, action) {
           pages: pages,
         }),
       });
+      message = "Book added";
     }
     if (action === "remove") {
       fetch(`/${action}/${book2change}`);
+      message = "Book removed";
     }
     if (action === "rate") {
       const rating = document.querySelector("#rating-input").value;
       makeChange2Book(book2change, "rate", rating);
-      // fetch(`/${action}/${book2change}/${rating}`);
+      message = "reload";
     }
     if (action === "next") {
       makeChange2Book(book2change, "next");
+      message = "reload";
     }
-    waitNreload();
+    waitNreload(message);
   };
 }
 
@@ -421,12 +440,10 @@ function makeChange2Book(bookid, action, rating) {
             meeting_date: date,
           }),
         });
-        waitNreload();
       };
     });
   }
 
-  // make book the next one in reading list
   if (action === "next") {
     fetch(`/edit/${bookid}`, {
       method: "PUT",
@@ -434,7 +451,6 @@ function makeChange2Book(bookid, action, rating) {
         next: true,
       }),
     });
-    waitNreload();
   }
 
   if (action === "rate") {
@@ -444,7 +460,6 @@ function makeChange2Book(bookid, action, rating) {
         rating: rating,
       }),
     });
-    waitNreload();
   }
 }
 
@@ -564,8 +579,27 @@ function deleteYearRows(rows) {
   }
 }
 
-function waitNreload() {
-  setTimeout(function () {
-    window.location.reload();
-  }, 500);
+function waitNreload(message) {
+  if (message == "reload") {
+    document.querySelector("#modalmessage").style.display = "flex";
+    document.querySelector(".message-text").innerHTML = "Book is read";
+    setTimeout(function () {
+      window.location.reload();
+    }, 1000);
+    return;
+  }
+  //todo - ratebook works bad still and next btn doesn't update page
+  setTimeout(showAllBooks, 700);
+  document.querySelector("#modalmessage").style.display = "flex";
+  document.querySelector(".message-text").innerHTML = message;
+  setTimeout(hideModals, 1000);
+}
+
+function hideModals() {
+  document.querySelector(".modal").style.display = "none";
+  document.querySelector("#modalenter").style.display = "none";
+  document.querySelector("#modaladd").style.display = "none";
+  document.querySelector("#modalremove").style.display = "none";
+  document.querySelector("#modalrate").style.display = "none";
+  document.querySelector("#modalmessage").style.display = "none";
 }

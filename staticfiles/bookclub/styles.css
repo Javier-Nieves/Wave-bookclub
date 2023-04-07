@@ -264,7 +264,7 @@ h2 {
     border: 1px solid yellow;
     transition: transform 0.5s ease-in-out;
 }
-.rate-btn:hover, .next-btn {
+.rate-btn:hover, .next-btn:hover {
     transform: scale(1.1);
     cursor: pointer;
     box-shadow: 0 0 15px yellow;
@@ -340,7 +340,7 @@ h2 {
     font-size: 20px;
     color: rgba(201, 201, 201, 0.94);
 }
-.modal-form-add, .modal-form-remove {
+.modal-form-add, .modal-form-remove, .modal-form-enter {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -399,9 +399,6 @@ h2 {
   }
 
 /* ? Tables */
-.hidden-table {
-    display: none;
-}
 
 @keyframes flicker {
     0%, 18%, 22%, 25%, 53%, 57%, 100% {
@@ -495,7 +492,7 @@ th, td {
     box-shadow: 0 0 5px #ffffff9b, 0 0 25px #27e7f8;
 }
 /* * History */
-#history-link {
+#history-link, #reading-link {
     background-color: transparent;
     border: none;
 }
@@ -509,6 +506,18 @@ th, td {
 }
 .Up:hover, .Down:hover {
     cursor: pointer;
+}
+
+#modalmessage {
+    /* display: flex; */
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: none;
+
+}
+.message-text {
+    font-size: 15vh;
+    color: yellow;
 }
 
 @media screen and (max-width: 800px) {
