@@ -2,7 +2,6 @@
 let today = new Date().toISOString().slice(0, 4);
 
 document.addEventListener("DOMContentLoaded", function () {
-  // todo - reading list to main page w\o reload
   // ! put all books in the tables
   const switchBtn = document.querySelector(".switch");
   const classicTable = document.querySelector("#classicTable");
@@ -75,6 +74,7 @@ document.addEventListener("DOMContentLoaded", function () {
   document.querySelector(".next-btn").onclick = () => {
     const book2change = document.querySelector(".view-title").dataset.bookid;
     makeChange2Book(book2change, "next");
+    waitNreload("reload");
   };
 
   // ! Show reading list
@@ -127,7 +127,6 @@ function showAllBooks() {
 }
 
 function showBook(book) {
-  // todo - show book from DB if it's already there
   HideAll();
   document.querySelector("#book-view").style.display = "flex";
   const rating = document.querySelector(".view-rating");
@@ -386,10 +385,6 @@ function bookAction(book2change, action) {
       makeChange2Book(book2change, "rate", rating);
       message = "reload";
     }
-    if (action === "next") {
-      makeChange2Book(book2change, "next");
-      message = "reload";
-    }
     waitNreload(message);
   };
 }
@@ -425,6 +420,7 @@ function displayButtons(response, ...buttons) {
 
 function makeChange2Book(bookid, action, rating) {
   // create meeting date
+  // todo - check how it works
   if (action === "meeting") {
     const meetingBtn = document.querySelector(".meetingBtn");
     document.querySelector(".meetingField").style.display = "block";
@@ -581,14 +577,13 @@ function deleteYearRows(rows) {
 
 function waitNreload(message) {
   if (message == "reload") {
-    document.querySelector("#modalmessage").style.display = "flex";
-    document.querySelector(".message-text").innerHTML = "Book is read";
+    // document.querySelector("#modalmessage").style.display = "flex";
+    // document.querySelector(".message-text").innerHTML = "Book is read";
     setTimeout(function () {
       window.location.reload();
     }, 1000);
     return;
   }
-  //todo - ratebook works bad still and next btn doesn't update page
   setTimeout(showAllBooks, 700);
   document.querySelector("#modalmessage").style.display = "flex";
   document.querySelector(".message-text").innerHTML = message;
