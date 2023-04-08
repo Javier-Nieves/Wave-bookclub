@@ -148,14 +148,25 @@
               <span class="close">&times;</span>
 
               <div id="modalenter">
-                <h2 class="modal-text">Your bookclub:</h2>
+                <h2 class="modal-text" id="register-text-header">Your bookclub:</h2>
                 <form class="modal-form-enter">
                   <div>
-                    <input type="text" class="searchField" id="club-name" placeholder="Club Name" autofocus required>
+                    <input type="text" class="searchField" id="club-name" placeholder="Club Name" required>
                     <input type="password" class="searchField" id="club-password" placeholder="Password" required>
                   </div>
                   <input type="submit" class="modal-btn" value="Enter">
                 </form>
+                <form class="modal-form-register">
+                  <div>
+                    <input type="text" class="searchField" id="register-name" placeholder="Club Name" required>
+                    <input type="password" class="searchField" id="register-password" placeholder="Password" required>
+                  </div>
+                  <input type="submit" class="modal-btn" value="Register">
+                </form>
+                <div class="register-container">
+                  <div class="simple-text" id="register-text">Don't have a bookclub yet?</div>
+                  <a class="register-link">Register</a>
+                </div>
               </div>
 
               <div id="modaladd">

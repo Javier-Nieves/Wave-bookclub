@@ -10,11 +10,21 @@ input::-webkit-inner-spin-button {
     justify-content: center;
     gap: 1.5vw;
 }
+.register-container {
+    display: flex;
+    align-items: center;
+    margin: 10px 0 0 10px;
+}
 a {
     text-decoration: none;
-    color: black;
+    color: whitesmoke;
     padding: 7px;
     font-size: 20px;
+}
+/* todo - nicer decoration */
+a:hover{
+    cursor: pointer;
+    text-decoration: underline;
 }
 html {
     display: flex;
@@ -44,7 +54,6 @@ h3 {
 h2 {
     margin: 10px;
 }
-/* todo - how does After works */
 .brand {
     font-size: 30px;
     font-family: cursive, sans-serif;
@@ -143,9 +152,11 @@ h2 {
     border-radius: 10px;
     font-size: 20px;
     background-color: rgba(176, 176, 174, 0.605);
-    backdrop-filter: blur(13px);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
     transition: transform 0.5s ease-out;
 }
+
 .upcoming-book-container:hover {
     background-color: rgba(210, 210, 210, 0.582);
     cursor: pointer;
@@ -192,6 +203,7 @@ h2 {
     margin: 10px;
     background-color: transparent;
     backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
 }
 .searchField:focus, .meetingField:focus {
     outline: none;
@@ -220,6 +232,7 @@ h2 {
     padding: 4px;
     background-color: transparent;
     backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
 }
 .searchBtn {
     width: 10vw;
@@ -340,11 +353,14 @@ h2 {
     font-size: 20px;
     color: rgba(201, 201, 201, 0.94);
 }
-.modal-form-add, .modal-form-remove, .modal-form-enter {
+.modal-form-add, .modal-form-remove, .modal-form-enter, .modal-form-register {
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 15px;
+}
+.modal-form-register {
+    display: none;
 }
 .modal-form-rate {
     display: flex;
@@ -363,9 +379,10 @@ h2 {
     overflow: auto;
     background-color: rgba(0,0,0,0.4);
     backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
   }
   .modal-content {
-    background-color: #3b3b3bb1;
+    background-color: rgba(59, 59, 59, 0.523);
     box-shadow: 0 0 150px #f9f9f9d2;
     margin: 15% auto; /* 15% from the top and centered */
     padding: 20px;
@@ -419,6 +436,7 @@ h2 {
 
 table {
     backdrop-filter: blur(13px);
+    -webkit-backdrop-filter: blur(13px);
     background-color: hsla(0, 0%, 27%, 0.514);
     vertical-align: middle;
     font-family: Palatino, URW Palladio L, serif;
@@ -446,6 +464,7 @@ th, td {
 .classic-body:hover {
     background-color: rgba(29, 238, 253, 0.3);
     box-shadow: 0 0 10px #fcfdf7;
+    -webkit-box-shadow: 0 0 10px #fcfdf7;
     cursor: pointer;
     transform: scale(1.02);
 }
@@ -453,11 +472,14 @@ th, td {
     background: #03e9f4;
     color: #050801;
     box-shadow: 0 0 5px #03e9f4, 0 0 20px #03e9f4, 0 0 40px #03e9f4, 0 0 160px #03e9f4;
+    -webkit-box-shadow: 0 0 5px #03e9f4, 0 0 20px #03e9f4, 0 0 40px #03e9f4, 0 0 160px #03e9f4;
+    
 }
 .modern-body:nth-of-type(odd) {
     background-color: #65646480;
     color: #fefefe;
     filter: hue-rotate(110deg);
+    -webkit-filter: hue-rotate(110deg);
 }
 .modern-body:nth-of-type(even) {
     background-color: #fb24de59;
@@ -467,9 +489,9 @@ th, td {
 .modern-body:hover {
     background-color: #193e3ed4;
     cursor: pointer;
+    -webkit-box-shadow: 0 0 5px rgba(244, 3, 200, 0.608), 0 0 25px rgb(39, 231, 248), 0 0 50px rgb(3, 233, 244), 0 0 200px rgb(3, 233, 244);
     box-shadow: 0 0 5px #f403c89b, 0 0 25px #27e7f8, 0 0 50px #03e9f4, 0 0 200px #03e9f4;
-    text-shadow:
-    0 0 2px #fff;
+    text-shadow: 0 0 2px #fff;
 }
 .history-head {
     background-color: rgba(2, 167, 167, 0.85);

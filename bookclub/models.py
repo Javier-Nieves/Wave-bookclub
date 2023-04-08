@@ -1,6 +1,5 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from datetime import datetime
 
 
 class User(AbstractUser):
@@ -41,4 +40,4 @@ class Book(models.Model):
         }
 
 
-# TODO - book, history, autor?
+# TODO - history, autor?
