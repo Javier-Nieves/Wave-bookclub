@@ -91,7 +91,7 @@ document.addEventListener("DOMContentLoaded", function () {
   };
 });
 
-function showAllBooks() {
+function showAllBooks(message) {
   HideAll();
   loadScreen(true);
   document.querySelector(".classic-table").innerHTML = "";
@@ -109,6 +109,13 @@ function showAllBooks() {
         }
       });
       loadScreen(false);
+      if (message) {
+        document.querySelector("#modalmessage").style.display = "flex";
+        document.querySelector(".message-text").innerHTML = message;
+        setTimeout(() => {
+          document.querySelector("#modalmessage").style.display = "none";
+        }, 2500);
+      }
     });
   // ! What's the next book? Set page style accordingly
   // today gives year
@@ -577,17 +584,18 @@ function deleteYearRows(rows) {
 
 function waitNreload(message) {
   if (message == "reload") {
-    // document.querySelector("#modalmessage").style.display = "flex";
-    // document.querySelector(".message-text").innerHTML = "Book is read";
+    document.querySelector("#modalmessage").style.display = "flex";
+    document.querySelector(".message-text").innerHTML = "Updated..";
     setTimeout(function () {
       window.location.reload();
     }, 1000);
     return;
   }
-  setTimeout(showAllBooks, 700);
-  document.querySelector("#modalmessage").style.display = "flex";
-  document.querySelector(".message-text").innerHTML = message;
-  setTimeout(hideModals, 1000);
+  // some time is needed to update DB
+  setTimeout(() => {
+    showAllBooks(message);
+  }, 600);
+  hideModals();
 }
 
 function hideModals() {
@@ -596,5 +604,4 @@ function hideModals() {
   document.querySelector("#modaladd").style.display = "none";
   document.querySelector("#modalremove").style.display = "none";
   document.querySelector("#modalrate").style.display = "none";
-  document.querySelector("#modalmessage").style.display = "none";
 }
