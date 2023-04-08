@@ -41,8 +41,12 @@ body {
 }
 
 h1 {
-    font-family: 'Snell Roundhand', cursive, Serif;
-    font-size: 50px;
+    /* font-family: Georgia, "Century Schoolbook L", Serif; 7*/
+    /* font-family: Impact, "Charcoal CY", sans-serif; */
+    /* font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif; 7*/
+    /* font-family: 'Neucha', cursive; */
+    font-family: 'Playfair Display', serif;
+    font-size: 6vh;
     font-weight: 600;
     margin: 0px;
     color: rgb(17, 17, 17);
@@ -312,7 +316,7 @@ h2 {
 }
 .book-info {
     margin-top: 8vh;
-    background-color: rgba(232, 232, 232, 0.8);
+    background-color: rgba(232, 232, 232, 0.87);
     border-radius: 10px;
 }
 .book-info-top {
@@ -323,6 +327,7 @@ h2 {
 }
 .view-desc {
     font-size: 20px;
+    /* font-family: 'Playfair Display', serif; */
     border: 1px solid gray;
     border-radius: 5px;
     padding: 10px;
@@ -439,7 +444,8 @@ table {
     -webkit-backdrop-filter: blur(13px);
     background-color: hsla(0, 0%, 27%, 0.514);
     vertical-align: middle;
-    font-family: Palatino, URW Palladio L, serif;
+    /* font-family: Palatino, URW Palladio L, serif; */
+    font-family: 'Playfair Display', serif;
     text-align: center;
     font-size: 20px;
     /* -webkit-box-reflect: below 1px linear-gradient(transparent, #0005); */

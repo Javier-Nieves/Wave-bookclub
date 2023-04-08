@@ -2,6 +2,8 @@ import json
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth import authenticate, login, logout
+from django.db import IntegrityError
 
 from .models import User, Book
 
@@ -76,3 +78,56 @@ def edit_book(request, bookid):
 
         book.save()
         return HttpResponse(status=204)
+
+# ----- LOGIN -----
+
+
+def login_view(request):
+    if request.method == "POST":
+        # * Attempt to sign user in
+        username = request.POST["username"].lower()
+        password = request.POST["password"]
+        user = authenticate(request, username=username, password=password)
+        # * Check if authentication is successful
+        if user is not None:
+            login(request, user)
+# todo JSON
+            return index(request, "You are logged in")
+        else:
+            return render(request, "stocks/login.html", {
+                "message": "Invalid username and/or password."
+            })
+    else:
+        return render(request, "stocks/login.html")
+
+
+def logout_view(request):
+    logout(request)
+    return index(request, "Logged out")
+
+
+# def register(request):
+#     if request.method == "POST":
+#         username = request.POST["username"].lower()
+#         email = request.POST["email"]
+
+#         # * Ensure password matches confirmation
+#         password = request.POST["password"]
+#         confirmation = request.POST["confirmation"]
+#         if password != confirmation:
+#             return render(request, "stocks/register.html", {
+#                 "message": "Passwords must match."
+#             })
+
+#         # * Attempt to create new user
+#         try:
+#             user = User.objects.create_user(username, email, password)
+#             user.save()
+#         except IntegrityError:
+#             return render(request, "stocks/register.html", {
+#                 "message": "User already exists."
+#             })
+#         login(request, user)
+#         return index(request, "You are registered")
+#     else:
+#         return render(request, "stocks/register.html")

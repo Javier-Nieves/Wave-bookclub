@@ -93,6 +93,12 @@ document.addEventListener("DOMContentLoaded", function () {
   histLink.onclick = () => {
     showHistory();
   };
+
+  const title = document.querySelector("#upcoming-title");
+  console.log(title.innerHTML.length);
+  if (title.innerHTML.length > 20) {
+    title.style.fontSize = "4vh";
+  }
 });
 
 function showAllBooks(message) {

@@ -5,6 +5,9 @@
     <head>
         <title>Wave Bookclub</title>
         <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Neucha&family=Playfair+Display:wght@400;600&display=swap" rel="stylesheet">
         <link href="{% static 'bookclub/styles.css' %}" rel="stylesheet">
         <link href="{% static 'bookclub/favicon.ico' %}" rel="icon">
         <script src="{% static 'bookclub/books.js' %}"></script>
@@ -43,7 +46,7 @@
                   </form>
                 </div>
                 {% else %}
-                <h1 id="upcoming-title">Select a book to read next</h1>
+                <h1 id="upcoming-title">Select a book to read</h1>
                 {% endif %}
               </div>
 
