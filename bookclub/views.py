@@ -79,6 +79,10 @@ def edit_book(request, bookid):
         book.save()
         return HttpResponse(status=204)
 
+
+def pass_view(request):
+    # needed to JS to load history page upon clicking browser back button from history book
+    return HttpResponse(status=204)
 # ----- LOGIN -----
 
 

@@ -104,7 +104,7 @@ function showAllBooks(message) {
   HideAll();
   loadScreen(true);
 
-  window.history.pushState("object or string", "unused", `/`);
+  window.history.pushState("unused", "unused", `/`);
 
   document.querySelector(".classic-table").innerHTML = "";
   document.querySelector(".modern-table").innerHTML = "";
@@ -168,6 +168,7 @@ document.addEventListener("click", (event) => {
 function showHistory() {
   loadScreen(true);
   HideAll();
+  window.history.pushState("unused", "unused", `/`);
 
   document.querySelector("#history-view").style.display = "block";
   document.querySelector(".upcoming-book-container").style.display = "block";
@@ -233,7 +234,7 @@ function showBook(book) {
       loadScreen(false);
     });
 
-  window.history.pushState("object or string", "unused", `/check/${book}`);
+  window.history.pushState("unused", "unused", `/check/${book}`);
 }
 
 function fillData(book, source) {
@@ -643,30 +644,12 @@ function hideModals() {
   document.querySelector("#modalrate").style.display = "none";
 }
 
-document.onmouseover = function () {
-  //User's mouse is inside the page.
-  window.innerDocClick = true;
-};
-document.onmouseleave = function () {
-  //User's mouse has left the page.
-  window.innerDocClick = false;
-};
-window.onhashchange = function () {
-  if (window.innerDocClick) {
-    //Your own in-page mechanism triggered the hash change
-    console.log("on page change");
-  } else {
-    //Browser back button was clicked
-    console.log("back btn");
-  }
-};
-
+// ? history (back button) action
 window.addEventListener("popstate", function (event) {
   // The popstate event is fired each time when the current history entry changes.
-
-  // history.back();
-  // Uncomment below line to redirect to the previous page instead.
-  window.location = document.referrer; // Note: IE11 is not supporting this.
-
+  window.location = document.referrer;
+  if (window.location.href.slice(-7) === "history") {
+    showHistory();
+  }
   // history.pushState(null, null, window.location.pathname);
 });
