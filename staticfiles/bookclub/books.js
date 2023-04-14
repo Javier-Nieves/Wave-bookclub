@@ -95,7 +95,6 @@ document.addEventListener("DOMContentLoaded", function () {
   };
 
   const title = document.querySelector("#upcoming-title");
-  console.log(title.innerHTML.length);
   if (title.innerHTML.length > 20) {
     title.style.fontSize = "4vh";
   }
@@ -104,6 +103,9 @@ document.addEventListener("DOMContentLoaded", function () {
 function showAllBooks(message) {
   HideAll();
   loadScreen(true);
+
+  window.history.pushState("object or string", "unused", `/`);
+
   document.querySelector(".classic-table").innerHTML = "";
   document.querySelector(".modern-table").innerHTML = "";
   document.querySelector(".upcoming-book-container").style.display = "block";
@@ -166,6 +168,7 @@ document.addEventListener("click", (event) => {
 function showHistory() {
   loadScreen(true);
   HideAll();
+
   document.querySelector("#history-view").style.display = "block";
   document.querySelector(".upcoming-book-container").style.display = "block";
   document.querySelector(".history-table").innerHTML = "";
@@ -193,6 +196,7 @@ function showHistory() {
         loadScreen(false);
       });
     });
+  window.history.pushState(null, null, `/history`);
 }
 
 function showBook(book) {
@@ -228,6 +232,8 @@ function showBook(book) {
       }
       loadScreen(false);
     });
+
+  window.history.pushState("object or string", "unused", `/check/${book}`);
 }
 
 function fillData(book, source) {
@@ -636,3 +642,31 @@ function hideModals() {
   document.querySelector("#modalremove").style.display = "none";
   document.querySelector("#modalrate").style.display = "none";
 }
+
+document.onmouseover = function () {
+  //User's mouse is inside the page.
+  window.innerDocClick = true;
+};
+document.onmouseleave = function () {
+  //User's mouse has left the page.
+  window.innerDocClick = false;
+};
+window.onhashchange = function () {
+  if (window.innerDocClick) {
+    //Your own in-page mechanism triggered the hash change
+    console.log("on page change");
+  } else {
+    //Browser back button was clicked
+    console.log("back btn");
+  }
+};
+
+window.addEventListener("popstate", function (event) {
+  // The popstate event is fired each time when the current history entry changes.
+
+  // history.back();
+  // Uncomment below line to redirect to the previous page instead.
+  window.location = document.referrer; // Note: IE11 is not supporting this.
+
+  // history.pushState(null, null, window.location.pathname);
+});
