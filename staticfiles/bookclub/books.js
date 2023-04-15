@@ -459,6 +459,13 @@ function makeChange2Book(bookid, action, rating) {
             meeting_date: date,
           }),
         });
+        showMessage("Date selected");
+        document.querySelector(".meetingField").style.display = "none";
+        meetingBtn.style.display = "none";
+        const newDate = document.createElement("div");
+        newDate.className = "meeting-date";
+        newDate.innerHTML = date;
+        document.querySelector(".add-date-container").append(newDate);
       };
     });
   }
