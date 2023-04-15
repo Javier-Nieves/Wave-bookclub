@@ -144,14 +144,32 @@ h2 {
     width: 10vw;
     height: 8.2vw;
     border: none;
+    border-radius: 50%;
     font-size: 20px;
     padding: 10px;
-    margin: 20px 0px 20px 0px;
-    transition: transform 0.5s;
+    margin: 10px;
+    transition: transform 0.5s ease-out;
 }
-.switch:hover{
+.switch:hover {
     cursor: pointer;
     transform: scale(1.05);
+}
+.switch:hover + .switch-back {
+    transform: scale(0.95);
+}
+
+.switch-container {
+    display: flex;
+    align-items:center;
+}
+.switch-back {
+    /* margin: -1vh 1vw -3vh -1vw; */
+    margin-left: -12.6vw;
+    width: 14vw;
+    /* height: 14vw; */
+    z-index: -2;
+    filter: grayscale();
+    transition: transform 0.5s ease-out;
 }
 
 /* ? Upcoming book */
@@ -639,11 +657,7 @@ th, td {
 #upcoming-pic {
     width: 30vw;
 }
-.switch{
-    margin: 10px;
-    width: 26vw;
-    height: 23vw;
-}
+
 .cl3, .cl4, .yearRow {
 display: none;
 }
@@ -657,8 +671,6 @@ display: none;
     width: 25vw;
 }
 }
-
-
 
 @keyframes appear2 {
     0% {
@@ -680,4 +692,4 @@ display: none;
         opacity: 0;
         transform: translateY(-40%);
       }
-}
+    }

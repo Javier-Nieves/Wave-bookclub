@@ -357,13 +357,15 @@ function showSearchResults(response) {
 function setStyle(style) {
   const links = document.querySelectorAll(".link");
   const switchBtn = document.querySelector(".switch");
+  const switchBack = document.querySelector(".switch-back");
   const modernTable = document.querySelector("#modernTable");
   switchBtn.style.display = "block";
   if (style === "modern") {
     classicTable.style.display = "none";
     modernTable.style.display = "block";
     document.body.style.backgroundImage = 'URL("/static/bookclub/13.jpeg")';
-    switchBtn.style.backgroundImage = 'URL("/static/bookclub/classic2.png")';
+    switchBtn.style.backgroundImage = 'URL("/static/bookclub/Modern2.png")';
+    // switchBack.src = "/static/bookclub/classic2.png";
     links.forEach((item) => {
       item.classList.replace("brand", "brandNeon");
     });
@@ -372,7 +374,8 @@ function setStyle(style) {
     classicTable.style.display = "block";
     modernTable.style.display = "none";
     document.body.style.backgroundImage = 'URL("/static/bookclub/back2.jpeg")';
-    switchBtn.style.backgroundImage = 'URL("/static/bookclub/Modern2.png")';
+    switchBtn.style.backgroundImage = 'URL("/static/bookclub/classic2.png")';
+    // switchBack.src = "/static/bookclub/Modern2.png";s
     links.forEach((item) => {
       item.classList.replace("brandNeon", "brand");
     });
