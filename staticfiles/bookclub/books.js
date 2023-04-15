@@ -1,8 +1,12 @@
 "use strict";
 // today gives year
 let today = new Date().toISOString().slice(0, 4);
+let isLogged = false;
 
 document.addEventListener("DOMContentLoaded", function () {
+  // outside users shouldn't see control elements
+  isLogged && hideControls();
+
   // ! put all books in the tables
   const switchBtn = document.querySelector(".switch");
   const classicTable = document.querySelector("#classicTable");
@@ -357,15 +361,13 @@ function showSearchResults(response) {
 function setStyle(style) {
   const links = document.querySelectorAll(".link");
   const switchBtn = document.querySelector(".switch");
-  const switchBack = document.querySelector(".switch-back");
   const modernTable = document.querySelector("#modernTable");
-  switchBtn.style.display = "block";
+  document.querySelector(".switch-container").style.display = "flex";
   if (style === "modern") {
     classicTable.style.display = "none";
     modernTable.style.display = "block";
     document.body.style.backgroundImage = 'URL("/static/bookclub/13.jpeg")';
     switchBtn.style.backgroundImage = 'URL("/static/bookclub/Modern2.png")';
-    // switchBack.src = "/static/bookclub/classic2.png";
     links.forEach((item) => {
       item.classList.replace("brand", "brandNeon");
     });
@@ -375,7 +377,6 @@ function setStyle(style) {
     modernTable.style.display = "none";
     document.body.style.backgroundImage = 'URL("/static/bookclub/back2.jpeg")';
     switchBtn.style.backgroundImage = 'URL("/static/bookclub/classic2.png")';
-    // switchBack.src = "/static/bookclub/Modern2.png";s
     links.forEach((item) => {
       item.classList.replace("brandNeon", "brand");
     });
@@ -634,7 +635,7 @@ function changeRegLink() {
 }
 
 function HideAll() {
-  document.querySelector(".switch").style.display = "none";
+  document.querySelector(".switch-container").style.display = "none";
   document.querySelector(".upcoming-book-container").style.display = "none";
   document.querySelector("#modernTable").style.display = "none";
   document.querySelector("#classicTable").style.display = "none";
@@ -653,6 +654,8 @@ function hideModals() {
   document.querySelector("#modalremove").style.display = "none";
   document.querySelector("#modalrate").style.display = "none";
 }
+
+function hideControls() {}
 
 // ? history (back button) action
 window.addEventListener("popstate", function (event) {
