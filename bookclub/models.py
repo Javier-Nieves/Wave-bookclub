@@ -43,3 +43,6 @@ class Book(models.Model):
 class Library(models.Model):
     club = models.ForeignKey(User, on_delete=models.CASCADE)
     books = models.ManyToManyField(Book, blank=True)
+
+    def __str__(self):
+        return f"{self.club}'s library"

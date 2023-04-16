@@ -96,18 +96,18 @@ def pass_view(request):
 def login_view(request):
     if request.method == "POST":
         # * Attempt to sign user in
-        username = request.POST["club-name"].lower()
+        bookclub = request.POST["club-name"].lower()
         password = request.POST["club-password"]
-        user = authenticate(request, username=username, password=password)
+        user = authenticate(request, username=bookclub, password=password)
         # * Check if authentication is successful
         if user is not None:
             login(request, user)
             print('login successful')
             return index(request)
         else:
-            return index(request, {"message": "Invalid username and/or password."})
+            return index(request)
     else:
-        return render(request, "stocks/login.html")
+        return index(request)
 
 
 def logout_view(request):
@@ -115,28 +115,26 @@ def logout_view(request):
     return index(request)
 
 
-# def register(request):
-#     if request.method == "POST":
-#         username = request.POST["username"].lower()
-#         email = request.POST["email"]
+def register(request):
+    if request.method == "POST":
+        username = request.POST["register-name"].lower()
+        password = request.POST["register-password"]
+        # confirmation = request.POST["confirmation"]
+        # if password != confirmation:
+        #     return render(request, "stocks/register.html", {
+        #         "message": "Passwords must match."
+        #     })
 
-#         # * Ensure password matches confirmation
-#         password = request.POST["password"]
-#         confirmation = request.POST["confirmation"]
-#         if password != confirmation:
-#             return render(request, "stocks/register.html", {
-#                 "message": "Passwords must match."
-#             })
-
-#         # * Attempt to create new user
-#         try:
-#             user = User.objects.create_user(username, email, password)
-#             user.save()
-#         except IntegrityError:
-#             return render(request, "stocks/register.html", {
-#                 "message": "User already exists."
-#             })
-#         login(request, user)
-#         return index(request, "You are registered")
-#     else:
-#         return render(request, "stocks/register.html")
+        # * Attempt to create new bookclub
+        try:
+            club = User.objects.create_user(username, password)
+            club.save()
+            library = Library.objects.create(club=club)
+            library.save()
+        except IntegrityError:
+            print('some error')
+            return index(request)
+        login(request, club)
+        return index(request)
+    else:
+        return index(request)

@@ -21,7 +21,7 @@
       <div class="enter-container">
         <div class="flex-container">
           {% if user.is_authenticated %} 
-          <div class="name-text">{{user.username}}</div>
+          <div class="name-text">{{user.username}} Bookclub</div>
           <button class="exit-btn">Logout</button>
           {% else %}
           <button class="enter-btn">Enter your Bookclub</button>
@@ -176,10 +176,11 @@
                   </div>
                   <input type="submit" class="modal-btn" value="Enter">
                 </form>
-                <form class="modal-form-register" method="post">
+                <form class="modal-form-register" action="{% url 'register' %}" method="post">
+                  {% csrf_token %}
                   <div>
-                    <input type="text" class="searchField" id="register-name" name="register-name" placeholder="Club Name" required>
-                    <input type="password" class="searchField" id="register-password" name="register-password" placeholder="Password" required>
+                    <input type="text" class="searchField" name="register-name" placeholder="Club Name" required>
+                    <input type="password" class="searchField" name="register-password" placeholder="Password" required>
                   </div>
                   <input type="submit" class="modal-btn" value="Register">
                 </form>
