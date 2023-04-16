@@ -18,6 +18,9 @@
       {% if user.is_authenticated %} 
         <input type="hidden" id="authenticated" value={{user.username}}>
       {% endif %}
+      {% if message %} 
+        <button type="text" id="message" style="display: none;">{{message}}</button>
+      {% endif %}
       <div class="enter-container">
         <div class="flex-container">
           {% if user.is_authenticated %} 

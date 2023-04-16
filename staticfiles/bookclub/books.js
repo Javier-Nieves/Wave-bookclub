@@ -86,14 +86,14 @@ document.addEventListener("DOMContentLoaded", function () {
   document.querySelector(".next-btn").onclick = () => {
     const book2change = document.querySelector(".view-title").dataset.bookid;
     makeChange2Book(book2change, "next");
-    waitNreload("reload");
+    waitNreload("next");
   };
   // ! logout
   try {
     document.querySelector(".exit-btn").onclick = () => {
       fetch("/logout");
       showMessage("Logged out");
-      waitNreload("reload");
+      waitNreload("logout");
       // const book2change = document.querySelector(".view-title").dataset.bookid;
       // makeChange2Book(book2change, "next");
       // waitNreload("reload");
@@ -119,9 +119,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 function tryLogin() {
   try {
-    const username = document.querySelector("#authenticated").value;
-    console.log(username);
-    // document.querySelector;
+    document.querySelector("#authenticated").value;
     return true;
   } catch {}
   return false;
@@ -132,6 +130,13 @@ function showAllBooks(message) {
   loadScreen(true);
   // outside users shouldn't see control elements
   !isLogged && hideControls();
+
+  // is there a backend message?
+  try {
+    let message = document.querySelector("#message").innerHTML;
+    showMessage(message);
+    message.innerHTML = "";
+  } catch {}
 
   window.history.pushState("unused", "unused", `/`);
 
@@ -246,7 +251,6 @@ function showBook(book) {
       }
       // manage buttons on page
       if (isLogged) {
-        console.log("you are", isLogged);
         if (response.year !== undefined) {
           if (response.rating) {
             rating.style.display = "block";
@@ -473,7 +477,7 @@ function bookAction(book2change, action) {
     if (action === "rate") {
       const rating = document.querySelector("#rating-input").value;
       makeChange2Book(book2change, "rate", rating);
-      message = "reload";
+      message = "rate";
     }
     waitNreload(message);
   };
@@ -628,9 +632,12 @@ function deleteYearRows(rows) {
 }
 
 function waitNreload(message) {
-  if (message == "reload") {
+  const reloadList = ["rate", "next", "logout"];
+  if (reloadList.includes(message)) {
     document.querySelector("#modalmessage").style.display = "flex";
-    document.querySelector(".message-text").innerHTML = "Updated...";
+    document.querySelector(".message-text").innerHTML = `${
+      message === "logout" ? "Logged out" : "Updated"
+    }`;
     showAllBooks();
     setTimeout(function () {
       window.location.reload();

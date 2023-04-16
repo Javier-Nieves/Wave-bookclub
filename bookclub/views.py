@@ -8,7 +8,7 @@ from django.db import IntegrityError
 from .models import User, Book
 
 
-def index(request):
+def index(request, message=""):
     if request.user.is_anonymous:
         user = User.objects.get(username='wave')
     else:
@@ -21,6 +21,7 @@ def index(request):
 
     return render(request, 'bookclub/index.html', {
         'up_book': up_book,
+        'message': message
     })
 
 
@@ -81,7 +82,7 @@ def edit_book(request, bookid):
 
         if data.get("rating") is not None:
             rating = float(data['rating'])
-            book = Book.objects.get(bookid=bookid)
+            book = Book.objects.get(bookid=bookid, club=request.user)
             book.rating = rating
             book.read = True
             book.upcoming = False
@@ -95,9 +96,8 @@ def pass_view(request):
     # needed to JS to load history page upon clicking browser back button from history book
     return HttpResponse(status=204)
 
+
 # ----- LOGIN -----
-
-
 def login_view(request):
     if request.method == "POST":
         # * Attempt to sign user in
@@ -107,17 +107,17 @@ def login_view(request):
         # * Check if authentication is successful
         if user is not None:
             login(request, user)
-            print('login successful')
-            return index(request)
+            message = 'login successful'
+            return index(request, message)
         else:
-            return index(request)
+            return index(request, "Mistakes were made")
     else:
         return index(request)
 
 
 def logout_view(request):
     logout(request)
-    return index(request)
+    return index(request, 'Logged out')
 
 
 def register(request):
@@ -132,13 +132,13 @@ def register(request):
 
         # * Attempt to create new bookclub
         try:
-            club = User.objects.create_user(username, password)
+            club = User.objects.create_user(username, 'email', password)
             club.save()
             # library = Library.objects.create(club=club)
             # library.save()
         except IntegrityError:
             return index(request)
         login(request, club)
-        return index(request)
+        return index(request, 'You are registered')
     else:
         return index(request)
