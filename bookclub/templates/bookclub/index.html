@@ -15,7 +15,19 @@
         <script src="{% static 'bookclub/books.js' %}"></script>
     </head>
     <body>
-      <button class="enter-btn">Enter your Bookclub</button>
+      {% if user.is_authenticated %} 
+        <input type="hidden" id="authenticated" value={{user.username}}>
+      {% endif %}
+      <div class="enter-container">
+        <div class="flex-container">
+          {% if user.is_authenticated %} 
+          <div class="name-text">{{user.username}}</div>
+          <button class="exit-btn">Logout</button>
+          {% else %}
+          <button class="enter-btn">Enter your Bookclub</button>
+          {% endif %}
+        </div>
+      </div>
           <div id="main-view">
             <div class="main-left-part">
               <div class="navbar">
@@ -156,17 +168,18 @@
 
               <div id="modalenter">
                 <h2 class="modal-text" id="register-text-header">Your bookclub:</h2>
-                <form class="modal-form-enter">
+                <form class="modal-form-enter" action="{% url 'login' %}" method="post">
+                  {% csrf_token %}
                   <div>
-                    <input type="text" class="searchField" id="club-name" placeholder="Club Name" required>
-                    <input type="password" class="searchField" id="club-password" placeholder="Password" required>
+                    <input type="text" class="searchField" name="club-name" placeholder="Club Name" required>
+                    <input type="password" class="searchField" name="club-password" placeholder="Password" required>
                   </div>
                   <input type="submit" class="modal-btn" value="Enter">
                 </form>
-                <form class="modal-form-register">
+                <form class="modal-form-register" method="post">
                   <div>
-                    <input type="text" class="searchField" id="register-name" placeholder="Club Name" required>
-                    <input type="password" class="searchField" id="register-password" placeholder="Password" required>
+                    <input type="text" class="searchField" id="register-name" name="register-name" placeholder="Club Name" required>
+                    <input type="password" class="searchField" id="register-password" name="register-password" placeholder="Password" required>
                   </div>
                   <input type="submit" class="modal-btn" value="Register">
                 </form>

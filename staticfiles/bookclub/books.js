@@ -1,12 +1,11 @@
 "use strict";
 // today gives year
 let today = new Date().toISOString().slice(0, 4);
+// logged users will see control elements
 let isLogged = false;
 
 document.addEventListener("DOMContentLoaded", function () {
-  // outside users shouldn't see control elements
-  isLogged && hideControls();
-
+  isLogged = tryLogin();
   // ! put all books in the tables
   const switchBtn = document.querySelector(".switch");
   const classicTable = document.querySelector("#classicTable");
@@ -61,10 +60,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // ! Enter your bookclub
   // todo
-  document.querySelector(".enter-btn").onclick = () => {
-    const book2change = document.querySelector(".view-title").dataset.bookid;
-    bookAction(book2change, "enter");
-  };
+  try {
+    document.querySelector(".enter-btn").onclick = () => {
+      const book2change = document.querySelector(".view-title").dataset.bookid;
+      showModal("enter");
+      // bookAction(book2change, "enter");
+    };
+  } catch {}
   // ! add book to the reading list
   document.querySelector(".add-btn").onclick = () => {
     const book2change = document.querySelector(".view-title").dataset.bookid;
@@ -86,6 +88,17 @@ document.addEventListener("DOMContentLoaded", function () {
     makeChange2Book(book2change, "next");
     waitNreload("reload");
   };
+  // ! logout
+  try {
+    document.querySelector(".exit-btn").onclick = () => {
+      fetch("/logout");
+      showMessage("Logged out");
+      waitNreload("reload");
+      // const book2change = document.querySelector(".view-title").dataset.bookid;
+      // makeChange2Book(book2change, "next");
+      // waitNreload("reload");
+    };
+  } catch {}
 
   // ! Show reading list
   const readLink = document.querySelector("#reading-link");
@@ -104,9 +117,21 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 });
 
+function tryLogin() {
+  try {
+    const username = document.querySelector("#authenticated").value;
+    console.log(username);
+    // document.querySelector;
+    return true;
+  } catch {}
+  return false;
+}
+
 function showAllBooks(message) {
   HideAll();
   loadScreen(true);
+  // outside users shouldn't see control elements
+  !isLogged && hideControls();
 
   window.history.pushState("unused", "unused", `/`);
 
@@ -220,20 +245,25 @@ function showBook(book) {
         fillData(book, "API");
       }
       // manage buttons on page
-      if (response.year !== undefined) {
-        if (response.rating) {
-          rating.style.display = "block";
-          rating.innerHTML = response.rating;
-        }
-        if (response.upcoming) {
-          displayButtons(response, "rate");
-        } else if (response.read) {
-          displayButtons();
+      if (isLogged) {
+        console.log("you are", isLogged);
+        if (response.year !== undefined) {
+          if (response.rating) {
+            rating.style.display = "block";
+            rating.innerHTML = response.rating;
+          }
+          if (response.upcoming) {
+            displayButtons(response, "rate");
+          } else if (response.read) {
+            displayButtons();
+          } else {
+            displayButtons(response, "remove");
+          }
         } else {
-          displayButtons(response, "remove");
+          displayButtons(response, "add");
         }
       } else {
-        displayButtons(response, "add");
+        displayButtons();
       }
       loadScreen(false);
     });
@@ -408,6 +438,9 @@ function bookAction(book2change, action) {
   showModal(`${action}`);
   form.onsubmit = (e) => {
     e.preventDefault();
+    if (action === "enter") {
+      console.log("enter club");
+    }
     if (action === "add") {
       const year = document.querySelector("#year-input").value;
       const country = document.querySelector("#country-input").value;
@@ -655,7 +688,10 @@ function hideModals() {
   document.querySelector("#modalrate").style.display = "none";
 }
 
-function hideControls() {}
+function hideControls() {
+  document.querySelector(".control-group").style.display = "none";
+  document.querySelector(".add-date-container").style.display = "none";
+}
 
 // ? history (back button) action
 window.addEventListener("popstate", function (event) {

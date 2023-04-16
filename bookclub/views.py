@@ -5,10 +5,11 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 
-from .models import User, Book
+from .models import User, Book, Library
 
 
 def index(request):
+    # todo - change for bookclub
     try:
         up_book = Book.objects.get(upcoming=True)
     except:
@@ -25,18 +26,21 @@ def add_book(request, bookid):
         data = json.loads(request.body)
     Book.objects.create(bookid=bookid, title=data["title"], author=data["author"], year=data["year"], country=data["country"], pages=data["pages"],
                         desc=data["desc"], image_link=data["image"])
+    # todo - add to bookclub's library
 
     return HttpResponse(status=204)
 
 
 # todo - checks for next functions
 def remove_book(request, bookid):
+    # todo - change for bookclub
     book = Book.objects.get(bookid=bookid)
     book.delete()
     return HttpResponse(status=204)
 
 
 def book_check(request, bookid):
+    # todo - change for bookclub
     try:
         check_book = Book.objects.get(bookid=bookid)
         return JsonResponse(check_book.serialize(), status=200)
@@ -45,6 +49,7 @@ def book_check(request, bookid):
 
 
 def all_books_view(request, field):
+    # todo - change for bookclub
     if field == 'history':
         # Return books in reverse chronologial order
         old_books = Book.objects.all().order_by("meeting_date").all()
@@ -56,6 +61,7 @@ def all_books_view(request, field):
 
 @csrf_exempt
 def edit_book(request, bookid):
+    # todo - change for bookclub
     try:
         book = Book.objects.get(bookid=bookid)
     except Book.DoesNotExist:
@@ -83,31 +89,30 @@ def edit_book(request, bookid):
 def pass_view(request):
     # needed to JS to load history page upon clicking browser back button from history book
     return HttpResponse(status=204)
+
 # ----- LOGIN -----
 
 
 def login_view(request):
     if request.method == "POST":
         # * Attempt to sign user in
-        username = request.POST["username"].lower()
-        password = request.POST["password"]
+        username = request.POST["club-name"].lower()
+        password = request.POST["club-password"]
         user = authenticate(request, username=username, password=password)
         # * Check if authentication is successful
         if user is not None:
             login(request, user)
-# todo JSON
-            return index(request, "You are logged in")
+            print('login successful')
+            return index(request)
         else:
-            return render(request, "stocks/login.html", {
-                "message": "Invalid username and/or password."
-            })
+            return index(request, {"message": "Invalid username and/or password."})
     else:
         return render(request, "stocks/login.html")
 
 
 def logout_view(request):
     logout(request)
-    return index(request, "Logged out")
+    return index(request)
 
 
 # def register(request):

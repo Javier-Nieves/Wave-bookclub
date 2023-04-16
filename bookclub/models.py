@@ -40,4 +40,6 @@ class Book(models.Model):
         }
 
 
-# TODO - history, autor?
+class Library(models.Model):
+    club = models.ForeignKey(User, on_delete=models.CASCADE)
+    books = models.ManyToManyField(Book, blank=True)
