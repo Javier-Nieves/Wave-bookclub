@@ -8,6 +8,8 @@ class User(AbstractUser):
 
 class Book(models.Model):
     bookid = models.CharField(max_length=20)
+    club = models.ForeignKey(
+        User, on_delete=models.CASCADE, to_field='username', default='wave')
     title = models.CharField(max_length=200)
     author = models.CharField(max_length=50)
     country = models.CharField(max_length=50, default="Disc World")
@@ -40,9 +42,9 @@ class Book(models.Model):
         }
 
 
-class Library(models.Model):
-    club = models.ForeignKey(User, on_delete=models.CASCADE)
-    books = models.ManyToManyField(Book, blank=True)
+# class Library(models.Model):
+#     club = models.ForeignKey(User, on_delete=models.CASCADE)
+#     books = models.ManyToManyField(Book, blank=True)
 
-    def __str__(self):
-        return f"{self.club}'s library"
+#     def __str__(self):
+#         return f"{self.club}'s library"

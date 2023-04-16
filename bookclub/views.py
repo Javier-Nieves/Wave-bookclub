@@ -5,13 +5,17 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 
-from .models import User, Book, Library
+from .models import User, Book
 
 
 def index(request):
-    # todo - change for bookclub
+    if request.user.is_anonymous:
+        user = User.objects.get(username='wave')
+    else:
+        user = request.user
+
     try:
-        up_book = Book.objects.get(upcoming=True)
+        up_book = Book.objects.get(club=user, upcoming=True)
     except:
         up_book = None
 
@@ -24,46 +28,46 @@ def index(request):
 def add_book(request, bookid):
     if request.method == "POST":
         data = json.loads(request.body)
-    Book.objects.create(bookid=bookid, title=data["title"], author=data["author"], year=data["year"], country=data["country"], pages=data["pages"],
+    Book.objects.create(bookid=bookid, club=request.user, title=data["title"], author=data["author"], year=data["year"], country=data["country"], pages=data["pages"],
                         desc=data["desc"], image_link=data["image"])
-    # todo - add to bookclub's library
-
     return HttpResponse(status=204)
 
 
 # todo - checks for next functions
 def remove_book(request, bookid):
-    # todo - change for bookclub
-    book = Book.objects.get(bookid=bookid)
+    book = Book.objects.get(bookid=bookid, club=request.user)
     book.delete()
     return HttpResponse(status=204)
 
 
 def book_check(request, bookid):
-    # todo - change for bookclub
     try:
-        check_book = Book.objects.get(bookid=bookid)
+        check_book = Book.objects.get(bookid=bookid, club=request.user)
         return JsonResponse(check_book.serialize(), status=200)
     except:
         return JsonResponse({'message': 'not in DB'}, status=200)
 
 
 def all_books_view(request, field):
-    # todo - change for bookclub
+    if request.user.is_anonymous:
+        user = User.objects.get(username='wave')
+    else:
+        user = request.user
+
     if field == 'history':
         # Return books in reverse chronologial order
-        old_books = Book.objects.all().order_by("meeting_date").all()
+        old_books = Book.objects.filter(
+            club=user).order_by("meeting_date").all()
         return JsonResponse([old_book.serialize() for old_book in old_books], safe=False)
     elif field == 'all':
-        books = Book.objects.all().order_by('-year')
+        books = Book.objects.filter(club=user).order_by('-year')
         return JsonResponse([book.serialize() for book in books], safe=False)
 
 
 @csrf_exempt
 def edit_book(request, bookid):
-    # todo - change for bookclub
     try:
-        book = Book.objects.get(bookid=bookid)
+        book = Book.objects.get(bookid=bookid, club=request.user)
     except Book.DoesNotExist:
         return JsonResponse({"error": "Book not found."}, status=404)
     if request.method == "PUT":
@@ -81,6 +85,7 @@ def edit_book(request, bookid):
             book.rating = rating
             book.read = True
             book.upcoming = False
+            # todo - add today if no meeting date
 
         book.save()
         return HttpResponse(status=204)
@@ -129,10 +134,9 @@ def register(request):
         try:
             club = User.objects.create_user(username, password)
             club.save()
-            library = Library.objects.create(club=club)
-            library.save()
+            # library = Library.objects.create(club=club)
+            # library.save()
         except IntegrityError:
-            print('some error')
             return index(request)
         login(request, club)
         return index(request)

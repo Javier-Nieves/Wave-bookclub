@@ -631,6 +631,7 @@ function waitNreload(message) {
   if (message == "reload") {
     document.querySelector("#modalmessage").style.display = "flex";
     document.querySelector(".message-text").innerHTML = "Updated...";
+    showAllBooks();
     setTimeout(function () {
       window.location.reload();
     }, 1000);
@@ -678,6 +679,9 @@ function HideAll() {
   document.querySelector(".control-group").style.display = "none";
   document.querySelector(".rate-btn-container").style.display = "none";
   document.querySelector(".view-rating").style.display = "none";
+  document.querySelector("#year-input").value = "";
+  document.querySelector("#country-input").value = "";
+  document.querySelector(".searchField").value = "";
 }
 
 function hideModals() {
