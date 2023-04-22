@@ -8,7 +8,7 @@ from django.db import IntegrityError
 from .models import User, Book
 
 
-def index(request, message=""):
+def index(request, message='', bookid='', **kwargs):
     if request.user.is_anonymous:
         user = User.objects.get(username='wave')
     else:
@@ -18,10 +18,13 @@ def index(request, message=""):
         up_book = Book.objects.get(club=user, upcoming=True)
     except:
         up_book = None
+    print(message)
+    print('id is', bookid)
 
     return render(request, 'bookclub/index.html', {
         'up_book': up_book,
-        'message': message
+        'message': message,
+        'bookid': bookid
     })
 
 
@@ -47,6 +50,10 @@ def book_check(request, bookid):
         return JsonResponse(check_book.serialize(), status=200)
     except:
         return JsonResponse({'message': 'not in DB'}, status=200)
+
+
+def book_refresh(request, bookid):
+    return index(request, bookid=bookid)
 
 
 def all_books_view(request, field):

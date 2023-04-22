@@ -59,12 +59,10 @@ document.addEventListener("DOMContentLoaded", function () {
   };
 
   // ! Enter your bookclub
-  // todo
   try {
     document.querySelector(".enter-btn").onclick = () => {
       const book2change = document.querySelector(".view-title").dataset.bookid;
       showModal("enter");
-      // bookAction(book2change, "enter");
     };
   } catch {}
   // ! add book to the reading list
@@ -94,9 +92,6 @@ document.addEventListener("DOMContentLoaded", function () {
       fetch("/logout");
       showMessage("Logged out");
       waitNreload("logout");
-      // const book2change = document.querySelector(".view-title").dataset.bookid;
-      // makeChange2Book(book2change, "next");
-      // waitNreload("reload");
     };
   } catch {}
 
@@ -127,11 +122,12 @@ function tryLogin() {
 
 function showAllBooks(message) {
   HideAll();
+  document.querySelector(".searchField").value = "";
   loadScreen(true);
   // outside users shouldn't see control elements
   !isLogged && hideControls();
 
-  // is there a backend message?
+  // is there a backend info?
   try {
     let message = document.querySelector("#message").innerHTML;
     showMessage(message);
@@ -158,6 +154,14 @@ function showAllBooks(message) {
       if (message) {
         showMessage(message);
       }
+
+      // * on page refresh for the book
+      let bookRefresh = document.querySelector("#bookid-refresh");
+      if (bookRefresh.innerHTML !== "") {
+        console.log(bookRefresh.innerHTML);
+        showBook(bookRefresh.innerHTML);
+        bookRefresh.innerHTML = "";
+      }
     });
   // ! What's the next book? Set page style accordingly
   let isClassic = true;
@@ -174,6 +178,9 @@ function showAllBooks(message) {
 function showMessage(message) {
   document.querySelector("#modalmessage").style.display = "flex";
   document.querySelector(".message-text").innerHTML = message;
+  try {
+    document.querySelector("#message").innerHTML = "";
+  } catch {}
   setTimeout(() => {
     document.querySelector("#modalmessage").style.display = "none";
   }, 2500);
@@ -237,7 +244,6 @@ function showHistory() {
 function showBook(book) {
   HideAll();
   document.querySelector("#book-view").style.display = "flex";
-  const rating = document.querySelector(".view-rating");
 
   fetch(`/check/${book}`)
     .then((response) => response.json())
@@ -252,10 +258,6 @@ function showBook(book) {
       // manage buttons on page
       if (isLogged) {
         if (response.year !== undefined) {
-          if (response.rating) {
-            rating.style.display = "block";
-            rating.innerHTML = response.rating;
-          }
           if (response.upcoming) {
             displayButtons(response, "rate");
           } else if (response.read) {
@@ -272,7 +274,7 @@ function showBook(book) {
       loadScreen(false);
     });
 
-  window.history.pushState("unused", "unused", `/check/${book}`);
+  window.history.pushState("unused", "unused", `/refresh/${book}`);
 }
 
 function fillData(book, source) {
@@ -282,6 +284,8 @@ function fillData(book, source) {
   const image = document.querySelector(".view-image");
   const control = document.querySelector(".control-group");
   const pages = document.querySelector(".view-pages");
+  const rating = document.querySelector(".view-rating");
+
   if (source === "DB") {
     control.style.display = "flex";
     title.innerHTML = book.title;
@@ -290,6 +294,10 @@ function fillData(book, source) {
     pages.innerHTML = `Page count: ${book.pages}`;
     description.innerHTML = book.desc;
     image.src = book.image_link;
+    if (book.rating) {
+      rating.style.display = "block";
+      rating.innerHTML = book.rating;
+    }
   }
   if (source === "API") {
     fetch(`https://www.googleapis.com/books/v1/volumes/${book}`)
@@ -348,6 +356,8 @@ function displayButtons(response, ...buttons) {
 
 function searchBook() {
   let title = document.querySelector(".searchField").value;
+  window.history.pushState("unused", "unused", `/search`);
+
   fetch(
     `https://www.googleapis.com/books/v1/volumes?q=+intitle:${title}&maxResults=20`
   )
@@ -688,7 +698,6 @@ function HideAll() {
   document.querySelector(".view-rating").style.display = "none";
   document.querySelector("#year-input").value = "";
   document.querySelector("#country-input").value = "";
-  document.querySelector(".searchField").value = "";
 }
 
 function hideModals() {
@@ -707,9 +716,20 @@ function hideControls() {
 // ? history (back button) action
 window.addEventListener("popstate", function (event) {
   // The popstate event is fired each time when the current history entry changes.
-  window.location = document.referrer;
+  console.log(window.location.href);
+  // window.location = document.referrer;
   if (window.location.href.slice(-7) === "history") {
     showHistory();
   }
-  // history.pushState(null, null, window.location.pathname);
+  if (window.location.href.slice(-1) === "/") {
+    showAllBooks();
+  }
+  if (window.location.href.slice(-6) === "search") {
+    searchBook();
+  }
+  console.log(window.location.href.slice(-20, -13));
+  if (window.location.href.slice(-20, -13) === "refresh") {
+    showBook(window.location.href.slice(-12));
+    console.log(window.location.href.slice(-12));
+  }
 });

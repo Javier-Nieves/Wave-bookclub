@@ -18,9 +18,11 @@
       {% if user.is_authenticated %} 
         <input type="hidden" id="authenticated" value={{user.username}}>
       {% endif %}
-      {% if message %} 
+      {% if message %}
         <button type="text" id="message" style="display: none;">{{message}}</button>
       {% endif %}
+      <div id="bookid-refresh">{{bookid}}</div>
+
       <div class="enter-container">
         <div class="flex-container">
           {% if user.is_authenticated %} 
@@ -88,17 +90,21 @@
                 <button class="switch"></button>
                 <img src='/static/bookclub/121.gif' class="switch-back">
               </div>
-              <table id="search-results" style="display: none;">
-                <thead>
-                  <tr id='search-head' class="clas-head">
-                      <th>Book</th>
-                      <th>Title</th>
-                      <th>Author</th>
-                  </tr>
-                </thead>
-                <tbody class="search-table">
-                </tbody>
-              </table>
+
+              <div id="search-results" style="display: none;">
+                <img src='static/bookclub/club2.png' style="width: 7vw; margin: 5px"></img>
+                <table>
+                  <thead>
+                    <tr id='search-head' class="clas-head">
+                        <th>Book</th>
+                        <th>Title</th>
+                        <th>Author</th>
+                    </tr>
+                  </thead>
+                  <tbody class="search-table">
+                  </tbody>
+                </table>
+              </div>
 
               <div id="history-view" style="display: none;">
                 <img src='static/bookclub/club2.png' style="width: 7vw; margin: 5px"></img>
