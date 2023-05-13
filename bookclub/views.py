@@ -18,8 +18,6 @@ def index(request, message='', bookid='', **kwargs):
         up_book = Book.objects.get(club=user, upcoming=True)
     except:
         up_book = None
-    print(message)
-    print('id is', bookid)
 
     return render(request, 'bookclub/index.html', {
         'up_book': up_book,

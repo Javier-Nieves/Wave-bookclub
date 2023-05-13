@@ -250,7 +250,7 @@ h2 {
 .small-pic {
     width: 3vw;
 }
-.searchBtn, .add-btn, .remove-btn, .rate-btn, .meetingBtn, .modal-btn, .next-btn, .enter-btn, .exit-btn {
+.searchBtn, .add-btn, .remove-btn, .rate-btn, .meetingBtn, .modal-btn, .next-btn, .enter-btn, .exit-btn, .edit-btn {
     color: rgba(201, 201, 201, 0.94);
     font-size: 18px;
     font-family: didot;
@@ -297,6 +297,11 @@ h2 {
     font-size: 21px;
     margin-right: 15px;
 }
+.edit-btn {
+    color: black;
+    border: 1px solid yellow;
+    padding: 0px 18px 0px 18px;
+}
 .enter-container {
     position: absolute;
     right: 2vw;
@@ -328,12 +333,15 @@ h2 {
     transform: scale(1.1);
     cursor: pointer;
 }
-.enter-btn:hover, .exit-btn:hover  {
+.enter-btn:hover, .exit-btn:hover, .edit-btn:hover {
     background-color: rgba(254, 236, 39, 0.806);
     box-shadow: 0 0 55px #f9f9f9d2;
     transform: scale(1.1);
     color: #050801;
     cursor: pointer;
+}
+.edit-btn:hover {
+    transform: none;
 }
 
 

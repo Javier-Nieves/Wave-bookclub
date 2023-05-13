@@ -75,6 +75,11 @@ document.addEventListener("DOMContentLoaded", function () {
     const book2change = document.querySelector(".view-title").dataset.bookid;
     bookAction(book2change, "remove");
   };
+  // ! edit book
+  document.querySelector(".edit-btn").onclick = () => {
+    console.log("edit");
+    editBook();
+  };
   // ! rate book
   document.querySelector(".rate-btn").addEventListener("click", () => {
     const book2change = document.querySelector(".view-title").dataset.bookid;
@@ -259,14 +264,17 @@ function showBook(book) {
       if (isLogged) {
         if (response.year !== undefined) {
           if (response.upcoming) {
-            displayButtons(response, "rate");
+            displayButtons("rate", "edit");
           } else if (response.read) {
-            displayButtons();
+            displayButtons("edit");
           } else {
-            displayButtons(response, "remove");
+            displayButtons("remove", "edit");
+            document.querySelector(".simple-text").innerHTML = `from the ${
+              response.year <= today - 50 ? "Classic" : "Modern"
+            } reading list`;
           }
         } else {
-          displayButtons(response, "add");
+          displayButtons("add");
         }
       } else {
         displayButtons();
@@ -313,7 +321,7 @@ function fillData(book, source) {
         } catch {}
         pages.innerHTML = `Page count: ${volumeInfo.pageCount}` || "no pages";
         // * image for book cover
-        let imgUrl = "static/bookclub/club2.png";
+        let imgUrl = "/staticfiles/bookclub/club2.png";
         try {
           imgUrl = volumeInfo.imageLinks.thumbnail;
         } catch {}
@@ -325,32 +333,35 @@ function fillData(book, source) {
   }
 }
 
-function displayButtons(response, ...buttons) {
+function displayButtons(...buttons) {
   const removeBtn = document.querySelector(".remove-btn-container");
   const addBtn = document.querySelector(".add-btn");
   const rateBtn = document.querySelector(".rate-btn-container");
   const nextBtn = document.querySelector(".next-btn");
   const nextBook = document.querySelector(".upcoming-book-container").dataset
     .bookid;
+  const editBtn = document.querySelector(".edit-btn");
   removeBtn.style.display = "none";
   addBtn.style.display = "none";
   rateBtn.style.display = "none";
   nextBtn.style.display = "none";
+  editBtn.style.display = "none";
 
-  if (!response) {
-  } else if (buttons.includes("remove")) {
-    addBtn.style.display = "none";
-    document.querySelector(".simple-text").innerHTML = `from the ${
-      response.year <= today - 50 ? "Classic" : "Modern"
-    } reading list`;
+  if (buttons.includes("remove")) {
+    // addBtn.style.display = "none";
     removeBtn.style.display = "flex";
     if (!nextBook) {
       nextBtn.style.display = "block";
     }
-  } else if (buttons.includes("rate")) {
+  }
+  if (buttons.includes("rate")) {
     rateBtn.style.display = "block";
-  } else if (buttons.includes("add")) {
+  }
+  if (buttons.includes("add")) {
     addBtn.style.display = "flex";
+  }
+  if (buttons.includes("edit")) {
+    editBtn.style.display = "block";
   }
 }
 
@@ -381,7 +392,7 @@ function showSearchResults(response) {
     try {
       link = item.volumeInfo.imageLinks.smallThumbnail;
     } catch {
-      link = "static/bookclub/club2.png";
+      link = "/staticfiles/bookclub/club2.png";
     }
     // creatig new row in table on 1st position
     let row = SearchTable.insertRow();
@@ -410,8 +421,10 @@ function setStyle(style) {
   if (style === "modern") {
     classicTable.style.display = "none";
     modernTable.style.display = "block";
-    document.body.style.backgroundImage = 'URL("/static/bookclub/13.jpeg")';
-    switchBtn.style.backgroundImage = 'URL("/static/bookclub/Modern2.png")';
+    document.body.style.backgroundImage =
+      "URL('/staticfiles/bookclub/13.jpeg')";
+    switchBtn.style.backgroundImage =
+      "URL('/staticfiles/bookclub/Modern2.png')";
     links.forEach((item) => {
       item.classList.replace("brand", "brandNeon");
     });
@@ -419,8 +432,10 @@ function setStyle(style) {
   if (style === "classic") {
     classicTable.style.display = "block";
     modernTable.style.display = "none";
-    document.body.style.backgroundImage = 'URL("/static/bookclub/back2.jpeg")';
-    switchBtn.style.backgroundImage = 'URL("/static/bookclub/classic2.png")';
+    document.body.style.backgroundImage =
+      "URL('/staticfiles/bookclub/back2.jpeg')";
+    switchBtn.style.backgroundImage =
+      "URL('/staticfiles/bookclub/classic2.png')";
     links.forEach((item) => {
       item.classList.replace("brandNeon", "brand");
     });
@@ -444,6 +459,17 @@ function showModal(action) {
       document.querySelector(`#modal${action}`).style.display = "none";
     }
   };
+}
+
+function editBook() {
+  const year = document.querySelector("#year-input");
+  const country = document.querySelector("#country-input");
+  const title = document.querySelector(".view-title");
+  const author = document.querySelector(".view-author");
+  const desc = document.querySelector(".view-desc");
+  const image = document.querySelector(".view-image");
+  let pages = document.querySelector(".view-pages");
+  desc.style.display = "none";
 }
 
 function bookAction(book2change, action) {
@@ -549,7 +575,7 @@ function fillTableRow(item, where) {
     } catch {}
   }
   let param = [item.title, item.author, item.year, item.country, item.pages];
-  // history table includes 1 more column - rating
+  // history table includes 2 more column - rating
   if (where === "history") {
     param.push(item.rating || "-");
   }

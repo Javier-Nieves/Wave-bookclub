@@ -88,11 +88,11 @@
             <div class="main-right-part">
               <div class="switch-container">
                 <button class="switch"></button>
-                <img src='/static/bookclub/121.gif' class="switch-back">
+                <img src='{% static "bookclub/121.gif" %}' class="switch-back">
               </div>
 
               <div id="search-results" style="display: none;">
-                <img src='static/bookclub/club2.png' style="width: 7vw; margin: 5px"></img>
+                <img src='{% static "bookclub/club2.png" %}' style="width: 7vw; margin: 5px"></img>
                 <table>
                   <thead>
                     <tr id='search-head' class="clas-head">
@@ -107,7 +107,7 @@
               </div>
 
               <div id="history-view" style="display: none;">
-                <img src='static/bookclub/club2.png' style="width: 7vw; margin: 5px"></img>
+                <img src='{% static "bookclub/club2.png" %}' style="width: 7vw; margin: 5px"></img>
                 <table>
                   <thead>
                     <tr id='history-head' class="history-head" data-table="history">
@@ -159,8 +159,13 @@
                   <div class="book-info-top">
                     <div>
                       <h1 class="view-title"></h1>
-                      <h2 class="view-author"></h2>
-                      <div class="view-pages"></div>
+                      <div style="display:flex; justify-content: center; gap:15px;">
+                        <div>
+                          <h2 class="view-author"></h2>
+                          <div class="view-pages"></div>
+                        </div>
+                        <button class="edit-btn">Edit</button>
+                      </div>
                     </div>
                     <button class="view-rating"></button>
                   </div>
@@ -228,7 +233,7 @@
           </div>
 
           <div class='modal' id="load-screen">
-            <img src='static/bookclub/gif4.gif' class="load-screen-gif"></img>
+            <img src='{% static "bookclub/gif4.gif" %}' class="load-screen-gif"></img>
           </div>
 
           <div id="modalmessage">
