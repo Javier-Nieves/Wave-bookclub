@@ -302,6 +302,10 @@ h2 {
     border: 1px solid yellow;
     padding: 0px 18px 0px 18px;
 }
+.save-btn {
+    background-color: rgba(3, 3, 3, 0.877);
+    color: whitesmoke;
+}
 .enter-container {
     position: absolute;
     right: 2vw;

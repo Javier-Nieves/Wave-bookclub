@@ -83,10 +83,8 @@ document.addEventListener("DOMContentLoaded", function () {
       book2edit = document.querySelector(".view-title").dataset.bookid;
     } catch {}
     if (editBtn.innerHTML === "Edit") {
-      console.log("edit");
       editBook();
     } else if (editBtn.innerHTML === "Save") {
-      console.log("save", book2edit);
       makeChange2Book(book2edit, "save");
     }
   };
@@ -470,12 +468,16 @@ function showModal(action) {
   };
 }
 
-function editBook(bool) {
+function editBook() {
+  changing = true;
   const title = document.querySelector(".view-title");
   const author = document.querySelector(".view-author");
   const desc = document.querySelector(".view-desc");
   const image = document.querySelector(".view-image");
   let pages = document.querySelector(".view-pages");
+  try {
+    document.querySelector(".view-rating").style.display = "none";
+  } catch {}
   const info = document.querySelector(".book-info");
   const heig = info.offsetHeight;
   const wid = info.offsetWidth;
@@ -484,24 +486,24 @@ function editBook(bool) {
   newTitle.value = title.innerHTML;
   newTitle.className = "newTitleInput";
   newTitle.style.width = `${wid - 40}px`;
-  title.parentElement.replaceChild(newTitle, title);
+  title.parentElement.prepend(newTitle);
   title.style.display = "none";
   const newAuthor = document.createElement("input");
   newAuthor.value = author.innerHTML;
   newAuthor.className = "newAuthorInput";
-  author.parentElement.replaceChild(newAuthor, author);
+  author.parentElement.prepend(newAuthor);
   author.style.display = "none";
   const newPages = document.createElement("input");
   newPages.value = pages.innerHTML;
   newPages.className = "newPagesInput";
   newPages.setAttribute("type", "number");
-  pages.parentElement.replaceChild(newPages, pages);
+  pages.parentElement.append(newPages);
   pages.style.display = "none";
   const newDesc = document.createElement("textarea");
   newDesc.className = "newDesc";
   newDesc.innerHTML = desc.innerText;
-  desc.parentElement.replaceChild(newDesc, desc);
-  desc.innerHTML = "";
+  desc.parentElement.append(newDesc);
+  desc.style.display = "none";
   const editBtn = document.querySelector(".edit-btn");
   editBtn.classList.add("save-btn");
   editBtn.innerHTML = "Save";
@@ -605,9 +607,7 @@ function makeChange2Book(bookid, action, rating) {
     const newAuthor = document.querySelector(".newAuthorInput").value;
     const newTitle = document.querySelector(".newTitleInput").value;
     const newPages = document.querySelector(".newPagesInput").value;
-    // todo - check for integer in newPagesInput
-    const newDesc = document.querySelector(".newDesc").innerHTML;
-    // console.log(newAuthor, newTitle, newPages, newDesc);
+    const newDesc = document.querySelector(".newDesc").value;
     fetch(`/edit/${bookid}`, {
       method: "PUT",
       body: JSON.stringify({
@@ -739,10 +739,9 @@ function waitNreload(message) {
     document.querySelector(".message-text").innerHTML = `${
       message === "logout" ? "Logged out" : "Updated"
     }`;
-    showAllBooks();
     setTimeout(function () {
       window.location.reload();
-    }, 1000);
+    }, 800);
     return;
   }
   // some time is needed to update DB
@@ -789,6 +788,22 @@ function HideAll() {
   document.querySelector(".view-rating").style.display = "none";
   document.querySelector("#year-input").value = "";
   document.querySelector("#country-input").value = "";
+  // in case Edit function wasn't completed:
+  try {
+    // todo - use selectorAll and for loop
+    document.querySelector(".newTitleInput").remove();
+    document.querySelector(".newAuthorInput").remove();
+    document.querySelector(".newPagesInput").remove();
+    document.querySelector(".newDesc").remove();
+    document.querySelector(".view-title").style.display = "block";
+    document.querySelector(".view-author").style.display = "block";
+    document.querySelector(".view-desc").style.display = "block";
+    document.querySelector(".view-pages").style.display = "block";
+    document.querySelector(".book-info").style.overflow = "auto";
+    const editBtn = document.querySelector(".edit-btn");
+    editBtn.classList.remove("save-btn");
+    editBtn.innerHTML = "Edit";
+  } catch {}
 }
 
 function hideModals() {
@@ -807,7 +822,6 @@ function hideControls() {
 // ? history (back button) action
 window.addEventListener("popstate", function (event) {
   // The popstate event is fired each time when the current history entry changes.
-  console.log(window.location.href);
   // window.location = document.referrer;
   if (window.location.href.slice(-7) === "history") {
     showHistory();
@@ -818,9 +832,6 @@ window.addEventListener("popstate", function (event) {
   if (window.location.href.slice(-6) === "search") {
     searchBook();
   }
-  console.log(window.location.href.slice(-20, -13));
   if (window.location.href.slice(-20, -13) === "refresh") {
-    showBook(window.location.href.slice(-12));
-    console.log(window.location.href.slice(-12));
   }
 });
