@@ -218,7 +218,7 @@ h2 {
     align-items: center;
     margin: 8px 0 8px 0;
 }
-.searchField, .meetingField {
+.searchField, .meetingField, .newTitleInput, .newAuthorInput {
     width: 20vw;
     color: whitesmoke;
     font-size: 22px;
@@ -357,6 +357,7 @@ h2 {
     margin-top: 8vh;
     background-color: rgba(232, 232, 232, 0.87);
     border-radius: 10px;
+    width: 67vw;
 }
 .book-info-top {
     display: flex;
@@ -364,9 +365,8 @@ h2 {
     align-items: center;
     gap: 3vw;
 }
-.view-desc {
+.view-desc, .newDesc {
     font-size: 20px;
-    /* font-family: 'Playfair Display', serif; */
     border: 1px solid gray;
     border-radius: 5px;
     padding: 10px;
@@ -458,7 +458,26 @@ h2 {
     text-decoration: none;
     cursor: pointer;
   }
-
+.newTitleInput {
+    font-family: 'Playfair Display', serif;
+    font-size: 6vh;
+    font-weight: 600;
+    margin: 10px;
+    color: rgb(17, 17, 17);
+}
+.newAuthorInput {
+    font-family: 'Playfair Display', serif;
+    font-size: 3vh;
+    font-weight: 600;
+    color: black;
+}
+.newDesc {
+    width: 90%; 
+    max-width: 90%;
+    height: 60%;
+    max-height: 60%;
+    background-color: rgba(245, 245, 245, 0.1);
+}
 /* ? Tables */
 
 @keyframes flicker {

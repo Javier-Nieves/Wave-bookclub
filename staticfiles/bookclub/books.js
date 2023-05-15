@@ -76,9 +76,19 @@ document.addEventListener("DOMContentLoaded", function () {
     bookAction(book2change, "remove");
   };
   // ! edit book
-  document.querySelector(".edit-btn").onclick = () => {
-    console.log("edit");
-    editBook();
+  let book2edit;
+  const editBtn = document.querySelector(".edit-btn");
+  editBtn.onclick = () => {
+    try {
+      book2edit = document.querySelector(".view-title").dataset.bookid;
+    } catch {}
+    if (editBtn.innerHTML === "Edit") {
+      console.log("edit");
+      editBook();
+    } else if (editBtn.innerHTML === "Save") {
+      console.log("save", book2edit);
+      makeChange2Book(book2edit, "save");
+    }
   };
   // ! rate book
   document.querySelector(".rate-btn").addEventListener("click", () => {
@@ -163,7 +173,6 @@ function showAllBooks(message) {
       // * on page refresh for the book
       let bookRefresh = document.querySelector("#bookid-refresh");
       if (bookRefresh.innerHTML !== "") {
-        console.log(bookRefresh.innerHTML);
         showBook(bookRefresh.innerHTML);
         bookRefresh.innerHTML = "";
       }
@@ -299,7 +308,7 @@ function fillData(book, source) {
     title.innerHTML = book.title;
     title.dataset.bookid = book.bookid;
     author.innerHTML = book.author;
-    pages.innerHTML = `Page count: ${book.pages}`;
+    pages.innerHTML = `${book.pages}`;
     description.innerHTML = book.desc;
     image.src = book.image_link;
     if (book.rating) {
@@ -319,7 +328,7 @@ function fillData(book, source) {
         try {
           author.innerHTML = volumeInfo.authors[0];
         } catch {}
-        pages.innerHTML = `Page count: ${volumeInfo.pageCount}` || "no pages";
+        pages.innerHTML = `${volumeInfo.pageCount}` || "no pages";
         // * image for book cover
         let imgUrl = "/staticfiles/bookclub/club2.png";
         try {
@@ -461,15 +470,41 @@ function showModal(action) {
   };
 }
 
-function editBook() {
-  const year = document.querySelector("#year-input");
-  const country = document.querySelector("#country-input");
+function editBook(bool) {
   const title = document.querySelector(".view-title");
   const author = document.querySelector(".view-author");
   const desc = document.querySelector(".view-desc");
   const image = document.querySelector(".view-image");
   let pages = document.querySelector(".view-pages");
-  desc.style.display = "none";
+  const info = document.querySelector(".book-info");
+  const heig = info.offsetHeight;
+  const wid = info.offsetWidth;
+  info.style.height = `${heig + 200}px`;
+  const newTitle = document.createElement("input");
+  newTitle.value = title.innerHTML;
+  newTitle.className = "newTitleInput";
+  newTitle.style.width = `${wid - 40}px`;
+  title.parentElement.replaceChild(newTitle, title);
+  title.style.display = "none";
+  const newAuthor = document.createElement("input");
+  newAuthor.value = author.innerHTML;
+  newAuthor.className = "newAuthorInput";
+  author.parentElement.replaceChild(newAuthor, author);
+  author.style.display = "none";
+  const newPages = document.createElement("input");
+  newPages.value = pages.innerHTML;
+  newPages.className = "newPagesInput";
+  newPages.setAttribute("type", "number");
+  pages.parentElement.replaceChild(newPages, pages);
+  pages.style.display = "none";
+  const newDesc = document.createElement("textarea");
+  newDesc.className = "newDesc";
+  newDesc.innerHTML = desc.innerText;
+  desc.parentElement.replaceChild(newDesc, desc);
+  desc.innerHTML = "";
+  const editBtn = document.querySelector(".edit-btn");
+  editBtn.classList.add("save-btn");
+  editBtn.innerHTML = "Save";
 }
 
 function bookAction(book2change, action) {
@@ -546,6 +581,7 @@ function makeChange2Book(bookid, action, rating) {
       };
     });
   }
+  // choose nest book
   if (action === "next") {
     fetch(`/edit/${bookid}`, {
       method: "PUT",
@@ -554,6 +590,7 @@ function makeChange2Book(bookid, action, rating) {
       }),
     });
   }
+  // rate current book
   if (action === "rate") {
     fetch(`/edit/${bookid}`, {
       method: "PUT",
@@ -562,6 +599,34 @@ function makeChange2Book(bookid, action, rating) {
       }),
     });
   }
+  // save changes to book's data in DB
+  if (action === "save") {
+    // todo - Would be great not to reload page but just change content
+    const newAuthor = document.querySelector(".newAuthorInput").value;
+    const newTitle = document.querySelector(".newTitleInput").value;
+    const newPages = document.querySelector(".newPagesInput").value;
+    // todo - check for integer in newPagesInput
+    const newDesc = document.querySelector(".newDesc").innerHTML;
+    // console.log(newAuthor, newTitle, newPages, newDesc);
+    fetch(`/edit/${bookid}`, {
+      method: "PUT",
+      body: JSON.stringify({
+        save: true,
+        newAuthor: newAuthor,
+        newTitle: newTitle,
+        newPages: newPages,
+        newDesc: newDesc,
+      }),
+    });
+    waitNreload("save");
+  }
+}
+
+function finishEditing() {
+  const title = document.querySelector(".view-title");
+  const author = document.querySelector(".view-author");
+  const description = document.querySelector(".view-desc");
+  const pages = document.querySelector(".view-pages");
 }
 
 function fillTableRow(item, where) {
@@ -668,7 +733,7 @@ function deleteYearRows(rows) {
 }
 
 function waitNreload(message) {
-  const reloadList = ["rate", "next", "logout"];
+  const reloadList = ["rate", "next", "logout", "save"];
   if (reloadList.includes(message)) {
     document.querySelector("#modalmessage").style.display = "flex";
     document.querySelector(".message-text").innerHTML = `${

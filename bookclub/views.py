@@ -91,7 +91,17 @@ def edit_book(request, bookid):
             book.rating = rating
             book.read = True
             book.upcoming = False
-            # todo - add today if no meeting date
+
+        if data.get("save") is not None:
+            book = Book.objects.get(bookid=bookid, club=request.user)
+            newAuthor = data['newAuthor']
+            newTitle = data['newTitle']
+            newPages = float(data['newPages'])//1
+            newDesc = data['newDesc']
+            book.author = newAuthor
+            book.title = newTitle
+            book.pages = newPages
+            book.desc = newDesc
 
         book.save()
         return HttpResponse(status=204)
