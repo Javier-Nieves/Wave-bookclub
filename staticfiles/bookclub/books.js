@@ -163,11 +163,11 @@ function showAllBooks(message) {
           fillTableRow(book, "modern");
         }
       });
+      arrangeCountries("main");
       loadScreen(false);
       if (message) {
         showMessage(message);
       }
-
       // * on page refresh for the book
       let bookRefresh = document.querySelector("#bookid-refresh");
       if (bookRefresh.innerHTML !== "") {
@@ -247,8 +247,9 @@ function showHistory() {
           yearChange = item.meeting_date.slice(0, 4);
           fillTableRow(item, "history");
         }
-        loadScreen(false);
       });
+      arrangeCountries("history");
+      loadScreen(false);
     });
   window.history.pushState(null, null, `/history`);
 }
@@ -469,7 +470,6 @@ function showModal(action) {
 }
 
 function editBook() {
-  changing = true;
   const title = document.querySelector(".view-title");
   const author = document.querySelector(".view-author");
   const desc = document.querySelector(".view-desc");
@@ -819,7 +819,7 @@ function hideControls() {
   document.querySelector(".add-date-container").style.display = "none";
 }
 
-// ? history (back button) action
+// ! history (back button) action
 window.addEventListener("popstate", function (event) {
   // The popstate event is fired each time when the current history entry changes.
   // window.location = document.referrer;
@@ -835,3 +835,89 @@ window.addEventListener("popstate", function (event) {
   if (window.location.href.slice(-20, -13) === "refresh") {
   }
 });
+
+function arrangeCountries(section) {
+  let countries = [];
+  let flags = [];
+  let table;
+  fetch(`https://restcountries.com/v3.1/all?fields=name,flags`)
+    .then((response) => response.json())
+    .then((result) => {
+      result.forEach((country) => {
+        // create lists of countries and their flags
+        countries.push(country.name.common);
+        flags.push(country.flags.png);
+      });
+      changeCountries(countries);
+      if (section === "history") {
+        table = document.querySelector(".history-table");
+        fillFlags(table, countries, flags);
+      } else if (section === "main") {
+        table = document.querySelector(".classic-table");
+        fillFlags(table, countries, flags);
+        table = document.querySelector(".modern-table");
+        fillFlags(table, countries, flags);
+      }
+    });
+
+  function fillFlags(table, countries, flags) {
+    const rows = table.rows;
+    let flag;
+    for (let k = 0; k < rows.length; k++) {
+      let cellValue = rows[k].cells[3].innerHTML;
+      for (let p = 0; p < countries.length; p++) {
+        if (cellValue === countries[p]) {
+          flag = flags[p];
+          rows[k].cells[3].innerHTML = `
+            <div class='flagContainer'>
+              <div>${cellValue}</div>
+              <img src="${flag}" class='smallFlag'>
+            </div>`;
+        }
+      }
+    }
+
+    // const countryInput = document.getElementById("countryInput");
+    // const countryList = document.getElementById("countryList");
+    // // Populate the datalist options
+    // countries.forEach(function (country) {
+    //   let option = document.createElement("option");
+    //   option.value = country;
+    //   countryList.appendChild(option);
+    // });
+    // // validate input
+    // countryInput.addEventListener("change", function (event) {
+    //   let selectedCountry = event.target.value;
+    //   let isValidCountry = countries.includes(selectedCountry);
+    //   if (!isValidCountry) {
+    //     event.target.setCustomValidity("Please select a valid country");
+    //   }
+    // });
+
+    // const form = document.querySelector(".inp-form");
+    // form.onsubmit = (e) => {
+    //   let source;
+    //   e.preventDefault();
+    //   const name = document.querySelector("#countryInput").value;
+    //   document.querySelector("#bigName").innerHTML = name;
+    //   const flag = document.querySelector("#flag");
+    //   for (let j = 0; j < countries.length; j++) {
+    //     if (countries[j] === name) {
+    //       source = flags[j];
+    //     }
+    //   }
+    //   flag.src = source;
+    // };
+  }
+}
+
+function changeCountries(countries) {
+  for (let i = 0; i < countries.length; i++) {
+    if (countries[i] === "United States") {
+      countries[i] = "USA";
+    }
+    if (countries[i] === "United Kingdom") {
+      countries[i] = "UK";
+    }
+  }
+}
