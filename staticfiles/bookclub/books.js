@@ -67,6 +67,7 @@ document.addEventListener("DOMContentLoaded", function () {
   } catch {}
   // ! add book to the reading list
   document.querySelector(".add-btn").onclick = () => {
+    arrangeCountries("new");
     const book2change = document.querySelector(".view-title").dataset.bookid;
     bookAction(book2change, "add");
   };
@@ -849,6 +850,7 @@ function arrangeCountries(section) {
         flags.push(country.flags.png);
       });
       changeCountries(countries);
+
       if (section === "history") {
         table = document.querySelector(".history-table");
         fillFlags(table, countries, flags);
@@ -857,6 +859,25 @@ function arrangeCountries(section) {
         fillFlags(table, countries, flags);
         table = document.querySelector(".modern-table");
         fillFlags(table, countries, flags);
+      } else if (section === "new") {
+        const countryInput = document.getElementById("country-input");
+        const countryList = document.getElementById("countryList");
+        // Populate the datalist options
+        countries.forEach(function (country) {
+          let option = document.createElement("option");
+          option.value = country;
+          countryList.appendChild(option);
+        });
+        // validate input
+        countryInput.addEventListener("change", function (event) {
+          let selectedCountry = event.target.value;
+          console.log(selectedCountry);
+          let isValidCountry = countries.includes(selectedCountry);
+          console.log(countries.includes(selectedCountry));
+          if (!isValidCountry) {
+            event.target.setCustomValidity("Please select a valid country");
+          }
+        });
       }
     });
 
@@ -876,38 +897,6 @@ function arrangeCountries(section) {
         }
       }
     }
-
-    // const countryInput = document.getElementById("countryInput");
-    // const countryList = document.getElementById("countryList");
-    // // Populate the datalist options
-    // countries.forEach(function (country) {
-    //   let option = document.createElement("option");
-    //   option.value = country;
-    //   countryList.appendChild(option);
-    // });
-    // // validate input
-    // countryInput.addEventListener("change", function (event) {
-    //   let selectedCountry = event.target.value;
-    //   let isValidCountry = countries.includes(selectedCountry);
-    //   if (!isValidCountry) {
-    //     event.target.setCustomValidity("Please select a valid country");
-    //   }
-    // });
-
-    // const form = document.querySelector(".inp-form");
-    // form.onsubmit = (e) => {
-    //   let source;
-    //   e.preventDefault();
-    //   const name = document.querySelector("#countryInput").value;
-    //   document.querySelector("#bigName").innerHTML = name;
-    //   const flag = document.querySelector("#flag");
-    //   for (let j = 0; j < countries.length; j++) {
-    //     if (countries[j] === name) {
-    //       source = flags[j];
-    //     }
-    //   }
-    //   flag.src = source;
-    // };
   }
 }
 

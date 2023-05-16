@@ -211,7 +211,8 @@
                 <form class="modal-form-add">
                   <div>
                     <input type="number" class="searchField" id="year-input" placeholder="Year of publication" autofocus required>
-                    <input type="text" class="searchField" id="country-input" placeholder="Country" required>
+                    <input type="text" class="searchField" id="country-input" list="countryList" placeholder="Country" required>
+                    <datalist id="countryList"></datalist>
                   </div>
                   <input type="submit" class="modal-btn" value="Add">
                 </form>
