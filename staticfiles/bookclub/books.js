@@ -6,6 +6,12 @@ let isLogged = false;
 
 document.addEventListener("DOMContentLoaded", function () {
   isLogged = tryLogin();
+  // capitalize bookclub name
+  const club = document.querySelector(".name-text");
+  let clubName = club.innerHTML;
+  let capitalized = clubName.charAt(0).toUpperCase() + clubName.substring(1);
+  club.innerHTML = capitalized;
+
   // ! put all books in the tables
   const switchBtn = document.querySelector(".switch");
   const classicTable = document.querySelector("#classicTable");
@@ -838,48 +844,52 @@ window.addEventListener("popstate", function (event) {
 });
 
 function arrangeCountries(section) {
-  let countries = [];
-  let flags = [];
-  let table;
-  fetch(`https://restcountries.com/v3.1/all?fields=name,flags`)
-    .then((response) => response.json())
-    .then((result) => {
-      result.forEach((country) => {
-        // create lists of countries and their flags
-        countries.push(country.name.common);
-        flags.push(country.flags.png);
-      });
-      changeCountries(countries);
+  const option = document.querySelector("option");
+  // if options aren't filled yet:
+  if (!option) {
+    let countries = [];
+    let flags = [];
+    let table;
+    fetch(`https://restcountries.com/v3.1/all?fields=name,flags`)
+      .then((response) => response.json())
+      .then((result) => {
+        result.forEach((country) => {
+          // create lists of countries and their flags
+          countries.push(country.name.common);
+          flags.push(country.flags.png);
+        });
+        changeCountries(countries);
 
-      if (section === "history") {
-        table = document.querySelector(".history-table");
-        fillFlags(table, countries, flags);
-      } else if (section === "main") {
-        table = document.querySelector(".classic-table");
-        fillFlags(table, countries, flags);
-        table = document.querySelector(".modern-table");
-        fillFlags(table, countries, flags);
-      } else if (section === "new") {
-        const countryInput = document.getElementById("country-input");
-        const countryList = document.getElementById("countryList");
-        // Populate the datalist options
-        countries.forEach(function (country) {
-          let option = document.createElement("option");
-          option.value = country;
-          countryList.appendChild(option);
-        });
-        // validate input
-        countryInput.addEventListener("change", function (event) {
-          let selectedCountry = event.target.value;
-          console.log(selectedCountry);
-          let isValidCountry = countries.includes(selectedCountry);
-          console.log(countries.includes(selectedCountry));
-          if (!isValidCountry) {
-            event.target.setCustomValidity("Please select a valid country");
-          }
-        });
-      }
-    });
+        if (section === "history") {
+          table = document.querySelector(".history-table");
+          fillFlags(table, countries, flags);
+        } else if (section === "main") {
+          table = document.querySelector(".classic-table");
+          fillFlags(table, countries, flags);
+          table = document.querySelector(".modern-table");
+          fillFlags(table, countries, flags);
+        } else if (section === "new") {
+          const countryInput = document.getElementById("country-input");
+          const countryList = document.getElementById("countryList");
+          // Populate the datalist options
+          countries.forEach(function (country) {
+            let option = document.createElement("option");
+            option.value = country;
+            countryList.appendChild(option);
+          });
+          // validate input
+          countryInput.addEventListener("change", function (event) {
+            let selectedCountry = event.target.value;
+            console.log(selectedCountry);
+            let isValidCountry = countries.includes(selectedCountry);
+            console.log(countries.includes(selectedCountry));
+            if (!isValidCountry) {
+              event.target.setCustomValidity("Please select a valid country");
+            }
+          });
+        }
+      });
+  }
 
   function fillFlags(table, countries, flags) {
     const rows = table.rows;

@@ -583,9 +583,9 @@ th, td {
     cursor: pointer;
 }
 .upcom-book {
-    background-color: rgba(8, 254, 200, 0.774);
+    background-color: rgba(224, 217, 3, 0.634);
     color: #050801;
-    box-shadow: 0 0 5px #ffffff9b, 0 0 25px #27e7f8;
+    box-shadow: 0 0 5px #ffffff9b, 0 0 25px #d4ca01, 0 0 50px #f5e901a5;
 }
 /* * History */
 #history-link, #reading-link {
@@ -743,4 +743,29 @@ display: none;
         opacity: 0;
         transform: translateY(-40%);
       }
-    }
+}
+
+datalist {
+  position: absolute;
+  background-color: white;
+  border: 1px solid blue;
+  border-radius: 0 0 5px 5px;
+  border-top: none;
+  font-family: sans-serif;
+  width: 350px;
+  padding: 5px;
+  max-height: 10rem;
+  overflow-y: auto
+  
+}
+
+option {
+  background-color: white;
+  padding: 4px;
+  color: blue;
+    font-size: 40px;
+  cursor: pointer;
+}
+option:hover,  .active{
+    background-color: lightblue;
+  }
