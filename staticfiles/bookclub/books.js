@@ -7,10 +7,12 @@ let isLogged = false;
 document.addEventListener("DOMContentLoaded", function () {
   isLogged = tryLogin();
   // capitalize bookclub name
-  const club = document.querySelector(".name-text");
-  let clubName = club.innerHTML;
-  let capitalized = clubName.charAt(0).toUpperCase() + clubName.substring(1);
-  club.innerHTML = capitalized;
+  try {
+    const club = document.querySelector(".name-text");
+    let clubName = club.innerHTML;
+    let capitalized = clubName.charAt(0).toUpperCase() + clubName.substring(1);
+    club.innerHTML = capitalized;
+  } catch {}
 
   // ! put all books in the tables
   const switchBtn = document.querySelector(".switch");
