@@ -385,7 +385,6 @@ function displayButtons(...buttons) {
 function searchBook() {
   let title = document.querySelector(".searchField").value;
   window.history.pushState("unused", "unused", `/search`);
-
   fetch(
     `https://www.googleapis.com/books/v1/volumes?q=+intitle:${title}&maxResults=20`
   )
@@ -395,6 +394,7 @@ function searchBook() {
         showSearchResults(data);
       } else loadScreen(false);
     });
+  document.querySelector(".searchField").value = "";
 }
 
 function showSearchResults(response) {
@@ -439,7 +439,13 @@ function setStyle(style) {
     classicTable.style.display = "none";
     modernTable.style.display = "block";
     document.body.style.backgroundImage =
-      "URL('/staticfiles/bookclub/13.jpeg')";
+      "URL('/staticfiles/bookclub/13small.jpg')";
+    let img = new Image();
+    img.src = "/staticfiles/bookclub/13.jpg";
+    img.addEventListener("load", function () {
+      document.body.style.backgroundImage =
+        "URL('/staticfiles/bookclub/13.jpg')";
+    });
     switchBtn.style.backgroundImage =
       "URL('/staticfiles/bookclub/Modern2.png')";
     links.forEach((item) => {
@@ -450,7 +456,13 @@ function setStyle(style) {
     classicTable.style.display = "block";
     modernTable.style.display = "none";
     document.body.style.backgroundImage =
-      "URL('/staticfiles/bookclub/back2.jpeg')";
+      "URL('/staticfiles/bookclub/back2small.jpg')";
+    let img = new Image();
+    img.src = "/staticfiles/bookclub/back2.jpeg";
+    img.addEventListener("load", function () {
+      document.body.style.backgroundImage =
+        "URL('/staticfiles/bookclub/back2.jpeg')";
+    });
     switchBtn.style.backgroundImage =
       "URL('/staticfiles/bookclub/classic2.png')";
     links.forEach((item) => {

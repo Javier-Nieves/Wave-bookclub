@@ -52,7 +52,7 @@
               {% if up_book.bookid %}
                 <h1 id="upcoming-title" class="book2show">{{up_book.title}}</h1>
                 <h3 id="upcoming-autor" class="book2show">{{up_book.author}}, {{up_book.year}}</h3>
-                <img id="upcoming-pic" src={{up_book.image_link}} class="book2show"></img>
+                <img id="upcoming-pic" src={{up_book.image_link}} class="book2show" loading="lazy"></img>
                 <div class="upcoming-container">
                   <div id="upcoming-date">Meeting date:</div>
                   <form class="add-date-container">
@@ -70,7 +70,7 @@
               </div>
 
               <div class="control-group">
-                <img class="view-image" src="" alt="Book Cover">
+                <img class="view-image" src="" alt="Book Cover" loading="lazy">
                 <button class="add-btn">To the Reading List</button>
                 <div class="remove-btn-container">
                   <button class="remove-btn">Remove</button>

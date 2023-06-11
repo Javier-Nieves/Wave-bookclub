@@ -41,10 +41,6 @@ body {
 }
 
 h1 {
-    /* font-family: Georgia, "Century Schoolbook L", Serif; 7*/
-    /* font-family: Impact, "Charcoal CY", sans-serif; */
-    /* font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif; 7*/
-    /* font-family: 'Neucha', cursive; */
     font-family: 'Playfair Display', serif;
     font-size: 6vh;
     font-weight: 600;
@@ -390,15 +386,16 @@ h2 {
 }
 .view-rating {
     display:none;
+    position: absolute;
+    right: 8%;
     background-image: url('gif3.gif');
     background-size: cover;
     width: 9vw;
     height: 8vw;
-    margin-right: 3vw;
     border: 1px solid yellow;
     border-radius: 10px;
     color: rgba(198, 0, 0, 0.867);
-    font-size: 60px;
+    font-size: 4vw;
     font-weight: 700;
     font-family: Arial, Helvetica, sans-serif;
     -webkit-text-stroke: 2px rgb(248, 248, 248);
@@ -795,5 +792,12 @@ option:hover,  .active{
         width: 23vw;
         height: 20vw;
         margin-left: -22vw;
+    }
+    .view-rating {
+        right: 9%;
+        top: 230px;
+        width: 20vw;
+        height: 20vw;
+        font-size: 10vw;
     }
 }
