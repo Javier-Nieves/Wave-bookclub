@@ -15,7 +15,7 @@
         <script src="{% static 'bookclub/books.js' %}"></script>
     </head>
     <body>
-      {% if user.is_authenticated %} 
+      {% if user.is_authenticated %}
         <input type="hidden" id="authenticated" value={{user.username}}>
       {% endif %}
       {% if message %}

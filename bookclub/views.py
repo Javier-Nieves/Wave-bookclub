@@ -149,8 +149,7 @@ def register(request):
         try:
             club = User.objects.create_user(username, 'email', password)
             club.save()
-            # library = Library.objects.create(club=club)
-            # library.save()
+
         except IntegrityError:
             return index(request)
         login(request, club)
