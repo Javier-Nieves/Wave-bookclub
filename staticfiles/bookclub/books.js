@@ -14,12 +14,12 @@ document.addEventListener("DOMContentLoaded", function () {
     club.innerHTML = capitalized;
   } catch {}
 
-  // ! put all books in the tables
+  // put all books in the tables
   const switchBtn = document.querySelector(".switch");
   const classicTable = document.querySelector("#classicTable");
   showAllBooks();
 
-  // ! show book info when book2show class element is clicked
+  // show book info when book2show class element is clicked
   document.addEventListener("click", (e) => {
     const tar = e.target;
     // ? get book id from data attribute in title div => show this book
@@ -40,7 +40,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-  // ! Switch classic and modern tables and styles
+  // Switch classic and modern tables and styles
   switchBtn.onclick = () => {
     if (classicTable.style.display !== "none") {
       setStyle("modern");
@@ -49,42 +49,44 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   };
 
-  // ! add meeting date
+  // add meeting date
   const bookid = document.querySelector(".upcoming-book-container").dataset
     .bookid;
   try {
     document.querySelector(".meetingBtn").addEventListener("click", () => {
       makeChange2Book(bookid, "meeting");
     });
-  } catch {}
+  } catch (e) {
+    console.log("%cNo meeting button", "color:orange");
+  }
 
-  // ! search the book
-  // todo - add search by title and author
+  // search the book
+  // todo - add search by author
   document.querySelector(".search-form").onsubmit = (e) => {
     e.preventDefault();
     loadScreen(true);
     searchBook();
   };
 
-  // ! Enter your bookclub
+  // Enter your bookclub
   try {
     document.querySelector(".enter-btn").onclick = () => {
       const book2change = document.querySelector(".view-title").dataset.bookid;
       showModal("enter");
     };
   } catch {}
-  // ! add book to the reading list
+  // add book to the reading list
   document.querySelector(".add-btn").onclick = () => {
     arrangeCountries("new");
     const book2change = document.querySelector(".view-title").dataset.bookid;
     bookAction(book2change, "add");
   };
-  // ! remove book from lists
+  // remove book from lists
   document.querySelector(".remove-btn").onclick = () => {
     const book2change = document.querySelector(".view-title").dataset.bookid;
     bookAction(book2change, "remove");
   };
-  // ! edit book
+  // edit book
   let book2edit;
   const editBtn = document.querySelector(".edit-btn");
   editBtn.onclick = () => {
@@ -97,18 +99,18 @@ document.addEventListener("DOMContentLoaded", function () {
       makeChange2Book(book2edit, "save");
     }
   };
-  // ! rate book
+  // rate book
   document.querySelector(".rate-btn").addEventListener("click", () => {
     const book2change = document.querySelector(".view-title").dataset.bookid;
     bookAction(book2change, "rate");
   });
-  // ! next book selection
+  // next book selection
   document.querySelector(".next-btn").onclick = () => {
     const book2change = document.querySelector(".view-title").dataset.bookid;
     makeChange2Book(book2change, "next");
     waitNreload("next");
   };
-  // ! logout
+  // logout
   try {
     document.querySelector(".exit-btn").onclick = () => {
       fetch("/logout");
@@ -117,12 +119,12 @@ document.addEventListener("DOMContentLoaded", function () {
     };
   } catch {}
 
-  // ! Show reading list
+  // Show reading list
   const readLink = document.querySelector("#reading-link");
   readLink.onclick = () => {
     showAllBooks();
   };
-  // ! Show history
+  // Show history
   const histLink = document.querySelector("#history-link");
   histLink.onclick = () => {
     showHistory();
@@ -148,8 +150,8 @@ function showAllBooks(message) {
   loadScreen(true);
   // outside users shouldn't see control elements
   !isLogged && hideControls();
-
-  // is there a backend info?
+  // is there a backend message?
+  // todo - fix try-catch everywhere
   try {
     let message = document.querySelector("#message").innerHTML;
     showMessage(message);
@@ -177,18 +179,19 @@ function showAllBooks(message) {
       if (message) {
         showMessage(message);
       }
-      // * on page refresh for the book
+      // on page refresh for the book
       let bookRefresh = document.querySelector("#bookid-refresh");
       if (bookRefresh.innerHTML !== "") {
         showBook(bookRefresh.innerHTML);
         bookRefresh.innerHTML = "";
       }
     });
-  // ! What's the next book? Set page style accordingly
-  let isClassic = true;
-  isClassic =
-    document.querySelector(".upcoming-book-container").dataset.isclassic <
-    today - 50;
+  // What's the next book? Set page style accordingly
+  const upcomBookYear =
+    document.querySelector(".upcoming-book-container").dataset.isclassic ||
+    1666;
+  console.log(upcomBookYear);
+  const isClassic = upcomBookYear < today - 50;
   if (isClassic) {
     setStyle("modern");
   } else {
@@ -394,7 +397,6 @@ function searchBook() {
         showSearchResults(data);
       } else loadScreen(false);
     });
-  document.querySelector(".searchField").value = "";
 }
 
 function showSearchResults(response) {
@@ -837,7 +839,11 @@ function hideModals() {
 
 function hideControls() {
   document.querySelector(".control-group").style.display = "none";
-  document.querySelector(".add-date-container").style.display = "none";
+  try {
+    document.querySelector(".add-date-container").style.display = "none";
+  } catch {
+    console.log("no date container");
+  }
 }
 
 // ! history (back button) action
