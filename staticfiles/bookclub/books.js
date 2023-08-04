@@ -1,23 +1,20 @@
 "use strict";
 // today gives year
-let today = new Date().toISOString().slice(0, 4);
+let today = new Date().getFullYear();
 // logged users will see control elements
 let isLogged = false;
 
 document.addEventListener("DOMContentLoaded", function () {
   isLogged = tryLogin();
-  // capitalize bookclub name
-  try {
-    const club = document.querySelector(".name-text");
-    let clubName = club.innerHTML;
-    let capitalized = clubName.charAt(0).toUpperCase() + clubName.substring(1);
-    club.innerHTML = capitalized;
-  } catch {}
-
-  // put all books in the tables
-  const switchBtn = document.querySelector(".switch");
-  const classicTable = document.querySelector("#classicTable");
   showAllBooks();
+  activateSearchForm(); // todo - add search by author
+  NavBtnsFunction();
+  bookBtnsFunctions();
+  switchBtnFunction();
+  meetingBtnFunction();
+  SessionBtnsFunction();
+  capitalizeName();
+  resizeTitle();
 
   // show book info when book2show class element is clicked
   document.addEventListener("click", (e) => {
@@ -39,102 +36,80 @@ document.addEventListener("DOMContentLoaded", function () {
       changeRegLink();
     }
   });
+});
 
-  // Switch classic and modern tables and styles
-  switchBtn.onclick = () => {
-    if (classicTable.style.display !== "none") {
-      setStyle("modern");
-    } else {
-      setStyle("classic");
-    }
-  };
+function NavBtnsFunction() {
+  const readLink = document.querySelector("#reading-link");
+  const histLink = document.querySelector("#history-link");
+  readLink.addEventListener("click", showAllBooks);
+  histLink.addEventListener("click", showHistory);
+}
 
-  // add meeting date
-  const bookid = document.querySelector(".upcoming-book-container").dataset
-    .bookid;
-  try {
-    document.querySelector(".meetingBtn").addEventListener("click", () => {
-      makeChange2Book(bookid, "meeting");
-    });
-  } catch (e) {
-    console.log("%cNo meeting button", "color:orange");
-  }
+function bookBtnsFunctions() {
+  document.querySelector(".add-btn").addEventListener("click", () => {
+    arrangeCountries("new");
+    addOrRemoveBook("add");
+  });
+  // prettier-ignore
+  document.querySelector(".remove-btn").addEventListener('click',() => addOrRemoveBook("remove"));
 
-  // search the book
-  // todo - add search by author
-  document.querySelector(".search-form").onsubmit = (e) => {
+  // edit book info
+  const editBtn = document.querySelector(".edit-btn");
+  editBtn.addEventListener("click", editBook);
+  // select next book
+  document.querySelector(".next-btn").addEventListener("click", () => {
+    makeChange2Book("next");
+    waitNreload("next");
+  });
+  // prettier-ignore
+  document.querySelector(".rate-btn").addEventListener("click", () => makeChange2Book("rate"));
+}
+
+function switchBtnFunction() {
+  const switchBtn = document.querySelector(".switch");
+  const classicTable = document.querySelector("#classicTable");
+  switchBtn.addEventListener("click", () =>
+    setStyle(classicTable.style.display !== "none" ? "modern" : "classic")
+  );
+}
+
+function meetingBtnFunction() {
+  // prettier-ignore
+  const bookid = document.querySelector(".upcoming-book-container").dataset.bookid;
+  document.querySelector(".meetingBtn")?.addEventListener("click", () => {
+    makeChange2Book(bookid, "meeting");
+  });
+}
+function SessionBtnsFunction() {
+  // prettier-ignore
+  document.querySelector(".enter-btn")?.addEventListener("click", () => showModal("enter"));
+  document.querySelector(".exit-btn")?.addEventListener("click", () => {
+    fetch("/logout");
+    showMessage("Logged out");
+    waitNreload("logout");
+  });
+}
+
+function activateSearchForm() {
+  document.querySelector(".search-form").addEventListener("submit", (e) => {
     e.preventDefault();
     loadScreen(true);
     searchBook();
-  };
-
-  // Enter your bookclub
-  try {
-    document.querySelector(".enter-btn").onclick = () => {
-      const book2change = document.querySelector(".view-title").dataset.bookid;
-      showModal("enter");
-    };
-  } catch {}
-  // add book to the reading list
-  document.querySelector(".add-btn").onclick = () => {
-    arrangeCountries("new");
-    const book2change = document.querySelector(".view-title").dataset.bookid;
-    bookAction(book2change, "add");
-  };
-  // remove book from lists
-  document.querySelector(".remove-btn").onclick = () => {
-    const book2change = document.querySelector(".view-title").dataset.bookid;
-    bookAction(book2change, "remove");
-  };
-  // edit book
-  let book2edit;
-  const editBtn = document.querySelector(".edit-btn");
-  editBtn.onclick = () => {
-    try {
-      book2edit = document.querySelector(".view-title").dataset.bookid;
-    } catch {}
-    if (editBtn.innerHTML === "Edit") {
-      editBook();
-    } else if (editBtn.innerHTML === "Save") {
-      makeChange2Book(book2edit, "save");
-    }
-  };
-  // rate book
-  document.querySelector(".rate-btn").addEventListener("click", () => {
-    const book2change = document.querySelector(".view-title").dataset.bookid;
-    bookAction(book2change, "rate");
   });
-  // next book selection
-  document.querySelector(".next-btn").onclick = () => {
-    const book2change = document.querySelector(".view-title").dataset.bookid;
-    makeChange2Book(book2change, "next");
-    waitNreload("next");
-  };
-  // logout
-  try {
-    document.querySelector(".exit-btn").onclick = () => {
-      fetch("/logout");
-      showMessage("Logged out");
-      waitNreload("logout");
-    };
-  } catch {}
+}
 
-  // Show reading list
-  const readLink = document.querySelector("#reading-link");
-  readLink.onclick = () => {
-    showAllBooks();
-  };
-  // Show history
-  const histLink = document.querySelector("#history-link");
-  histLink.onclick = () => {
-    showHistory();
-  };
+function capitalizeName() {
+  const club = document.querySelector(".name-text");
+  if (!club) return;
+  let clubName = club.innerHTML;
+  let capitalized = clubName.charAt(0).toUpperCase() + clubName.substring(1);
+  club.innerHTML = capitalized;
+}
 
+const resizeTitle = () => {
   const title = document.querySelector("#upcoming-title");
-  if (title.innerHTML.length > 20) {
-    title.style.fontSize = "4vh";
-  }
-});
+  title?.innerHTML.length > 20 && (title.style.fontSize = "4vh");
+};
 
 function tryLogin() {
   try {
@@ -190,7 +165,6 @@ function showAllBooks(message) {
   const upcomBookYear =
     document.querySelector(".upcoming-book-container").dataset.isclassic ||
     1666;
-  console.log(upcomBookYear);
   const isClassic = upcomBookYear < today - 50;
   if (isClassic) {
     setStyle("modern");
@@ -477,9 +451,7 @@ function showModal(action) {
   const close = document.querySelector(".close");
   const modal = document.querySelector(".modal");
   modal.style.display = "block";
-
   document.querySelector(`#modal${action}`).style.display = "block";
-
   close.onclick = () => {
     modal.style.display = "none";
     document.querySelector(`#modal${action}`).style.display = "none";
@@ -493,10 +465,11 @@ function showModal(action) {
 }
 
 function editBook() {
+  console.log("try to edit");
   const title = document.querySelector(".view-title");
   const author = document.querySelector(".view-author");
   const desc = document.querySelector(".view-desc");
-  const image = document.querySelector(".view-image");
+  // const image = document.querySelector(".view-image");
   let pages = document.querySelector(".view-pages");
   try {
     document.querySelector(".view-rating").style.display = "none";
@@ -530,17 +503,17 @@ function editBook() {
   const editBtn = document.querySelector(".edit-btn");
   editBtn.classList.add("save-btn");
   editBtn.innerHTML = "Save";
+  editBtn.removeEventListener("click", () => editBook);
+  editBtn.addEventListener("click", () => makeChange2Book("save"));
 }
 
-function bookAction(book2change, action) {
+function addOrRemoveBook(action) {
+  const book2change = document.querySelector(".view-title").dataset.bookid;
   let message;
-  let form = document.querySelector(`.modal-form-${action}`);
+  const form = document.querySelector(`.modal-form-${action}`);
   showModal(`${action}`);
   form.onsubmit = (e) => {
     e.preventDefault();
-    if (action === "enter") {
-      console.log("enter club");
-    }
     if (action === "add") {
       const year = document.querySelector("#year-input").value;
       const country = document.querySelector("#country-input").value;
@@ -551,7 +524,6 @@ function bookAction(book2change, action) {
       let pages = document.querySelector(".view-pages").innerHTML;
       // figure out
       pages = pages.replace(/[^0-9]/g, "");
-
       fetch(`/add/${book2change}`, {
         method: "POST",
         body: JSON.stringify({
@@ -570,16 +542,12 @@ function bookAction(book2change, action) {
       fetch(`/${action}/${book2change}`);
       message = "Book removed";
     }
-    if (action === "rate") {
-      const rating = document.querySelector("#rating-input").value;
-      makeChange2Book(book2change, "rate", rating);
-      message = "rate";
-    }
     waitNreload(message);
   };
 }
 
-function makeChange2Book(bookid, action, rating) {
+function makeChange2Book(action) {
+  const bookid = document.querySelector(".view-title").dataset.bookid;
   // create meeting date
   if (action === "meeting") {
     const meetingBtn = document.querySelector(".meetingBtn");
@@ -606,7 +574,7 @@ function makeChange2Book(bookid, action, rating) {
       };
     });
   }
-  // choose nest book
+  // choose next book
   if (action === "next") {
     fetch(`/edit/${bookid}`, {
       method: "PUT",
@@ -617,15 +585,23 @@ function makeChange2Book(bookid, action, rating) {
   }
   // rate current book
   if (action === "rate") {
-    fetch(`/edit/${bookid}`, {
-      method: "PUT",
-      body: JSON.stringify({
-        rating: rating,
-      }),
-    });
+    let form = document.querySelector(`.modal-form-${action}`);
+    showModal(`rate`);
+    form.onsubmit = (e) => {
+      e.preventDefault();
+      const rating = document.querySelector("#rating-input").value;
+      fetch(`/edit/${bookid}`, {
+        method: "PUT",
+        body: JSON.stringify({
+          rating: rating,
+        }),
+      });
+      waitNreload("rate");
+    };
   }
   // save changes to book's data in DB
   if (action === "save") {
+    console.log("saving");
     // todo - Would be great not to reload page but just change content
     const newAuthor = document.querySelector(".newAuthorInput").value;
     const newTitle = document.querySelector(".newTitleInput").value;
@@ -643,13 +619,6 @@ function makeChange2Book(bookid, action, rating) {
     });
     waitNreload("save");
   }
-}
-
-function finishEditing() {
-  const title = document.querySelector(".view-title");
-  const author = document.querySelector(".view-author");
-  const description = document.querySelector(".view-desc");
-  const pages = document.querySelector(".view-pages");
 }
 
 function fillTableRow(item, where) {
@@ -749,9 +718,7 @@ function sortTable(table, whichSort) {
 
 function deleteYearRows(rows) {
   for (let i = 0; i < rows.length - 1; i++) {
-    if (rows[i].cells[0].className.includes("yearRow")) {
-      rows[i].remove();
-    }
+    if (rows[i].cells[0].className.includes("yearRow")) rows[i].remove();
   }
 }
 
@@ -850,17 +817,10 @@ function hideControls() {
 window.addEventListener("popstate", function (event) {
   // The popstate event is fired each time when the current history entry changes.
   // window.location = document.referrer;
-  if (window.location.href.slice(-7) === "history") {
-    showHistory();
-  }
-  if (window.location.href.slice(-1) === "/") {
-    showAllBooks();
-  }
-  if (window.location.href.slice(-6) === "search") {
-    searchBook();
-  }
-  if (window.location.href.slice(-20, -13) === "refresh") {
-  }
+  if (window.location.href.includes("history")) showHistory();
+  if (window.location.href.slice(-1) === "/") showAllBooks();
+  if (window.location.href.includes("search")) searchBook();
+  // if (window.location.href.slice(-20, -13) === "refresh") {}
 });
 
 function arrangeCountries(section) {
@@ -900,9 +860,7 @@ function arrangeCountries(section) {
           // validate input
           countryInput.addEventListener("change", function (event) {
             let selectedCountry = event.target.value;
-            console.log(selectedCountry);
             let isValidCountry = countries.includes(selectedCountry);
-            console.log(countries.includes(selectedCountry));
             if (!isValidCountry) {
               event.target.setCustomValidity("Please select a valid country");
             }
@@ -932,11 +890,7 @@ function arrangeCountries(section) {
 
 function changeCountries(countries) {
   for (let i = 0; i < countries.length; i++) {
-    if (countries[i] === "United States") {
-      countries[i] = "USA";
-    }
-    if (countries[i] === "United Kingdom") {
-      countries[i] = "UK";
-    }
+    if (countries[i] === "United States") countries[i] = "USA";
+    if (countries[i] === "United Kingdom") countries[i] = "UK";
   }
 }
