@@ -1,6 +1,5 @@
-"use strict";
 // today gives year
-let today = new Date().getFullYear();
+const today = new Date().getFullYear();
 // logged users will see control elements
 let isLogged = false;
 
@@ -17,6 +16,7 @@ document.addEventListener("DOMContentLoaded", function () {
   resizeTitle();
 
   // show book info when book2show class element is clicked
+  // todo - implement event delegation
   document.addEventListener("click", (e) => {
     const tar = e.target;
     // ? get book id from data attribute in title div => show this book
@@ -46,10 +46,9 @@ function NavBtnsFunction() {
 }
 
 function bookBtnsFunctions() {
-  document.querySelector(".add-btn").addEventListener("click", () => {
-    arrangeCountries("new");
-    addOrRemoveBook("add");
-  });
+  document
+    .querySelector(".add-btn")
+    .addEventListener("click", () => addOrRemoveBook("add"));
   // prettier-ignore
   document.querySelector(".remove-btn").addEventListener('click',() => addOrRemoveBook("remove"));
 
@@ -76,10 +75,11 @@ function switchBtnFunction() {
 function meetingBtnFunction() {
   // prettier-ignore
   const bookid = document.querySelector(".upcoming-book-container").dataset.bookid;
-  document.querySelector(".meetingBtn")?.addEventListener("click", () => {
-    makeChange2Book(bookid, "meeting");
-  });
+  document
+    .querySelector(".meetingBtn")
+    ?.addEventListener("click", () => makeChange2Book(bookid, "meeting"));
 }
+
 function SessionBtnsFunction() {
   // prettier-ignore
   document.querySelector(".enter-btn")?.addEventListener("click", () => showModal("enter"));
@@ -111,13 +111,8 @@ const resizeTitle = () => {
   title?.innerHTML.length > 20 && (title.style.fontSize = "4vh");
 };
 
-function tryLogin() {
-  try {
-    document.querySelector("#authenticated").value;
-    return true;
-  } catch {}
-  return false;
-}
+const tryLogin = () =>
+  document.querySelector("#authenticated")?.value ? true : false;
 
 function showAllBooks(message) {
   HideAll();
@@ -149,7 +144,7 @@ function showAllBooks(message) {
           fillTableRow(book, "modern");
         }
       });
-      arrangeCountries("main");
+      arrangeCountries();
       loadScreen(false);
       if (message) {
         showMessage(message);
@@ -503,7 +498,7 @@ function editBook() {
   const editBtn = document.querySelector(".edit-btn");
   editBtn.classList.add("save-btn");
   editBtn.innerHTML = "Save";
-  editBtn.removeEventListener("click", () => editBook);
+  editBtn.removeEventListener("click", editBook);
   editBtn.addEventListener("click", () => makeChange2Book("save"));
 }
 
@@ -515,6 +510,7 @@ function addOrRemoveBook(action) {
   form.onsubmit = (e) => {
     e.preventDefault();
     if (action === "add") {
+      arrangeCountries("new");
       const year = document.querySelector("#year-input").value;
       const country = document.querySelector("#country-input").value;
       const title = document.querySelector(".view-title").innerHTML;
@@ -766,25 +762,21 @@ function changeRegLink() {
 }
 
 function HideAll() {
-  document.querySelector(".switch-container").style.display = "none";
-  document.querySelector(".upcoming-book-container").style.display = "none";
-  document.querySelector("#modernTable").style.display = "none";
-  document.querySelector("#classicTable").style.display = "none";
-  document.querySelector("#book-view").style.display = "none";
-  document.querySelector("#history-view").style.display = "none";
-  document.querySelector("#search-results").style.display = "none";
-  document.querySelector(".control-group").style.display = "none";
-  document.querySelector(".rate-btn-container").style.display = "none";
-  document.querySelector(".view-rating").style.display = "none";
-  document.querySelector("#year-input").value = "";
-  document.querySelector("#country-input").value = "";
-  // in case Edit function wasn't completed:
+  // prettier-ignore
+  const hideList = [".switch-container", ".upcoming-book-container", "#modernTable", 
+  "#classicTable", "#book-view", "#history-view", "#search-results", ".control-group",
+  ".rate-btn-container", ".view-rating"];
+  hideList.forEach(
+    (elem) => (document.querySelector(elem).style.display = "none")
+  );
+  ["#year-input", "#country-input"].map(
+    (elem) => (document.querySelector(elem).value = "")
+  );
+  // todo - in case Edit function wasn't completed:
   try {
-    // todo - use selectorAll and for loop
-    document.querySelector(".newTitleInput").remove();
-    document.querySelector(".newAuthorInput").remove();
-    document.querySelector(".newPagesInput").remove();
-    document.querySelector(".newDesc").remove();
+    [".newTitleInput", ".newAuthorInput", ".newPagesInput", ".newDesc"].map(
+      (elem) => document.querySelector(elem).remove()
+    );
     document.querySelector(".view-title").style.display = "block";
     document.querySelector(".view-author").style.display = "block";
     document.querySelector(".view-desc").style.display = "block";
@@ -797,11 +789,9 @@ function HideAll() {
 }
 
 function hideModals() {
-  document.querySelector(".modal").style.display = "none";
-  document.querySelector("#modalenter").style.display = "none";
-  document.querySelector("#modaladd").style.display = "none";
-  document.querySelector("#modalremove").style.display = "none";
-  document.querySelector("#modalrate").style.display = "none";
+  [".modal", "#modalenter", "#modaladd", "#modalremove", "#modalrate"].map(
+    (elem) => (document.querySelector(elem).style.display = "none")
+  );
 }
 
 function hideControls() {
@@ -814,83 +804,82 @@ function hideControls() {
 }
 
 // ! history (back button) action
-window.addEventListener("popstate", function (event) {
+window.addEventListener("popstate", function () {
   // The popstate event is fired each time when the current history entry changes.
-  // window.location = document.referrer;
-  if (window.location.href.includes("history")) showHistory();
-  if (window.location.href.slice(-1) === "/") showAllBooks();
-  if (window.location.href.includes("search")) searchBook();
+  const url = window.location.href;
+  url.includes("history") && showHistory();
+  url.includes("search") && searchBook();
+  url.slice(-1) === "/" && showAllBooks();
   // if (window.location.href.slice(-20, -13) === "refresh") {}
 });
 
-function arrangeCountries(section) {
+async function arrangeCountries(section) {
+  console.log("working");
   const option = document.querySelector("option");
   // if options aren't filled yet:
-  if (!option) {
-    let countries = [];
-    let flags = [];
-    let table;
-    fetch(`https://restcountries.com/v3.1/all?fields=name,flags`)
-      .then((response) => response.json())
-      .then((result) => {
-        result.forEach((country) => {
-          // create lists of countries and their flags
-          countries.push(country.name.common);
-          flags.push(country.flags.png);
-        });
-        changeCountries(countries);
+  if (option) return;
+  const response = await fetch(
+    `https://restcountries.com/v3.1/all?fields=name,flags`
+  );
+  const countries = await response.json();
+  const flags = countries.map((item) => item.flags.png);
+  const countryNames = countries.map((item) => item.name.common);
+  countryNames[countryNames.indexOf("United States")] = "USA";
+  countryNames[countryNames.indexOf("United Kingdom")] = "UK";
 
-        if (section === "history") {
-          table = document.querySelector(".history-table");
-          fillFlags(table, countries, flags);
-        } else if (section === "main") {
-          table = document.querySelector(".classic-table");
-          fillFlags(table, countries, flags);
-          table = document.querySelector(".modern-table");
-          fillFlags(table, countries, flags);
-        } else if (section === "new") {
-          const countryInput = document.getElementById("country-input");
-          const countryList = document.getElementById("countryList");
-          // Populate the datalist options
-          countries.forEach(function (country) {
-            let option = document.createElement("option");
-            option.value = country;
-            countryList.appendChild(option);
-          });
-          // validate input
-          countryInput.addEventListener("change", function (event) {
-            let selectedCountry = event.target.value;
-            let isValidCountry = countries.includes(selectedCountry);
-            if (!isValidCountry) {
-              event.target.setCustomValidity("Please select a valid country");
-            }
-          });
-        }
-      });
+  [".history-table", ".classic-table", ".modern-table"].forEach((table) =>
+    fillFlags(document.querySelector(table), countryNames, flags)
+  );
+
+  if (section === "new") {
+    createCountryOptions(countryNames);
   }
+}
 
-  function fillFlags(table, countries, flags) {
-    const rows = table.rows;
-    let flag;
-    for (let k = 0; k < rows.length; k++) {
-      let cellValue = rows[k].cells[3].innerHTML;
-      for (let p = 0; p < countries.length; p++) {
-        if (cellValue === countries[p]) {
-          flag = flags[p];
-          rows[k].cells[3].innerHTML = `
+function createCountryOptions(countryNames) {
+  // create countries list for new book country selector
+  const countryInput = document.getElementById("country-input");
+  const countryList = document.getElementById("countryList");
+  // Populate the datalist options
+  countryNames.forEach(function (country) {
+    let option = document.createElement("option");
+    option.value = country;
+    countryList.appendChild(option);
+  });
+  // validate input
+  countryInput.addEventListener("change", function (event) {
+    let selectedCountry = event.target.value;
+    let isValidCountry = countryNames.includes(selectedCountry);
+    if (!isValidCountry)
+      event.target.setCustomValidity("Please select a valid country");
+  });
+}
+
+function fillFlags(table, countries, flags) {
+  const rows = table.rows;
+  let flag;
+  for (let k = 0; k < rows.length; k++) {
+    let cellValue = rows[k].cells[3].innerHTML;
+    for (let p = 0; p < countries.length; p++) {
+      if (cellValue === countries[p]) {
+        flag = flags[p];
+        rows[k].cells[3].innerHTML = `
             <div class='flagContainer'>
               <div>${cellValue}</div>
               <img src="${flag}" class='smallFlag'>
             </div>`;
-        }
       }
     }
   }
 }
 
 function changeCountries(countries) {
-  for (let i = 0; i < countries.length; i++) {
-    if (countries[i] === "United States") countries[i] = "USA";
-    if (countries[i] === "United Kingdom") countries[i] = "UK";
-  }
+  return countries.map((country) => {
+    if (country === "United States") return "USA";
+    if (country === "United Kingdom") return "UK";
+  });
+  // for (let i = 0; i < countries.length; i++) {
+  //   if (countries[i] === "United States") countries[i] = "USA";
+  //   if (countries[i] === "United Kingdom") countries[i] = "UK";
+  // }
 }
