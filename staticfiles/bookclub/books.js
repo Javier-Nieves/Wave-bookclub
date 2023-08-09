@@ -20,14 +20,14 @@ document.addEventListener("DOMContentLoaded", function () {
 function handleClicks() {
   // prettier-ignore
   [".search-table", ".classic-table", ".modern-table", ".history-table", ".upcoming-book-container"]
-  .forEach((item) => document.querySelector(item).addEventListener("click", (e) => {
-    showBook(e.target.closest(".dataContainer").dataset.bookid);
-  }));
-
+  .forEach((item) => document.querySelector(item).addEventListener("click", (e) => 
+    showBook(e.target.closest(".dataContainer").dataset.bookid)
+  ));
   // change login modal to register and back
-  // if (tar.className.includes("register-link")) {
-  //   changeRegLink();
-  // }
+  document.querySelector(".register-link").addEventListener("click", (e) => {
+    e.preventDefault();
+    changeRegLink();
+  });
 }
 
 function NavBtnsFunction() {
@@ -106,7 +106,7 @@ const resizeTitle = () => {
 const tryLogin = () =>
   document.querySelector("#authenticated")?.value ? true : false;
 
-function showAllBooks(message) {
+async function showAllBooks() {
   HideAll();
   document.querySelector(".searchField").value = "";
   loadScreen(true);
@@ -126,28 +126,25 @@ function showAllBooks(message) {
   document.querySelector(".modern-table").innerHTML = "";
   document.querySelector(".upcoming-book-container").style.display = "block";
 
-  fetch("allbooks/all")
-    .then((response) => response.json())
-    .then((books) => {
-      books.forEach((book) => {
-        if (book.year <= today - 50 && !book.read) {
-          fillTableRow(book, "classic");
-        } else if (book.year > today - 50 && !book.read) {
-          fillTableRow(book, "modern");
-        }
-      });
-      arrangeCountries();
-      loadScreen(false);
-      if (message) {
-        showMessage(message);
-      }
-      // on page refresh for the book
-      let bookRefresh = document.querySelector("#bookid-refresh");
-      if (bookRefresh.innerHTML !== "") {
-        showBook(bookRefresh.innerHTML);
-        bookRefresh.innerHTML = "";
-      }
-    });
+  const response = await fetch("allbooks/all");
+  const books = await response.json();
+  books.forEach((book) => {
+    if (book.year <= today - 50 && !book.read) {
+      fillTableRow(book, "classic");
+    } else if (book.year > today - 50 && !book.read) {
+      fillTableRow(book, "modern");
+    }
+  });
+
+  arrangeCountries();
+  loadScreen(false);
+
+  // on page refresh for the book
+  let bookRefresh = document.querySelector("#bookid-refresh");
+  if (bookRefresh.innerHTML !== "") {
+    showBook(bookRefresh.innerHTML);
+    bookRefresh.innerHTML = "";
+  }
   // What's the next book? Set page style accordingly
   const upcomBookYear =
     document.querySelector(".upcoming-book-container").dataset.isclassic ||
@@ -726,7 +723,8 @@ function waitNreload(message) {
   }
   // some time is needed to update DB
   setTimeout(() => {
-    showAllBooks(message);
+    showAllBooks();
+    showMessage(message);
   }, 600);
   hideModals();
 }
