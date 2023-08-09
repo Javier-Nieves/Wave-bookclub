@@ -47,12 +47,12 @@
                 </form>
               </div>
 
-              <div class="upcoming-book-container book2show" data-isclassic= "{{up_book.year}}" 
-              data-bookid="{{up_book.bookid}}" class="book2show">
+              <div class="upcoming-book-container dataContainer" data-isclasic= "{{up_book.year}}" 
+              data-bookid="{{up_book.bookid}}">
               {% if up_book.bookid %}
-                <h1 id="upcoming-title" class="book2show">{{up_book.title}}</h1>
-                <h3 id="upcoming-autor" class="book2show">{{up_book.author}}, {{up_book.year}}</h3>
-                <img id="upcoming-pic" src={{up_book.image_link}} class="book2show" loading="lazy"></img>
+                <h1 id="upcoming-title">{{up_book.title}}</h1>
+                <h3 id="upcoming-autor">{{up_book.author}}, {{up_book.year}}</h3>
+                <img id="upcoming-pic" src={{up_book.image_link}} loading="lazy"></img>
                 <div class="upcoming-container">
                   <div id="upcoming-date">Meeting date:</div>
                   <form class="add-date-container">

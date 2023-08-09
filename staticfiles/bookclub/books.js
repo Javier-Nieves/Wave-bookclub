@@ -6,6 +6,7 @@ let isLogged = false;
 document.addEventListener("DOMContentLoaded", function () {
   isLogged = tryLogin();
   showAllBooks();
+  handleClicks();
   activateSearchForm(); // todo - add search by author
   NavBtnsFunction();
   bookBtnsFunctions();
@@ -14,29 +15,20 @@ document.addEventListener("DOMContentLoaded", function () {
   SessionBtnsFunction();
   capitalizeName();
   resizeTitle();
-
-  // show book info when book2show class element is clicked
-  // todo - implement event delegation
-  document.addEventListener("click", (e) => {
-    const tar = e.target;
-    // ? get book id from data attribute in title div => show this book
-    if (tar.className.includes("book2show")) {
-      if (
-        tar.className.includes("container") ||
-        tar.className.includes("upcoming-book-container")
-      ) {
-        loadScreen(true);
-        showBook(tar.dataset.bookid);
-      }
-      loadScreen(true);
-      showBook(tar.parentElement.dataset.bookid);
-    }
-    // change login modal to register and back
-    if (tar.className.includes("register-link")) {
-      changeRegLink();
-    }
-  });
 });
+
+function handleClicks() {
+  // prettier-ignore
+  [".search-table", ".classic-table", ".modern-table", ".history-table", ".upcoming-book-container"]
+  .forEach((item) => document.querySelector(item).addEventListener("click", (e) => {
+    showBook(e.target.closest(".dataContainer").dataset.bookid);
+  }));
+
+  // change login modal to register and back
+  // if (tar.className.includes("register-link")) {
+  //   changeRegLink();
+  // }
+}
 
 function NavBtnsFunction() {
   const readLink = document.querySelector("#reading-link");
@@ -236,6 +228,7 @@ function showHistory() {
 }
 
 function showBook(book) {
+  loadScreen(true);
   HideAll();
   document.querySelector("#book-view").style.display = "flex";
 
@@ -356,8 +349,9 @@ function displayButtons(...buttons) {
 
 function searchBook() {
   let title = document.querySelector(".searchField").value;
-  window.history.pushState("unused", "unused", `/search`);
+  window.history.pushState("_", "_", `/search`);
   fetch(
+    // todo - pagination
     `https://www.googleapis.com/books/v1/volumes?q=+intitle:${title}&maxResults=20`
   )
     .then((response) => response.json())
@@ -384,15 +378,15 @@ function showSearchResults(response) {
     }
     // creatig new row in table on 1st position
     let row = SearchTable.insertRow();
-    row.className = "table-row classic-body book2show";
+    row.className = "table-row classic-body dataContainer";
     row.dataset.bookid = item.id;
     let cell1 = row.insertCell(0);
-    cell1.dataset.bookid = item.id;
+    // cell1.dataset.bookid = item.id;
     let cell2 = row.insertCell(1);
-    cell2.className = "book2show";
+    // cell2.className = "book2show";
     let cell3 = row.insertCell(2);
-    cell3.className = "book2show";
-    cell1.innerHTML = `<img class='small-pic book2show' src=${link}>`;
+    // cell3.className = "book2show";
+    cell1.innerHTML = `<img class='small-pic' src=${link}>`;
     cell2.innerHTML = `${
       item.volumeInfo.authors ? item.volumeInfo.authors[0] : ""
     }`;
@@ -621,7 +615,7 @@ function fillTableRow(item, where) {
   let CellList = createRow(item, `${where}`);
   for (let i = 0; i < 6; i++) {
     try {
-      CellList[i].className = `cl${i} book2show`;
+      CellList[i].className = `cl${i}`;
       if (item.upcoming) {
         CellList[i].classList.add("upcom-book");
       }
@@ -649,7 +643,7 @@ function createRow(item, where) {
     Table = document.querySelector(".modern-table");
   }
   const row = Table.insertRow(0);
-  row.className = `table-row ${where}-body book2show`;
+  row.className = `table-row ${where}-body dataContainer`;
   try {
     row.dataset.bookid = item.bookid;
   } catch {}
@@ -814,7 +808,6 @@ window.addEventListener("popstate", function () {
 });
 
 async function arrangeCountries(section) {
-  console.log("working");
   const option = document.querySelector("option");
   // if options aren't filled yet:
   if (option) return;

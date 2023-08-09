@@ -122,10 +122,10 @@ def login_view(request):
         # * Check if authentication is successful
         if user is not None:
             login(request, user)
-            message = 'login successful'
+            message = 'Login successful'
             return index(request, message)
         else:
-            return index(request, "Mistakes were made")
+            return index(request, "Incorrect")
     else:
         return index(request)
 
@@ -139,12 +139,6 @@ def register(request):
     if request.method == "POST":
         username = request.POST["register-name"].lower()
         password = request.POST["register-password"]
-        # confirmation = request.POST["confirmation"]
-        # if password != confirmation:
-        #     return render(request, "stocks/register.html", {
-        #         "message": "Passwords must match."
-        #     })
-
         # * Attempt to create new bookclub
         try:
             club = User.objects.create_user(username, 'email', password)
