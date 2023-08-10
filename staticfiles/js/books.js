@@ -1,23 +1,20 @@
-// today gives year
-const today = new Date().getFullYear();
-// logged users will see control elements
-let isLogged = false;
+import { showAllBooks, setStyle, fillTableRow, createRow } from "./mainView.js";
+import { getAllBooks, arrangeCountries, Authenticate } from "./model.js";
+import { loadScreen, HideAll, resizeTitle } from "./helpers.js";
 
-document.addEventListener("DOMContentLoaded", function () {
-  isLogged = tryLogin();
-  checkMessages();
-  loadView();
-  handleClicks();
-  activateSearchForm(); // todo - add search by author
-  NavBtnsFunction();
-  bookBtnsFunctions();
-  switchBtnFunction();
-  meetingBtnFunction();
-  sessionBtnsFunction();
-  capitalizeName();
-  resizeTitle();
-  window.addEventListener("popstate", loadView);
-});
+Authenticate();
+checkMessages();
+loadView();
+handleClicks();
+activateSearchForm(); // todo - add search by author
+NavBtnsFunction();
+bookBtnsFunctions();
+switchBtnFunction();
+meetingBtnFunction();
+sessionBtnsFunction();
+capitalizeName();
+resizeTitle();
+window.addEventListener("popstate", loadView);
 
 function handleClicks() {
   // prettier-ignore
@@ -37,15 +34,6 @@ function checkMessages() {
   if (!message) return;
   showMessage(message.innerHTML);
   message.innerHTML = "";
-}
-
-function onPageRefresh() {
-  // on page refresh for the book
-  const bookRefresh = document.querySelector("#bookid-refresh");
-  if (bookRefresh.innerHTML !== "") {
-    showBook(bookRefresh.innerHTML);
-    bookRefresh.innerHTML = "";
-  }
 }
 
 function NavBtnsFunction() {
@@ -112,37 +100,11 @@ function capitalizeName() {
   club.innerHTML = capitalized;
 }
 
-const resizeTitle = () => {
-  const title = document.querySelector("#upcoming-title");
-  title?.innerHTML.length > 20 && (title.style.fontSize = "4vh");
-};
-
-const tryLogin = () =>
-  document.querySelector("#authenticated")?.value ? true : false;
-
-async function showAllBooks() {
-  console.log("all books");
-  loadScreen(true);
-  HideAll();
-  setStyle();
-  document.querySelector(".searchField").value = "";
-  // outside users can't see control elements
-  !isLogged && hideControls();
-  // is there a backend message?
-  // todo - fix try-catch everywhere
-  window.history.pushState("_", "_", `/`);
-  document.querySelector(".classic-table").innerHTML = "";
-  document.querySelector(".modern-table").innerHTML = "";
-  document.querySelector(".upcoming-book-container").style.display = "block";
-
-  const response = await fetch("allbooks/all");
-  const books = await response.json();
-  books.forEach((book) => {
-    book.year <= today - 50 && !book.read && fillTableRow(book, "classic");
-    book.year > today - 50 && !book.read && fillTableRow(book, "modern");
-  });
-  arrangeCountries();
-  loadScreen(false);
+async function showAllBooks_control() {
+  const books = await getAllBooks();
+  showAllBooks(books);
+  !Authenticate() && hideControls();
+  await arrangeCountries();
 }
 
 function showMessage(message) {
@@ -206,7 +168,7 @@ function showHistory() {
           fillTableRow(item, "history");
         }
       });
-      arrangeCountries("history");
+      arrangeCountries();
       loadScreen(false);
     });
   window.history.pushState(null, null, `/history`);
@@ -228,7 +190,7 @@ function showBook(book) {
         fillData(book, "API");
       }
       // manage buttons on page
-      if (isLogged) {
+      if (localStorage.getItem("loggedIn")) {
         if (response.year !== undefined) {
           if (response.upcoming) {
             displayButtons("rate", "edit");
@@ -237,7 +199,9 @@ function showBook(book) {
           } else {
             displayButtons("remove", "edit");
             document.querySelector(".simple-text").innerHTML = `from the ${
-              response.year <= today - 50 ? "Classic" : "Modern"
+              response.year <= new Date().getFullYear() - 50
+                ? "Classic"
+                : "Modern"
             } reading list`;
           }
         } else {
@@ -381,38 +345,6 @@ function showSearchResults(response) {
   loadScreen(false);
 }
 
-function setStyle(changeStyle = false) {
-  const upcomBookYear =
-    document.querySelector(".upcoming-book-container").dataset.year || 1666;
-  // if book is classic => style should be made modern
-  let makeModern = upcomBookYear < today - 50;
-  document.querySelector(".switch-container").style.display = "flex";
-  const classicTable = document.querySelector("#classicTable");
-  const modernTable = document.querySelector("#modernTable");
-  // if switch btn is clicked - style will change to the other one
-  if (changeStyle) makeModern = classicTable.style.display !== "none";
-  classicTable.style.display = makeModern ? "none" : "block";
-  modernTable.style.display = makeModern ? "block" : "none";
-  document.body.style.backgroundImage = makeModern
-    ? "URL('/staticfiles/bookclub/13small.jpg')"
-    : "URL('/staticfiles/bookclub/back2small.jpg')";
-  const switchBtn = document.querySelector(".switch");
-  switchBtn.style.backgroundImage = makeModern
-    ? "URL('/staticfiles/bookclub/Modern2.png')"
-    : "URL('/staticfiles/bookclub/classic2.png')";
-  let img = new Image();
-  img.src = makeModern
-    ? "/staticfiles/bookclub/13.jpg"
-    : "/staticfiles/bookclub/back2.jpeg";
-  img.addEventListener("load", () => {
-    document.body.style.backgroundImage = `URL(${img.src})`;
-  });
-  document.querySelectorAll(".link").forEach((item) => {
-    makeModern && item.classList.replace("brand", "brandNeon");
-    !makeModern && item.classList.replace("brandNeon", "brand");
-  });
-}
-
 function showModal(action) {
   const close = document.querySelector(".close");
   const modal = document.querySelector(".modal");
@@ -431,7 +363,6 @@ function showModal(action) {
 }
 
 function editBook() {
-  console.log("try to edit");
   const title = document.querySelector(".view-title");
   const author = document.querySelector(".view-author");
   const desc = document.querySelector(".view-desc");
@@ -568,7 +499,6 @@ function changeBookDB(action) {
   }
   // save changes to book's data in DB
   if (action === "save") {
-    console.log("saving");
     // todo - Would be great not to reload page but just change content
     const newAuthor = document.querySelector(".newAuthorInput").value;
     const newTitle = document.querySelector(".newTitleInput").value;
@@ -586,61 +516,6 @@ function changeBookDB(action) {
     });
     waitNreload("save");
   }
-}
-
-function fillTableRow(item, where) {
-  let CellList = createRow(item, `${where}`);
-  for (let i = 0; i < 6; i++) {
-    try {
-      CellList[i].className = `cl${i}`;
-      if (item.upcoming) {
-        CellList[i].classList.add("upcom-book");
-      }
-    } catch {}
-  }
-  let param = [item.title, item.author, item.year, item.country, item.pages];
-  // history table includes 2 more column - rating
-  if (where === "history") {
-    param.push(item.rating || "-");
-  }
-  for (let i = 0; i < param.length; i++) {
-    CellList[i].innerHTML = `${param[i]}`;
-  }
-}
-
-function createRow(item, where) {
-  let Table;
-  if (where === "history") {
-    Table = document.querySelector(".history-table");
-  }
-  if (where === "classic") {
-    Table = document.querySelector(".classic-table");
-  }
-  if (where === "modern") {
-    Table = document.querySelector(".modern-table");
-  }
-  const row = Table.insertRow(0);
-  row.className = `table-row ${where}-body dataContainer`;
-  try {
-    row.dataset.bookid = item.bookid;
-  } catch {}
-  const cell1 = row.insertCell(0);
-  const cell2 = row.insertCell(1);
-  const cell3 = row.insertCell(2);
-  const cell4 = row.insertCell(3);
-  const cell5 = row.insertCell(4);
-  const CellList = [cell1, cell2, cell3, cell4, cell5];
-  if (where === "history") {
-    const cell6 = row.insertCell(5);
-    CellList.push(cell6);
-  }
-  return CellList;
-}
-
-function loadScreen(bool) {
-  const loadScreen = document.querySelector("#load-screen");
-  if (bool) loadScreen.style.display = "block";
-  else loadScreen.style.display = "none";
 }
 
 function sortTable(table, whichSort) {
@@ -733,33 +608,6 @@ function changeRegLink() {
   }
 }
 
-function HideAll() {
-  // prettier-ignore
-  const hideList = [".switch-container", ".upcoming-book-container", "#modernTable", 
-  "#classicTable", "#book-view", "#history-view", "#search-results", ".control-group",
-  ".rate-btn-container", ".view-rating"];
-  hideList.forEach(
-    (elem) => (document.querySelector(elem).style.display = "none")
-  );
-  ["#year-input", "#country-input"].map(
-    (elem) => (document.querySelector(elem).value = "")
-  );
-  // todo - in case Edit function wasn't completed:
-  try {
-    [".newTitleInput", ".newAuthorInput", ".newPagesInput", ".newDesc"].map(
-      (elem) => document.querySelector(elem).remove()
-    );
-    document.querySelector(".view-title").style.display = "block";
-    document.querySelector(".view-author").style.display = "block";
-    document.querySelector(".view-desc").style.display = "block";
-    document.querySelector(".view-pages").style.display = "block";
-    document.querySelector(".book-info").style.overflow = "auto";
-    const editBtn = document.querySelector(".edit-btn");
-    editBtn.classList.remove("save-btn");
-    editBtn.innerHTML = "Edit";
-  } catch {}
-}
-
 function hideModals() {
   [".modal", "#modalenter", "#modaladd", "#modalremove", "#modalrate"].map(
     (elem) => (document.querySelector(elem).style.display = "none")
@@ -784,62 +632,5 @@ function loadView() {
   url.includes("history") && showHistory();
   url.includes("search") && searchBook();
   url.includes("refresh") && showBook(url.slice(url.lastIndexOf("/") + 1));
-  url.slice(-1) === "/" && showAllBooks();
-}
-
-async function arrangeCountries(section) {
-  const option = document.querySelector("option");
-  // if options aren't filled yet:
-  if (option) return;
-  const response = await fetch(
-    `https://restcountries.com/v3.1/all?fields=name,flags`
-  );
-  const countries = await response.json();
-  const flags = countries.map((item) => item.flags.png);
-  const countryNames = countries.map((item) => item.name.common);
-  countryNames[countryNames.indexOf("United States")] = "USA";
-  countryNames[countryNames.indexOf("United Kingdom")] = "UK";
-
-  [".history-table", ".classic-table", ".modern-table"].forEach((table) =>
-    fillFlags(document.querySelector(table), countryNames, flags)
-  );
-
-  if (section === "new") createCountryOptions(countryNames);
-}
-
-function createCountryOptions(countryNames) {
-  // create countries list for new book country selector
-  const countryInput = document.getElementById("country-input");
-  const countryList = document.getElementById("countryList");
-  // Populate the datalist options
-  countryNames.forEach(function (country) {
-    let option = document.createElement("option");
-    option.value = country;
-    countryList.appendChild(option);
-  });
-  // validate input
-  countryInput.addEventListener("change", function (event) {
-    let selectedCountry = event.target.value;
-    let isValidCountry = countryNames.includes(selectedCountry);
-    if (!isValidCountry)
-      event.target.setCustomValidity("Please select a valid country");
-  });
-}
-
-function fillFlags(table, countries, flags) {
-  const rows = table.rows;
-  let flag;
-  for (let k = 0; k < rows.length; k++) {
-    let cellValue = rows[k].cells[3].innerHTML;
-    for (let p = 0; p < countries.length; p++) {
-      if (cellValue === countries[p]) {
-        flag = flags[p];
-        rows[k].cells[3].innerHTML = `
-            <div class='flagContainer'>
-              <div>${cellValue}</div>
-              <img src="${flag}" class='smallFlag'>
-            </div>`;
-      }
-    }
-  }
+  url.slice(-1) === "/" && showAllBooks_control();
 }
