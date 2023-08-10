@@ -5,16 +5,18 @@ let isLogged = false;
 
 document.addEventListener("DOMContentLoaded", function () {
   isLogged = tryLogin();
-  showAllBooks();
+  checkMessages();
+  loadView();
   handleClicks();
   activateSearchForm(); // todo - add search by author
   NavBtnsFunction();
   bookBtnsFunctions();
   switchBtnFunction();
   meetingBtnFunction();
-  SessionBtnsFunction();
+  sessionBtnsFunction();
   capitalizeName();
   resizeTitle();
+  window.addEventListener("popstate", loadView);
 });
 
 function handleClicks() {
@@ -28,6 +30,22 @@ function handleClicks() {
     e.preventDefault();
     changeRegLink();
   });
+}
+
+function checkMessages() {
+  const message = document.querySelector("#message");
+  if (!message) return;
+  showMessage(message.innerHTML);
+  message.innerHTML = "";
+}
+
+function onPageRefresh() {
+  // on page refresh for the book
+  const bookRefresh = document.querySelector("#bookid-refresh");
+  if (bookRefresh.innerHTML !== "") {
+    showBook(bookRefresh.innerHTML);
+    bookRefresh.innerHTML = "";
+  }
 }
 
 function NavBtnsFunction() {
@@ -49,19 +67,16 @@ function bookBtnsFunctions() {
   editBtn.addEventListener("click", editBook);
   // select next book
   document.querySelector(".next-btn").addEventListener("click", () => {
-    makeChange2Book("next");
+    changeBookDB("next");
     waitNreload("next");
   });
   // prettier-ignore
-  document.querySelector(".rate-btn").addEventListener("click", () => makeChange2Book("rate"));
+  document.querySelector(".rate-btn").addEventListener("click", () => changeBookDB("rate"));
 }
 
 function switchBtnFunction() {
   const switchBtn = document.querySelector(".switch");
-  const classicTable = document.querySelector("#classicTable");
-  switchBtn.addEventListener("click", () =>
-    setStyle(classicTable.style.display !== "none" ? "modern" : "classic")
-  );
+  switchBtn.addEventListener("click", () => setStyle(true));
 }
 
 function meetingBtnFunction() {
@@ -69,10 +84,10 @@ function meetingBtnFunction() {
   const bookid = document.querySelector(".upcoming-book-container").dataset.bookid;
   document
     .querySelector(".meetingBtn")
-    ?.addEventListener("click", () => makeChange2Book(bookid, "meeting"));
+    ?.addEventListener("click", () => changeBookDB(bookid, "meeting"));
 }
 
-function SessionBtnsFunction() {
+function sessionBtnsFunction() {
   // prettier-ignore
   document.querySelector(".enter-btn")?.addEventListener("click", () => showModal("enter"));
   document.querySelector(".exit-btn")?.addEventListener("click", () => {
@@ -85,7 +100,6 @@ function SessionBtnsFunction() {
 function activateSearchForm() {
   document.querySelector(".search-form").addEventListener("submit", (e) => {
     e.preventDefault();
-    loadScreen(true);
     searchBook();
   });
 }
@@ -94,7 +108,7 @@ function capitalizeName() {
   const club = document.querySelector(".name-text");
   if (!club) return;
   let clubName = club.innerHTML;
-  let capitalized = clubName.charAt(0).toUpperCase() + clubName.substring(1);
+  let capitalized = clubName.at(0).toUpperCase() + clubName.slice(1);
   club.innerHTML = capitalized;
 }
 
@@ -107,21 +121,16 @@ const tryLogin = () =>
   document.querySelector("#authenticated")?.value ? true : false;
 
 async function showAllBooks() {
-  HideAll();
-  document.querySelector(".searchField").value = "";
+  console.log("all books");
   loadScreen(true);
-  // outside users shouldn't see control elements
+  HideAll();
+  setStyle();
+  document.querySelector(".searchField").value = "";
+  // outside users can't see control elements
   !isLogged && hideControls();
   // is there a backend message?
   // todo - fix try-catch everywhere
-  try {
-    let message = document.querySelector("#message").innerHTML;
-    showMessage(message);
-    message.innerHTML = "";
-  } catch {}
-
-  window.history.pushState("unused", "unused", `/`);
-
+  window.history.pushState("_", "_", `/`);
   document.querySelector(".classic-table").innerHTML = "";
   document.querySelector(".modern-table").innerHTML = "";
   document.querySelector(".upcoming-book-container").style.display = "block";
@@ -129,32 +138,11 @@ async function showAllBooks() {
   const response = await fetch("allbooks/all");
   const books = await response.json();
   books.forEach((book) => {
-    if (book.year <= today - 50 && !book.read) {
-      fillTableRow(book, "classic");
-    } else if (book.year > today - 50 && !book.read) {
-      fillTableRow(book, "modern");
-    }
+    book.year <= today - 50 && !book.read && fillTableRow(book, "classic");
+    book.year > today - 50 && !book.read && fillTableRow(book, "modern");
   });
-
   arrangeCountries();
   loadScreen(false);
-
-  // on page refresh for the book
-  let bookRefresh = document.querySelector("#bookid-refresh");
-  if (bookRefresh.innerHTML !== "") {
-    showBook(bookRefresh.innerHTML);
-    bookRefresh.innerHTML = "";
-  }
-  // What's the next book? Set page style accordingly
-  const upcomBookYear =
-    document.querySelector(".upcoming-book-container").dataset.isclassic ||
-    1666;
-  const isClassic = upcomBookYear < today - 50;
-  if (isClassic) {
-    setStyle("modern");
-  } else {
-    setStyle("classic");
-  }
 }
 
 function showMessage(message) {
@@ -345,6 +333,7 @@ function displayButtons(...buttons) {
 }
 
 function searchBook() {
+  loadScreen(true);
   let title = document.querySelector(".searchField").value;
   window.history.pushState("_", "_", `/search`);
   fetch(
@@ -392,45 +381,36 @@ function showSearchResults(response) {
   loadScreen(false);
 }
 
-function setStyle(style) {
-  const links = document.querySelectorAll(".link");
-  const switchBtn = document.querySelector(".switch");
-  const modernTable = document.querySelector("#modernTable");
+function setStyle(changeStyle = false) {
+  const upcomBookYear =
+    document.querySelector(".upcoming-book-container").dataset.year || 1666;
+  // if book is classic => style should be made modern
+  let makeModern = upcomBookYear < today - 50;
   document.querySelector(".switch-container").style.display = "flex";
-  if (style === "modern") {
-    classicTable.style.display = "none";
-    modernTable.style.display = "block";
-    document.body.style.backgroundImage =
-      "URL('/staticfiles/bookclub/13small.jpg')";
-    let img = new Image();
-    img.src = "/staticfiles/bookclub/13.jpg";
-    img.addEventListener("load", function () {
-      document.body.style.backgroundImage =
-        "URL('/staticfiles/bookclub/13.jpg')";
-    });
-    switchBtn.style.backgroundImage =
-      "URL('/staticfiles/bookclub/Modern2.png')";
-    links.forEach((item) => {
-      item.classList.replace("brand", "brandNeon");
-    });
-  }
-  if (style === "classic") {
-    classicTable.style.display = "block";
-    modernTable.style.display = "none";
-    document.body.style.backgroundImage =
-      "URL('/staticfiles/bookclub/back2small.jpg')";
-    let img = new Image();
-    img.src = "/staticfiles/bookclub/back2.jpeg";
-    img.addEventListener("load", function () {
-      document.body.style.backgroundImage =
-        "URL('/staticfiles/bookclub/back2.jpeg')";
-    });
-    switchBtn.style.backgroundImage =
-      "URL('/staticfiles/bookclub/classic2.png')";
-    links.forEach((item) => {
-      item.classList.replace("brandNeon", "brand");
-    });
-  }
+  const classicTable = document.querySelector("#classicTable");
+  const modernTable = document.querySelector("#modernTable");
+  // if switch btn is clicked - style will change to the other one
+  if (changeStyle) makeModern = classicTable.style.display !== "none";
+  classicTable.style.display = makeModern ? "none" : "block";
+  modernTable.style.display = makeModern ? "block" : "none";
+  document.body.style.backgroundImage = makeModern
+    ? "URL('/staticfiles/bookclub/13small.jpg')"
+    : "URL('/staticfiles/bookclub/back2small.jpg')";
+  const switchBtn = document.querySelector(".switch");
+  switchBtn.style.backgroundImage = makeModern
+    ? "URL('/staticfiles/bookclub/Modern2.png')"
+    : "URL('/staticfiles/bookclub/classic2.png')";
+  let img = new Image();
+  img.src = makeModern
+    ? "/staticfiles/bookclub/13.jpg"
+    : "/staticfiles/bookclub/back2.jpeg";
+  img.addEventListener("load", () => {
+    document.body.style.backgroundImage = `URL(${img.src})`;
+  });
+  document.querySelectorAll(".link").forEach((item) => {
+    makeModern && item.classList.replace("brand", "brandNeon");
+    !makeModern && item.classList.replace("brandNeon", "brand");
+  });
 }
 
 function showModal(action) {
@@ -490,7 +470,7 @@ function editBook() {
   editBtn.classList.add("save-btn");
   editBtn.innerHTML = "Save";
   editBtn.removeEventListener("click", editBook);
-  editBtn.addEventListener("click", () => makeChange2Book("save"));
+  editBtn.addEventListener("click", () => changeBookDB("save"));
 }
 
 function addOrRemoveBook(action) {
@@ -533,7 +513,7 @@ function addOrRemoveBook(action) {
   };
 }
 
-function makeChange2Book(action) {
+function changeBookDB(action) {
   const bookid = document.querySelector(".view-title").dataset.bookid;
   // create meeting date
   if (action === "meeting") {
@@ -795,15 +775,17 @@ function hideControls() {
   }
 }
 
-// ! history (back button) action
-window.addEventListener("popstate", function () {
-  // The popstate event is fired each time when the current history entry changes.
+function loadView() {
+  // Set page style depending of the current book year
+  const upcomBookYear =
+    document.querySelector(".upcoming-book-container").dataset.year || 1666;
+  setStyle();
   const url = window.location.href;
   url.includes("history") && showHistory();
   url.includes("search") && searchBook();
+  url.includes("refresh") && showBook(url.slice(url.lastIndexOf("/") + 1));
   url.slice(-1) === "/" && showAllBooks();
-  // if (window.location.href.slice(-20, -13) === "refresh") {}
-});
+}
 
 async function arrangeCountries(section) {
   const option = document.querySelector("option");
@@ -822,9 +804,7 @@ async function arrangeCountries(section) {
     fillFlags(document.querySelector(table), countryNames, flags)
   );
 
-  if (section === "new") {
-    createCountryOptions(countryNames);
-  }
+  if (section === "new") createCountryOptions(countryNames);
 }
 
 function createCountryOptions(countryNames) {
@@ -862,15 +842,4 @@ function fillFlags(table, countries, flags) {
       }
     }
   }
-}
-
-function changeCountries(countries) {
-  return countries.map((country) => {
-    if (country === "United States") return "USA";
-    if (country === "United Kingdom") return "UK";
-  });
-  // for (let i = 0; i < countries.length; i++) {
-  //   if (countries[i] === "United States") countries[i] = "USA";
-  //   if (countries[i] === "United Kingdom") countries[i] = "UK";
-  // }
 }

@@ -1,12 +1,9 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="en">
     <head>
         <title>Wave Bookclub</title>
         <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Bad+Script&family=Exo+2:ital@1&family=Neucha&family=Playfair+Display:wght@400;600&display=swap" rel="stylesheet">
@@ -47,7 +44,7 @@
                 </form>
               </div>
 
-              <div class="upcoming-book-container dataContainer" data-isclasic= "{{up_book.year}}" 
+              <div class="upcoming-book-container dataContainer" data-year= "{{up_book.year}}" 
               data-bookid="{{up_book.bookid}}">
               {% if up_book.bookid %}
                 <h1 id="upcoming-title">{{up_book.title}}</h1>
