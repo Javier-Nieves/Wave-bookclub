@@ -1,8 +1,8 @@
 import { showAllBooks, setStyle, fillTableRow, createRow } from "./mainView.js";
-import { getAllBooks, arrangeCountries, Authenticate } from "./model.js";
+import { getAllBooks, arrangeCountries, Authenticated } from "./model.js";
 import { loadScreen, HideAll, resizeTitle } from "./helpers.js";
 
-Authenticate();
+Authenticated();
 checkMessages();
 loadView();
 handleClicks();
@@ -80,6 +80,7 @@ function sessionBtnsFunction() {
   document.querySelector(".enter-btn")?.addEventListener("click", () => showModal("enter"));
   document.querySelector(".exit-btn")?.addEventListener("click", () => {
     fetch("/logout");
+    localStorage.removeItem("loggedIn");
     showMessage("Logged out");
     waitNreload("logout");
   });
@@ -101,10 +102,12 @@ function capitalizeName() {
 }
 
 async function showAllBooks_control() {
+  loadScreen(true);
   const books = await getAllBooks();
   showAllBooks(books);
-  !Authenticate() && hideControls();
+  !Authenticated() && hideControls();
   await arrangeCountries();
+  loadScreen(false);
 }
 
 function showMessage(message) {
@@ -629,6 +632,10 @@ function loadView() {
     document.querySelector(".upcoming-book-container").dataset.year || 1666;
   setStyle();
   const url = window.location.href;
+  if (url.includes("logout") || url.includes("login")) {
+    window.history.pushState("_", "_", `/`);
+    showAllBooks_control();
+  }
   url.includes("history") && showHistory();
   url.includes("search") && searchBook();
   url.includes("refresh") && showBook(url.slice(url.lastIndexOf("/") + 1));

@@ -60,13 +60,11 @@ function fillFlags(table, countries, flags) {
   }
 }
 
-export function Authenticate() {
+export function Authenticated() {
   // todo - LOGOUT localstorage clear
-  if (!localStorage.getItem("loggedIn")) {
-    const loggedIn = document.querySelector("#authenticated")?.value
-      ? true
-      : false;
-    localStorage.setItem("loggedIn", loggedIn);
-  }
-  return localStorage.getItem("loggedIn");
+  const loggedIn = document.querySelector("#authenticated")?.value
+    ? true
+    : false;
+  localStorage.setItem("loggedIn", loggedIn);
+  return localStorage.getItem("loggedIn") === "true";
 }

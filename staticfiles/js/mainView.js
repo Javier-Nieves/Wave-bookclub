@@ -1,9 +1,8 @@
-import { loadScreen, HideAll } from "./helpers.js";
+import { HideAll } from "./helpers.js";
 
 const today = new Date().getFullYear();
 
 export function showAllBooks(books) {
-  loadScreen(true);
   HideAll();
   setStyle();
   document.querySelector(".searchField").value = "";
@@ -16,7 +15,6 @@ export function showAllBooks(books) {
     book.year > today - 50 && !book.read && fillTableRow(book, "modern");
   });
   //   arrangeCountries();
-  loadScreen(false);
   window.history.pushState("_", "_", `/`);
 }
 
