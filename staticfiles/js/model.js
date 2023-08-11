@@ -1,29 +1,30 @@
-export async function getAllBooks() {
-  const response = await fetch("allbooks/all");
+let countries = [];
+
+await getCountryList();
+
+export async function getJSON(url) {
+  const response = await fetch(url);
   return await response.json();
 }
 
-export async function arrangeCountries(section) {
-  const option = document.querySelector("option");
-  // if options aren't filled yet:
-  if (option) return;
-  const response = await fetch(
-    `https://restcountries.com/v3.1/all?fields=name,flags`
-  );
-  const countries = await response.json();
-  const flags = countries.map((item) => item.flags.png);
-  const countryNames = countries.map((item) => item.name.common);
-  countryNames[countryNames.indexOf("United States")] = "USA";
-  countryNames[countryNames.indexOf("United Kingdom")] = "UK";
-
-  [".history-table", ".classic-table", ".modern-table"].forEach((table) =>
-    fillFlags(document.querySelector(table), countryNames, flags)
-  );
+export async function getCountryList(section) {
+  console.log("start arranging");
+  if (!countries) return;
+  console.log("fetching");
+  // prettier-ignore
+  countries = await getJSON(`https://restcountries.com/v3.1/all?fields=name,flags`);
+  //   flags = countries.map((item) => item.flags.png);
+  countries = countries.map((item) => {
+    if (item.name.common === "United States") item.name.common = "USA";
+    if (item.name.common === "United Kingdom") item.name.common = "UK";
+    return item;
+  });
 
   if (section === "new") createCountryOptions(countryNames);
 }
 
 function createCountryOptions(countryNames) {
+  console.log("createOptions");
   // create countries list for new book country selector
   const countryInput = document.getElementById("country-input");
   const countryList = document.getElementById("countryList");
@@ -42,22 +43,22 @@ function createCountryOptions(countryNames) {
   });
 }
 
-function fillFlags(table, countries, flags) {
-  const rows = table.rows;
-  let flag;
-  for (let k = 0; k < rows.length; k++) {
-    let cellValue = rows[k].cells[3].innerHTML;
-    for (let p = 0; p < countries.length; p++) {
-      if (cellValue === countries[p]) {
-        flag = flags[p];
-        rows[k].cells[3].innerHTML = `
+export function fillFlags(where) {
+  let toFill;
+  if (where === "main") toFill = [".classic-table", ".modern-table"];
+  if (where === "history") toFill = [".history-table"];
+  toFill.forEach((table) => {
+    const rows = Array.from(document.querySelector(table).rows);
+    rows.forEach((row) => {
+      // prettier-ignore
+      const country = countries.find((country) => country.name.common === row.cells[3].innerHTML);
+      row.cells[3].innerHTML = `
               <div class='flagContainer'>
-                <div>${cellValue}</div>
-                <img src="${flag}" class='smallFlag'>
+                <div>${country.name.common}</div>
+                <img src="${country.flags.png}" class='smallFlag'>
               </div>`;
-      }
-    }
-  }
+    });
+  });
 }
 
 export function Authenticated() {

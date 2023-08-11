@@ -1,6 +1,4 @@
-import { HideAll } from "./helpers.js";
-
-const today = new Date().getFullYear();
+import { CLASSIC_LIMIT, HideAll } from "./helpers.js";
 
 export function showAllBooks(books) {
   HideAll();
@@ -9,12 +7,10 @@ export function showAllBooks(books) {
   document.querySelector(".classic-table").innerHTML = "";
   document.querySelector(".modern-table").innerHTML = "";
   document.querySelector(".upcoming-book-container").style.display = "block";
-
   books.forEach((book) => {
-    book.year <= today - 50 && !book.read && fillTableRow(book, "classic");
-    book.year > today - 50 && !book.read && fillTableRow(book, "modern");
+    book.year <= CLASSIC_LIMIT && !book.read && fillTableRow(book, "classic");
+    book.year > CLASSIC_LIMIT && !book.read && fillTableRow(book, "modern");
   });
-  //   arrangeCountries();
   window.history.pushState("_", "_", `/`);
 }
 
@@ -61,7 +57,7 @@ export function setStyle(changeStyle = false) {
   const upcomBookYear =
     document.querySelector(".upcoming-book-container").dataset.year || 1666;
   // if book is classic => style should be made modern
-  let makeModern = upcomBookYear < today - 50;
+  let makeModern = upcomBookYear < CLASSIC_LIMIT;
   document.querySelector(".switch-container").style.display = "flex";
   const classicTable = document.querySelector("#classicTable");
   const modernTable = document.querySelector("#modernTable");

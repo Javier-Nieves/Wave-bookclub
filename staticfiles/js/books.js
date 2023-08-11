@@ -1,6 +1,10 @@
-import { showAllBooks, setStyle, fillTableRow, createRow } from "./mainView.js";
-import { getAllBooks, arrangeCountries, Authenticated } from "./model.js";
-import { loadScreen, HideAll, resizeTitle } from "./helpers.js";
+import { showAllBooks, setStyle } from "./mainView.js";
+// prettier-ignore
+import { getJSON, getCountryList, Authenticated, fillFlags } from "./model.js";
+import { showHistory } from "./historyView.js";
+// prettier-ignore
+import { CLASSIC_LIMIT, loadScreen, HideAll, resizeTitle, 
+          capitalizeName, showMessage } from "./helpers.js";
 
 Authenticated();
 checkMessages();
@@ -39,8 +43,8 @@ function checkMessages() {
 function NavBtnsFunction() {
   const readLink = document.querySelector("#reading-link");
   const histLink = document.querySelector("#history-link");
-  readLink.addEventListener("click", showAllBooks);
-  histLink.addEventListener("click", showHistory);
+  readLink.addEventListener("click", showAllBooks_control);
+  histLink.addEventListener("click", showHistory_control);
 }
 
 function bookBtnsFunctions() {
@@ -93,32 +97,22 @@ function activateSearchForm() {
   });
 }
 
-function capitalizeName() {
-  const club = document.querySelector(".name-text");
-  if (!club) return;
-  let clubName = club.innerHTML;
-  let capitalized = clubName.at(0).toUpperCase() + clubName.slice(1);
-  club.innerHTML = capitalized;
-}
-
 async function showAllBooks_control() {
+  // todo - add try-catch, error throwing
   loadScreen(true);
-  const books = await getAllBooks();
+  const books = await getJSON("/allbooks/all");
   showAllBooks(books);
   !Authenticated() && hideControls();
-  await arrangeCountries();
+  fillFlags("main");
   loadScreen(false);
 }
 
-function showMessage(message) {
-  document.querySelector("#modalmessage").style.display = "flex";
-  document.querySelector(".message-text").innerHTML = message;
-  try {
-    document.querySelector("#message").innerHTML = "";
-  } catch {}
-  setTimeout(() => {
-    document.querySelector("#modalmessage").style.display = "none";
-  }, 2500);
+async function showHistory_control() {
+  loadScreen(true);
+  const oldBooks = await getJSON("/allbooks/history");
+  showHistory(oldBooks);
+  fillFlags("history");
+  loadScreen(false);
 }
 
 // ! sorting tables
@@ -140,42 +134,6 @@ document.addEventListener("click", (event) => {
   if (whichSort.includes("Up")) sortTar.classList.replace("Up", "Down");
   else sortTar.classList.replace("Down", "Up");
 });
-
-function showHistory() {
-  loadScreen(true);
-  HideAll();
-  window.history.pushState("unused", "unused", `/`);
-
-  document.querySelector("#history-view").style.display = "block";
-  document.querySelector(".upcoming-book-container").style.display = "block";
-  document.querySelector(".history-table").innerHTML = "";
-
-  let yearChange;
-  fetch("allbooks/history")
-    .then((response) => response.json())
-    .then((old_books) => {
-      old_books.forEach((item) => {
-        if (item.read) {
-          if (!yearChange) {
-            yearChange = item.meeting_date.slice(0, 4);
-          }
-          if (item.meeting_date.slice(0, 4) !== yearChange) {
-            let CellList = createRow(item, "history");
-            CellList[0].innerHTML = `<b>${yearChange}</b>`;
-            // add separator Year-row if new year has started
-            for (let h = 0; h < CellList.length; h++) {
-              CellList[h].classList.add("yearRow");
-            }
-          }
-          yearChange = item.meeting_date.slice(0, 4);
-          fillTableRow(item, "history");
-        }
-      });
-      arrangeCountries();
-      loadScreen(false);
-    });
-  window.history.pushState(null, null, `/history`);
-}
 
 function showBook(book) {
   loadScreen(true);
@@ -202,9 +160,7 @@ function showBook(book) {
           } else {
             displayButtons("remove", "edit");
             document.querySelector(".simple-text").innerHTML = `from the ${
-              response.year <= new Date().getFullYear() - 50
-                ? "Classic"
-                : "Modern"
+              response.year <= CLASSIC_LIMIT ? "Classic" : "Modern"
             } reading list`;
           }
         } else {
@@ -216,7 +172,7 @@ function showBook(book) {
       loadScreen(false);
     });
 
-  window.history.pushState("unused", "unused", `/refresh/${book}`);
+  window.history.pushState("_", "_", `/refresh/${book}`);
 }
 
 function fillData(book, source) {
@@ -282,21 +238,12 @@ function displayButtons(...buttons) {
   editBtn.style.display = "none";
 
   if (buttons.includes("remove")) {
-    // addBtn.style.display = "none";
     removeBtn.style.display = "flex";
-    if (!nextBook) {
-      nextBtn.style.display = "block";
-    }
+    if (!nextBook) nextBtn.style.display = "block";
   }
-  if (buttons.includes("rate")) {
-    rateBtn.style.display = "block";
-  }
-  if (buttons.includes("add")) {
-    addBtn.style.display = "flex";
-  }
-  if (buttons.includes("edit")) {
-    editBtn.style.display = "block";
-  }
+  if (buttons.includes("rate")) rateBtn.style.display = "block";
+  if (buttons.includes("add")) addBtn.style.display = "flex";
+  if (buttons.includes("edit")) editBtn.style.display = "block";
 }
 
 function searchBook() {
@@ -408,6 +355,7 @@ function editBook() {
 }
 
 function addOrRemoveBook(action) {
+  getCountryList("new");
   const book2change = document.querySelector(".view-title").dataset.bookid;
   let message;
   const form = document.querySelector(`.modal-form-${action}`);
@@ -415,7 +363,6 @@ function addOrRemoveBook(action) {
   form.onsubmit = (e) => {
     e.preventDefault();
     if (action === "add") {
-      arrangeCountries("new");
       const year = document.querySelector("#year-input").value;
       const country = document.querySelector("#country-input").value;
       const title = document.querySelector(".view-title").innerHTML;
@@ -627,16 +574,13 @@ function hideControls() {
 }
 
 function loadView() {
-  // Set page style depending of the current book year
-  const upcomBookYear =
-    document.querySelector(".upcoming-book-container").dataset.year || 1666;
   setStyle();
   const url = window.location.href;
   if (url.includes("logout") || url.includes("login")) {
     window.history.pushState("_", "_", `/`);
     showAllBooks_control();
   }
-  url.includes("history") && showHistory();
+  url.includes("history") && showHistory_control();
   url.includes("search") && searchBook();
   url.includes("refresh") && showBook(url.slice(url.lastIndexOf("/") + 1));
   url.slice(-1) === "/" && showAllBooks_control();

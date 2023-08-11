@@ -1,3 +1,5 @@
+export const CLASSIC_LIMIT = new Date().getFullYear() - 50;
+
 export function loadScreen(bool) {
   const loadScreen = document.querySelector("#load-screen");
   if (bool) loadScreen.style.display = "block";
@@ -35,3 +37,22 @@ export const resizeTitle = () => {
   const title = document.querySelector("#upcoming-title");
   title?.innerHTML.length > 20 && (title.style.fontSize = "4vh");
 };
+
+export function capitalizeName() {
+  const club = document.querySelector(".name-text");
+  if (!club) return;
+  let clubName = club.innerHTML;
+  let capitalized = clubName.at(0).toUpperCase() + clubName.slice(1);
+  club.innerHTML = capitalized;
+}
+
+export function showMessage(message) {
+  document.querySelector("#modalmessage").style.display = "flex";
+  document.querySelector(".message-text").innerHTML = message;
+  try {
+    document.querySelector("#message").innerHTML = "";
+  } catch {}
+  setTimeout(() => {
+    document.querySelector("#modalmessage").style.display = "none";
+  }, 2500);
+}
