@@ -1,36 +1,37 @@
-import { showAllBooks, setStyle } from "./mainView.js";
 // prettier-ignore
-import { getJSON, Authenticated, fillFlags } from "./model.js";
+import { showAllBooks, setStyle, NavBtnsFunction, meetingBtnFunction,
+          sessionBtnsFunction, showModal } from "./mainView.js";
 import { showHistory } from "./historyView.js";
+import { getJSON, Authenticated, fillFlags } from "./model.js";
 // prettier-ignore
-import { CLASSIC_LIMIT, loadScreen, HideAll, resizeTitle, 
-          capitalizeName, showMessage } from "./helpers.js";
+import { CLASSIC_LIMIT, loadScreen, HideAll, showMessage } from "./helpers.js";
 
 Authenticated();
 checkMessages();
 loadView();
-handleClicks();
-activateSearchForm(); // todo - add search by author
-NavBtnsFunction();
-bookBtnsFunctions();
-switchBtnFunction();
-meetingBtnFunction();
-sessionBtnsFunction();
-capitalizeName();
-resizeTitle();
+Btns_control();
 window.addEventListener("popstate", loadView);
 
-function handleClicks() {
+function Btns_control() {
+  NavBtnsFunction(showAllBooks_control, showHistory_control);
+  sessionBtnsFunction(logoutSequence, changeRegLink);
+  meetingBtnFunction(changeBookDB_constructor("meeting"));
+
+  bookSummon();
+  // todo - search view
+  activateSearchForm(); // todo - add search by author
+  // todo - book view
+  bookBtnsFunctions();
+}
+
+function bookSummon() {
   // prettier-ignore
   [".search-table", ".classic-table", ".modern-table", ".history-table", ".upcoming-book-container"]
-  .forEach((item) => document.querySelector(item).addEventListener("click", (e) => 
+  .forEach((item) => document.querySelector(item).addEventListener("click", (e) => {
+    if (!e.target.closest(".add-date-container"))
     showBook(e.target.closest(".dataContainer").dataset.bookid)
+  }
   ));
-  // change login modal to register and back
-  document.querySelector(".register-link").addEventListener("click", (e) => {
-    e.preventDefault();
-    changeRegLink();
-  });
 }
 
 function checkMessages() {
@@ -38,13 +39,6 @@ function checkMessages() {
   if (!message) return;
   showMessage(message.innerHTML);
   message.innerHTML = "";
-}
-
-function NavBtnsFunction() {
-  const readLink = document.querySelector("#reading-link");
-  const histLink = document.querySelector("#history-link");
-  readLink.addEventListener("click", showAllBooks_control);
-  histLink.addEventListener("click", showHistory_control);
 }
 
 function bookBtnsFunctions() {
@@ -66,28 +60,11 @@ function bookBtnsFunctions() {
   document.querySelector(".rate-btn").addEventListener("click", () => changeBookDB("rate"));
 }
 
-function switchBtnFunction() {
-  const switchBtn = document.querySelector(".switch");
-  switchBtn.addEventListener("click", () => setStyle(true));
-}
-
-function meetingBtnFunction() {
-  // prettier-ignore
-  const bookid = document.querySelector(".upcoming-book-container").dataset.bookid;
-  document
-    .querySelector(".meetingBtn")
-    ?.addEventListener("click", () => changeBookDB(bookid, "meeting"));
-}
-
-function sessionBtnsFunction() {
-  // prettier-ignore
-  document.querySelector(".enter-btn")?.addEventListener("click", () => showModal("enter"));
-  document.querySelector(".exit-btn")?.addEventListener("click", () => {
-    fetch("/logout");
-    localStorage.removeItem("loggedIn");
-    showMessage("Logged out");
-    waitNreload("logout");
-  });
+function logoutSequence() {
+  fetch("/logout");
+  localStorage.removeItem("loggedIn");
+  showMessage("Logged out");
+  waitNreload("logout");
 }
 
 function activateSearchForm() {
@@ -295,23 +272,6 @@ function showSearchResults(response) {
   loadScreen(false);
 }
 
-function showModal(action) {
-  const close = document.querySelector(".close");
-  const modal = document.querySelector(".modal");
-  modal.style.display = "block";
-  document.querySelector(`#modal${action}`).style.display = "block";
-  close.onclick = () => {
-    modal.style.display = "none";
-    document.querySelector(`#modal${action}`).style.display = "none";
-  };
-  window.onclick = (event) => {
-    if (event.target == modal) {
-      modal.style.display = "none";
-      document.querySelector(`#modal${action}`).style.display = "none";
-    }
-  };
-}
-
 function editBook() {
   const title = document.querySelector(".view-title");
   const author = document.querySelector(".view-author");
@@ -391,80 +351,6 @@ function addOrRemoveBook(action) {
     }
     waitNreload(message);
   };
-}
-
-function changeBookDB(action) {
-  const bookid = document.querySelector(".view-title").dataset.bookid;
-  // create meeting date
-  if (action === "meeting") {
-    const meetingBtn = document.querySelector(".meetingBtn");
-    document.querySelector(".meetingField").style.display = "block";
-    // input will appear on first click
-    meetingBtn.addEventListener("click", () => {
-      const date = document.querySelector(".meetingField").value;
-      document.querySelector(".add-date-container").onsubmit = (e) => {
-        e.preventDefault();
-        // second click will sent API
-        fetch(`/edit/${bookid}`, {
-          method: "PUT",
-          body: JSON.stringify({
-            meeting_date: date,
-          }),
-        });
-        showMessage("Date selected");
-        document.querySelector(".meetingField").style.display = "none";
-        meetingBtn.style.display = "none";
-        const newDate = document.createElement("div");
-        newDate.className = "meeting-date";
-        newDate.innerHTML = date;
-        document.querySelector(".add-date-container").append(newDate);
-      };
-    });
-  }
-  // choose next book
-  if (action === "next") {
-    fetch(`/edit/${bookid}`, {
-      method: "PUT",
-      body: JSON.stringify({
-        next: true,
-      }),
-    });
-  }
-  // rate current book
-  if (action === "rate") {
-    let form = document.querySelector(`.modal-form-${action}`);
-    showModal(`rate`);
-    form.onsubmit = (e) => {
-      e.preventDefault();
-      const rating = document.querySelector("#rating-input").value;
-      fetch(`/edit/${bookid}`, {
-        method: "PUT",
-        body: JSON.stringify({
-          rating: rating,
-        }),
-      });
-      waitNreload("rate");
-    };
-  }
-  // save changes to book's data in DB
-  if (action === "save") {
-    // todo - Would be great not to reload page but just change content
-    const newAuthor = document.querySelector(".newAuthorInput").value;
-    const newTitle = document.querySelector(".newTitleInput").value;
-    const newPages = document.querySelector(".newPagesInput").value;
-    const newDesc = document.querySelector(".newDesc").value;
-    fetch(`/edit/${bookid}`, {
-      method: "PUT",
-      body: JSON.stringify({
-        save: true,
-        newAuthor: newAuthor,
-        newTitle: newTitle,
-        newPages: newPages,
-        newDesc: newDesc,
-      }),
-    });
-    waitNreload("save");
-  }
 }
 
 function sortTable(table, whichSort) {
@@ -587,4 +473,158 @@ function loadView() {
   url.includes("search") && searchBook();
   url.includes("refresh") && showBook(url.slice(url.lastIndexOf("/") + 1));
   url.slice(-1) === "/" && showAllBooks_control();
+}
+
+function changeBookDB(action) {
+  let bookid = document.querySelector(".view-title").dataset.bookid;
+  // create meeting date
+  if (action === "meeting") {
+    bookid = document.querySelector(".upcoming-book-container").dataset.bookid;
+    const meetingBtn = document.querySelector(".meetingBtn");
+    document.querySelector(".meetingField").style.display = "block";
+    // input will appear on first click
+    meetingBtn.addEventListener("click", () => {
+      const date = document.querySelector(".meetingField").value;
+      document.querySelector(".add-date-container").onsubmit = (e) => {
+        e.preventDefault();
+        // second click will sent API
+        fetch(`/edit/${bookid}`, {
+          method: "PUT",
+          body: JSON.stringify({
+            meeting_date: date,
+          }),
+        });
+        showMessage("Date selected");
+        document.querySelector(".meetingField").style.display = "none";
+        meetingBtn.style.display = "none";
+        const newDate = document.createElement("div");
+        newDate.className = "meeting-date";
+        newDate.innerHTML = date;
+        document.querySelector(".add-date-container").append(newDate);
+      };
+    });
+  }
+  // choose next book
+  if (action === "next") {
+    fetch(`/edit/${bookid}`, {
+      method: "PUT",
+      body: JSON.stringify({
+        next: true,
+      }),
+    });
+  }
+  // rate current book
+  if (action === "rate") {
+    let form = document.querySelector(`.modal-form-${action}`);
+    showModal(`rate`);
+    form.onsubmit = (e) => {
+      e.preventDefault();
+      const rating = document.querySelector("#rating-input").value;
+      fetch(`/edit/${bookid}`, {
+        method: "PUT",
+        body: JSON.stringify({
+          rating: rating,
+        }),
+      });
+      waitNreload("rate");
+    };
+  }
+  // save changes to book's data in DB
+  if (action === "save") {
+    // todo - Would be great not to reload page but just change content
+    const newAuthor = document.querySelector(".newAuthorInput").value;
+    const newTitle = document.querySelector(".newTitleInput").value;
+    const newPages = document.querySelector(".newPagesInput").value;
+    const newDesc = document.querySelector(".newDesc").value;
+    fetch(`/edit/${bookid}`, {
+      method: "PUT",
+      body: JSON.stringify({
+        save: true,
+        newAuthor: newAuthor,
+        newTitle: newTitle,
+        newPages: newPages,
+        newDesc: newDesc,
+      }),
+    });
+    waitNreload("save");
+  }
+}
+
+function changeBookDB_constructor(action) {
+  return function () {
+    let bookid = document.querySelector(".view-title").dataset.bookid;
+    // create meeting date
+    if (action === "meeting") {
+      console.log("starting function", action);
+      bookid = document.querySelector(".upcoming-book-container").dataset
+        .bookid;
+      const meetingBtn = document.querySelector(".meetingBtn");
+      document.querySelector(".meetingField").style.display = "block";
+      // input will appear on first click
+      meetingBtn.addEventListener("click", () => {
+        const date = document.querySelector(".meetingField").value;
+        document
+          .querySelector(".add-date-container")
+          .addEventListener("submit", (e) => {
+            e.preventDefault();
+            // second click will sent API
+            fetch(`/edit/${bookid}`, {
+              method: "PUT",
+              body: JSON.stringify({
+                meeting_date: date,
+              }),
+            });
+            showMessage("Date selected");
+            document.querySelector(".meetingField").style.display = "none";
+            meetingBtn.style.display = "none";
+            const newDate = document.createElement("div");
+            newDate.className = "meeting-date";
+            newDate.innerHTML = date;
+            document.querySelector(".add-date-container").append(newDate);
+          });
+      });
+    }
+    if (action === "next") {
+      fetch(`/edit/${bookid}`, {
+        method: "PUT",
+        body: JSON.stringify({
+          next: true,
+        }),
+      });
+    }
+    if (action === "rate") {
+      let form = document.querySelector(`.modal-form-${action}`);
+      showModal(`rate`);
+      form.onsubmit = (e) => {
+        e.preventDefault();
+        const rating = document.querySelector("#rating-input").value;
+        fetch(`/edit/${bookid}`, {
+          method: "PUT",
+          body: JSON.stringify({
+            rating: rating,
+          }),
+        });
+        waitNreload("rate");
+      };
+    }
+    // save changes to book's data in DB
+    if (action === "save") {
+      // todo - Would be great not to reload page but just change content
+      const newAuthor = document.querySelector(".newAuthorInput").value;
+      const newTitle = document.querySelector(".newTitleInput").value;
+      const newPages = document.querySelector(".newPagesInput").value;
+      const newDesc = document.querySelector(".newDesc").value;
+      fetch(`/edit/${bookid}`, {
+        method: "PUT",
+        body: JSON.stringify({
+          save: true,
+          newAuthor: newAuthor,
+          newTitle: newTitle,
+          newPages: newPages,
+          newDesc: newDesc,
+        }),
+      });
+      waitNreload("save");
+    }
+  };
 }

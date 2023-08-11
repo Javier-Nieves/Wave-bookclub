@@ -33,19 +33,6 @@ export function HideAll() {
   } catch {}
 }
 
-export const resizeTitle = () => {
-  const title = document.querySelector("#upcoming-title");
-  title?.innerHTML.length > 20 && (title.style.fontSize = "4vh");
-};
-
-export function capitalizeName() {
-  const club = document.querySelector(".name-text");
-  if (!club) return;
-  let clubName = club.innerHTML;
-  let capitalized = clubName.at(0).toUpperCase() + clubName.slice(1);
-  club.innerHTML = capitalized;
-}
-
 export function showMessage(message) {
   document.querySelector("#modalmessage").style.display = "flex";
   document.querySelector(".message-text").innerHTML = message;

@@ -45,8 +45,8 @@
               </div>
 
               <div class="upcoming-book-container dataContainer" data-year= "{{up_book.year}}" 
-              data-bookid="{{up_book.bookid}}">
-              {% if up_book.bookid %}
+                data-bookid="{{up_book.bookid}}">
+                {% if up_book.bookid %}
                 <h1 id="upcoming-title">{{up_book.title}}</h1>
                 <h3 id="upcoming-autor">{{up_book.author}}, {{up_book.year}}</h3>
                 <img id="upcoming-pic" src={{up_book.image_link}} loading="lazy"></img>
@@ -199,7 +199,7 @@
                 </form>
                 <div class="register-container">
                   <div class="simple-text" id="register-text">Don't have a bookclub yet?</div>
-                  <a class="register-link">Register</a>
+                  <button class="register-link">Register</button>
                 </div>
               </div>
 

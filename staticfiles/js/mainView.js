@@ -1,4 +1,7 @@
 import { CLASSIC_LIMIT, HideAll } from "./helpers.js";
+switchBtnFunction();
+capitalizeName();
+resizeTitle();
 
 export function showAllBooks(books) {
   HideAll();
@@ -53,6 +56,53 @@ export function createRow(item, where) {
   return CellList;
 }
 
+export function NavBtnsFunction(function1, function2) {
+  const readLink = document.querySelector("#reading-link");
+  const histLink = document.querySelector("#history-link");
+  readLink.addEventListener("click", function1);
+  histLink.addEventListener("click", function2);
+}
+
+export function sessionBtnsFunction(function1, function2) {
+  // prettier-ignore
+  document.querySelector(".enter-btn")?.addEventListener("click", () => showModal("enter"));
+  // prettier-ignore
+  document.querySelector(".exit-btn")?.addEventListener("click", function1);
+  // change login modal to register and back
+  document.querySelector(".register-link").addEventListener("click", function2);
+}
+
+export function meetingBtnFunction(function1) {
+  // prettier-ignore
+  document
+      .querySelector(".meetingBtn")
+      ?.addEventListener("click", function1);
+}
+
+function switchBtnFunction() {
+  const switchBtn = document.querySelector(".switch");
+  switchBtn.addEventListener("click", () => setStyle(true));
+}
+
+export function showModal(action) {
+  // todo - use Dialog
+  const close = document.querySelector(".close");
+  const modal = document.querySelector(".modal");
+  const modalContent = document.querySelector(`#modal${action}`);
+  modal.style.display = "block";
+  modalContent.style.display = "block";
+  close.addEventListener("click", () => {
+    modal.style.display = "none";
+    modalContent.style.display = "none";
+  });
+  window.onclick = (event) => {
+    if (event.target == modal) {
+      modal.style.display = "none";
+      modalContent.style.display = "none";
+    }
+  };
+}
+
 export function setStyle(changeStyle = false) {
   const upcomBookYear =
     document.querySelector(".upcoming-book-container").dataset.year || 1666;
@@ -84,4 +134,17 @@ export function setStyle(changeStyle = false) {
     makeModern && item.classList.replace("brand", "brandNeon");
     !makeModern && item.classList.replace("brandNeon", "brand");
   });
+}
+
+function capitalizeName() {
+  const club = document.querySelector(".name-text");
+  if (!club) return;
+  let clubName = club.innerHTML;
+  let capitalized = clubName.at(0).toUpperCase() + clubName.slice(1);
+  club.innerHTML = capitalized;
+}
+
+function resizeTitle() {
+  const title = document.querySelector("#upcoming-title");
+  title?.innerHTML.length > 20 && (title.style.fontSize = "4vh");
 }
