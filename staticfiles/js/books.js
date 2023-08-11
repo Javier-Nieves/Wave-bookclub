@@ -1,6 +1,6 @@
 import { showAllBooks, setStyle } from "./mainView.js";
 // prettier-ignore
-import { getJSON, getCountryList, Authenticated, fillFlags } from "./model.js";
+import { getJSON, Authenticated, fillFlags } from "./model.js";
 import { showHistory } from "./historyView.js";
 // prettier-ignore
 import { CLASSIC_LIMIT, loadScreen, HideAll, resizeTitle, 
@@ -355,7 +355,6 @@ function editBook() {
 }
 
 function addOrRemoveBook(action) {
-  getCountryList("new");
   const book2change = document.querySelector(".view-title").dataset.bookid;
   let message;
   const form = document.querySelector(`.modal-form-${action}`);
@@ -515,6 +514,7 @@ function deleteYearRows(rows) {
 }
 
 function waitNreload(message) {
+  console.log("reloading");
   const reloadList = ["rate", "next", "logout", "save"];
   if (reloadList.includes(message)) {
     document.querySelector("#modalmessage").style.display = "flex";
@@ -528,7 +528,7 @@ function waitNreload(message) {
   }
   // some time is needed to update DB
   setTimeout(() => {
-    showAllBooks();
+    showAllBooks_control();
     showMessage(message);
   }, 600);
   hideModals();
@@ -580,7 +580,10 @@ function loadView() {
     window.history.pushState("_", "_", `/`);
     showAllBooks_control();
   }
-  url.includes("history") && showHistory_control();
+  if (url.includes("history")) {
+    console.log("history go!");
+    showHistory_control();
+  }
   url.includes("search") && searchBook();
   url.includes("refresh") && showBook(url.slice(url.lastIndexOf("/") + 1));
   url.slice(-1) === "/" && showAllBooks_control();
