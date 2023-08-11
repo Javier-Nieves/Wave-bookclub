@@ -7,6 +7,26 @@ export async function getJSON(url) {
   return await response.json();
 }
 
+export async function createBook(id) {
+  // prettier-ignore
+  const book = await getJSON(`https://www.googleapis.com/books/v1/volumes/${id}`);
+  const info = book.volumeInfo;
+  return {
+    author: info.authors[0],
+    bookid: book.id,
+    country: null,
+    desc: info.description,
+    image_link: info.imageLinks.smallThumbnail,
+    meeting_date: null,
+    pages: info.pageCount,
+    rating: null,
+    read: false,
+    title: info.title,
+    upcoming: false,
+    year: null,
+  };
+}
+
 async function getCountryList() {
   // todo - try-catch
   if (!countries) return;
