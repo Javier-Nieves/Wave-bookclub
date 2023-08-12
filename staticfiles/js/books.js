@@ -3,9 +3,8 @@ import { showAllBooks, setStyle, NavBtnsFunction, meetingBtnFunction,
           sessionBtnsFunction, showModal } from "./mainView.js";
 import { showHistory } from "./historyView.js";
 // prettier-ignore
-import { showBook, fillBookData, bookSummon, bookBtnsFunctions } from "./bookView.js";
+import { showBook, bookSummon, bookBtnsFunctions } from "./bookView.js";
 import { getJSON, fillFlags, createBook } from "./model.js";
-// prettier-ignore
 import { loadScreen, HideAll, showMessage } from "./helpers.js";
 
 checkMessages();
@@ -72,10 +71,9 @@ async function showHistory_control() {
 async function showBook_contol(id) {
   loadScreen(true);
   let book = await getJSON(`/check/${id}`);
-  showBook(book);
-  // if book is not in the DB - get data from API
+  // if book isn't in the DB - get data from API
   if (!book.year) book = await createBook(id);
-  fillBookData(book);
+  showBook(book);
   loadScreen(false);
   window.history.pushState("_", "_", `/refresh/${id}`);
 }
@@ -279,7 +277,6 @@ function deleteYearRows(rows) {
 }
 
 function waitNreload(message) {
-  console.log("reloading");
   const reloadList = ["rate", "next", "logout", "save"];
   if (reloadList.includes(message)) {
     document.querySelector("#modalmessage").style.display = "flex";
@@ -336,12 +333,10 @@ function loadView() {
     window.history.pushState("_", "_", `/`);
     showAllBooks_control();
   }
-  if (url.includes("history")) {
-    console.log("history go!");
-    showHistory_control();
-  }
+  if (url.includes("history")) showHistory_control();
   url.includes("search") && searchBook();
-  url.includes("refresh") && showBook(url.slice(url.lastIndexOf("/") + 1));
+  url.includes("refresh") &&
+    showBook_contol(url.slice(url.lastIndexOf("/") + 1));
   url.slice(-1) === "/" && showAllBooks_control();
 }
 
@@ -351,7 +346,6 @@ function changeBookDB(action) {
     let bookid = document.querySelector(".view-title").dataset.bookid;
     // create meeting date
     if (action === "meeting") {
-      console.log("starting function", action);
       bookid = document.querySelector(".upcoming-book-container").dataset
         .bookid;
       const meetingBtn = document.querySelector(".meetingBtn");

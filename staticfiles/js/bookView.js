@@ -1,7 +1,6 @@
 import { Authenticated } from "./model.js";
 import { CLASSIC_LIMIT, HideAll } from "./helpers.js";
 
-let bookToShow;
 !Authenticated() && hideControls();
 
 export function bookSummon(function1) {
@@ -15,7 +14,6 @@ export function bookSummon(function1) {
 }
 
 export function showBook(book) {
-  bookToShow = book;
   HideAll();
   document.querySelector("#book-view").style.display = "flex";
   // manage buttons on page
@@ -25,9 +23,7 @@ export function showBook(book) {
     book.year && book.upcoming && displayButtons("rate", "edit");
     !book.year && displayButtons("add");
   } else displayButtons();
-}
 
-export function fillBookData(book) {
   const title = document.querySelector(".view-title");
   const author = document.querySelector(".view-author");
   const description = document.querySelector(".view-desc");
@@ -68,9 +64,6 @@ function displayButtons(...buttons) {
     (btn) => (btn.style.display = "none")
   );
   if (buttons.includes("remove")) {
-    document.querySelector(".simple-text").innerHTML = `from the ${
-      bookToShow.year <= CLASSIC_LIMIT ? "Classic" : "Modern"
-    } reading list`;
     removeBtn.style.display = "flex";
     if (!nextBook) nextBtn.style.display = "block";
   }
