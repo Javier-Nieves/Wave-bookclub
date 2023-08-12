@@ -17,43 +17,23 @@ export function showAllBooks(books) {
   window.history.pushState("_", "_", `/`);
 }
 
-export function fillTableRow(item, where) {
-  let CellList = createRow(item, `${where}`);
-  for (let i = 0; i < 6; i++) {
-    try {
-      CellList[i].className = `cl${i}`;
-      if (item.upcoming) {
-        CellList[i].classList.add("upcom-book");
-      }
-    } catch {}
-  }
-  let param = [item.title, item.author, item.year, item.country, item.pages];
-  // history table includes 2 more column - rating
-  if (where === "history") {
-    param.push(item.rating || "-");
-  }
-  for (let i = 0; i < param.length; i++) {
-    CellList[i].innerHTML = `${param[i]}`;
-  }
+export function fillTableRow(book, where) {
+  let row = createRow(book, `${where}`);
+  book.upcoming && row.classList.add("upcom-book");
+  Array.from(row.cells).forEach((cell, i) => (cell.className = `cl${i}`));
+  // prettier-ignore
+  let parameters = [book.title, book.author, book.year, book.country, book.pages];
+  where === "history" && parameters.push(book.rating || "-");
+  for (let [i, param] of parameters.entries()) row.cells[i].innerHTML = param;
 }
 
-export function createRow(item, where) {
+export function createRow(book, where) {
   const row = document.querySelector(`.${where}-table`).insertRow(0);
   row.className = `table-row ${where}-body dataContainer`;
-  try {
-    row.dataset.bookid = item.bookid;
-  } catch {}
-  const cell1 = row.insertCell(0);
-  const cell2 = row.insertCell(1);
-  const cell3 = row.insertCell(2);
-  const cell4 = row.insertCell(3);
-  const cell5 = row.insertCell(4);
-  const CellList = [cell1, cell2, cell3, cell4, cell5];
-  if (where === "history") {
-    const cell6 = row.insertCell(5);
-    CellList.push(cell6);
-  }
-  return CellList;
+  row.dataset.bookid = book.bookid;
+  const cellCount = where === "history" ? 6 : 5;
+  for (let i = 0; i < cellCount; i++) row.insertCell(i);
+  return row;
 }
 
 export function NavBtnsFunction(function1, function2) {

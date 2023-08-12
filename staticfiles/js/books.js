@@ -2,37 +2,33 @@
 import { showAllBooks, setStyle, NavBtnsFunction, meetingBtnFunction,
           sessionBtnsFunction, showModal } from "./mainView.js";
 import { showHistory } from "./historyView.js";
-import { showBook, fillBookData } from "./bookView.js";
-import { getJSON, Authenticated, fillFlags, createBook } from "./model.js";
+// prettier-ignore
+import { showBook, fillBookData, bookSummon, bookBtnsFunctions } from "./bookView.js";
+import { getJSON, fillFlags, createBook } from "./model.js";
 // prettier-ignore
 import { loadScreen, HideAll, showMessage } from "./helpers.js";
 
-Authenticated();
 checkMessages();
 loadView();
 Btns_control();
 window.addEventListener("popstate", loadView);
 
 function Btns_control() {
+  // mainView functions
   NavBtnsFunction(showAllBooks_control, showHistory_control);
   sessionBtnsFunction(logoutSequence, changeRegLink);
   meetingBtnFunction(changeBookDB("meeting"));
-
+  // bookView functions
+  bookSummon(showBook_contol);
+  bookBtnsFunctions(
+    addOrRemoveBook("add"),
+    addOrRemoveBook("remove"),
+    editBook,
+    changeBookDB("next"),
+    changeBookDB("rate")
+  );
   // todo - search view
   activateSearchForm(); // todo - add search by author
-  // todo - book view
-  bookBtnsFunctions();
-  bookSummon();
-}
-
-function bookSummon() {
-  // prettier-ignore
-  [".search-table", ".classic-table", ".modern-table", ".history-table", ".upcoming-book-container"]
-  .forEach((item) => document.querySelector(item).addEventListener("click", (e) => {
-    if (!e.target.closest(".add-date-container"))
-    showBook_contol(e.target.closest(".dataContainer").dataset.bookid)
-  }
-  ));
 }
 
 function checkMessages() {
@@ -40,24 +36,6 @@ function checkMessages() {
   if (!message) return;
   showMessage(message.innerHTML);
   message.innerHTML = "";
-}
-
-function bookBtnsFunctions() {
-  document
-    .querySelector(".add-btn")
-    .addEventListener("click", () => addOrRemoveBook("add"));
-  // prettier-ignore
-  document.querySelector(".remove-btn").addEventListener('click',() => addOrRemoveBook("remove"));
-
-  // edit book info
-  const editBtn = document.querySelector(".edit-btn");
-  editBtn.addEventListener("click", editBook);
-  // select next book
-  document
-    .querySelector(".next-btn")
-    .addEventListener("click", changeBookDB("next"));
-  // prettier-ignore
-  document.querySelector(".rate-btn").addEventListener("click", changeBookDB("rate"));
 }
 
 function logoutSequence() {
@@ -79,7 +57,6 @@ async function showAllBooks_control() {
   loadScreen(true);
   const books = await getJSON("/allbooks/all");
   showAllBooks(books);
-  !Authenticated() && hideControls();
   fillFlags("main");
   loadScreen(false);
 }
@@ -95,7 +72,6 @@ async function showHistory_control() {
 async function showBook_contol(id) {
   loadScreen(true);
   let book = await getJSON(`/check/${id}`);
-  console.log(book);
   showBook(book);
   // if book is not in the DB - get data from API
   if (!book.year) book = await createBook(id);
@@ -216,41 +192,43 @@ function editBook() {
 }
 
 function addOrRemoveBook(action) {
-  const book2change = document.querySelector(".view-title").dataset.bookid;
-  let message;
-  const form = document.querySelector(`.modal-form-${action}`);
-  showModal(`${action}`);
-  form.onsubmit = (e) => {
-    e.preventDefault();
-    if (action === "add") {
-      const year = document.querySelector("#year-input").value;
-      const country = document.querySelector("#country-input").value;
-      const title = document.querySelector(".view-title").innerHTML;
-      const author = document.querySelector(".view-author").innerHTML;
-      const desc = document.querySelector(".view-desc").innerHTML;
-      const image = document.querySelector(".view-image").src;
-      let pages = document.querySelector(".view-pages").innerHTML;
-      // figure out
-      pages = pages.replace(/[^0-9]/g, "");
-      fetch(`/add/${book2change}`, {
-        method: "POST",
-        body: JSON.stringify({
-          year: year,
-          country: country,
-          title: title,
-          author: author,
-          desc: desc,
-          image: image,
-          pages: pages,
-        }),
-      });
-      message = "Book added";
-    }
-    if (action === "remove") {
-      fetch(`/${action}/${book2change}`);
-      message = "Book removed";
-    }
-    waitNreload(message);
+  return function () {
+    const book2change = document.querySelector(".view-title").dataset.bookid;
+    let message;
+    const form = document.querySelector(`.modal-form-${action}`);
+    showModal(`${action}`);
+    form.onsubmit = (e) => {
+      e.preventDefault();
+      if (action === "add") {
+        const year = document.querySelector("#year-input").value;
+        const country = document.querySelector("#country-input").value;
+        const title = document.querySelector(".view-title").innerHTML;
+        const author = document.querySelector(".view-author").innerHTML;
+        const desc = document.querySelector(".view-desc").innerHTML;
+        const image = document.querySelector(".view-image").src;
+        let pages = document.querySelector(".view-pages").innerHTML;
+        // figure out
+        pages = pages.replace(/[^0-9]/g, "");
+        fetch(`/add/${book2change}`, {
+          method: "POST",
+          body: JSON.stringify({
+            year: year,
+            country: country,
+            title: title,
+            author: author,
+            desc: desc,
+            image: image,
+            pages: pages,
+          }),
+        });
+        message = "Book added";
+      }
+      if (action === "remove") {
+        fetch(`/${action}/${book2change}`);
+        message = "Book removed";
+      }
+      waitNreload(message);
+    };
   };
 }
 
@@ -351,15 +329,6 @@ function hideModals() {
   );
 }
 
-function hideControls() {
-  document.querySelector(".control-group").style.display = "none";
-  try {
-    document.querySelector(".add-date-container").style.display = "none";
-  } catch {
-    console.log("no date container");
-  }
-}
-
 function loadView() {
   setStyle();
   const url = window.location.href;
@@ -376,6 +345,7 @@ function loadView() {
   url.slice(-1) === "/" && showAllBooks_control();
 }
 
+// todo:
 function changeBookDB(action) {
   return function () {
     let bookid = document.querySelector(".view-title").dataset.bookid;

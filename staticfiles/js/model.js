@@ -44,15 +44,17 @@ export function fillFlags(where) {
   if (where === "main") toFill = [".classic-table", ".modern-table"];
   if (where === "history") toFill = [".history-table"];
   toFill.forEach((table) => {
-    Array.from(document.querySelector(table).rows).forEach((row) => {
-      // prettier-ignore
-      const country = countries.find((country) => country.name.common === row.cells[3].innerHTML);
-      row.cells[3].innerHTML = `
+    Array.from(document.querySelector(table).rows)
+      .filter((row) => !row.classList.contains("yearRow"))
+      .forEach((row) => {
+        // prettier-ignore
+        const country = countries.find((country) => country.name.common === row.cells[3].innerHTML);
+        row.cells[3].innerHTML = `
         <div class='flagContainer'>
             <div>${country.name.common}</div>
             <img src="${country.flags.png}" class='smallFlag'>
         </div>`;
-    });
+      });
   });
 }
 

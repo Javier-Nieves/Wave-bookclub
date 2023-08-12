@@ -584,7 +584,7 @@ th, td {
     background-color: rgba(250, 196, 70, 0.83);
     cursor: pointer;
 }
-.upcom-book {
+.upcom-book > * {
     background-color: rgba(224, 217, 3, 0.634);
     color: #050801;
     box-shadow: 0 0 5px #ffffff9b, 0 0 25px #d4ca01, 0 0 50px #f5e901a5;
@@ -594,7 +594,7 @@ th, td {
     background-color: transparent;
     border: none;
 }
-.yearRow {
+.yearRow > * {
     font-size: 25px;
     background-color: rgba(2, 167, 167, 0.85);
     color: black;
