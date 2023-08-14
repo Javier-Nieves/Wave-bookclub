@@ -1,7 +1,7 @@
 import { HideAll } from "./helpers.js";
 import { fillTableRow, createRow } from "./mainView.js";
 
-export function showHistory(oldBooks) {
+function showHistory(oldBooks) {
   HideAll();
   window.history.pushState("_", "_", `/`);
   document.querySelector("#history-view").style.display = "block";
@@ -20,5 +20,6 @@ export function showHistory(oldBooks) {
     yearChange = book.meeting_date.slice(0, 4);
     fillTableRow(book, "history");
   });
-  window.history.pushState("_", "_", `/history`);
 }
+
+export default showHistory;

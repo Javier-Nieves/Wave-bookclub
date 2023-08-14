@@ -12,11 +12,12 @@ export async function createBook(id) {
   const book = await getJSON(`https://www.googleapis.com/books/v1/volumes/${id}`);
   const info = book.volumeInfo;
   return {
-    author: info.authors[0],
+    author: info.authors?.[0] || "-",
     bookid: book.id,
     country: null,
     desc: info.description,
-    image_link: info.imageLinks.smallThumbnail,
+    image_link:
+      info.imageLinks?.smallThumbnail || "/staticfiles/bookclub/club2.png",
     meeting_date: null,
     pages: info.pageCount,
     rating: null,
@@ -84,4 +85,10 @@ function createCountryOptions() {
     if (!isValidCountry)
       event.target.setCustomValidity("Please select a valid country");
   });
+}
+
+export function searchBooks(title) {
+  return getJSON(
+    `https://www.googleapis.com/books/v1/volumes?q=+intitle:${title}&maxResults=20`
+  );
 }

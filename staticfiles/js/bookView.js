@@ -1,5 +1,5 @@
 import { Authenticated } from "./model.js";
-import { CLASSIC_LIMIT, HideAll } from "./helpers.js";
+import { HideAll } from "./helpers.js";
 
 !Authenticated() && hideControls();
 
@@ -44,10 +44,11 @@ export function showBook(book) {
   }
 }
 
-export function bookBtnsFunctions(add, remove, edit, next, rate) {
+export function bookBtnsFunctions(add, remove, onEdit, next, rate) {
   document.querySelector(".add-btn").addEventListener("click", add);
   document.querySelector(".remove-btn").addEventListener("click", remove);
-  document.querySelector(".edit-btn").addEventListener("click", edit);
+  // prettier-ignore
+  document.querySelector(".edit-btn").addEventListener("click", () => editBook(onEdit));
   document.querySelector(".next-btn").addEventListener("click", next);
   document.querySelector(".rate-btn").addEventListener("click", rate);
 }
@@ -79,4 +80,46 @@ function hideControls() {
   } catch {
     console.log("no date container");
   }
+}
+
+function editBook(onEdit) {
+  const title = document.querySelector(".view-title");
+  const author = document.querySelector(".view-author");
+  const desc = document.querySelector(".view-desc");
+  // const image = document.querySelector(".view-image");
+  let pages = document.querySelector(".view-pages");
+  try {
+    document.querySelector(".view-rating").style.display = "none";
+  } catch {}
+  const info = document.querySelector(".book-info");
+  const heig = info.offsetHeight;
+  const wid = info.offsetWidth;
+  info.style.height = `${heig + 200}px`;
+  const newTitle = document.createElement("input");
+  newTitle.value = title.innerHTML;
+  newTitle.className = "newTitleInput";
+  newTitle.style.width = `${wid - 40}px`;
+  title.parentElement.prepend(newTitle);
+  title.style.display = "none";
+  const newAuthor = document.createElement("input");
+  newAuthor.value = author.innerHTML;
+  newAuthor.className = "newAuthorInput";
+  author.parentElement.prepend(newAuthor);
+  author.style.display = "none";
+  const newPages = document.createElement("input");
+  newPages.value = pages.innerHTML;
+  newPages.className = "newPagesInput";
+  newPages.setAttribute("type", "number");
+  pages.parentElement.append(newPages);
+  pages.style.display = "none";
+  const newDesc = document.createElement("textarea");
+  newDesc.className = "newDesc";
+  newDesc.innerHTML = desc.innerText;
+  desc.parentElement.append(newDesc);
+  desc.style.display = "none";
+  const editBtn = document.querySelector(".edit-btn");
+  editBtn.classList.add("save-btn");
+  editBtn.innerHTML = "Save";
+  editBtn.removeEventListener("click", editBook);
+  editBtn.addEventListener("click", onEdit);
 }

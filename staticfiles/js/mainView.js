@@ -14,7 +14,6 @@ export function showAllBooks(books) {
     book.year <= CLASSIC_LIMIT && !book.read && fillTableRow(book, "classic");
     book.year > CLASSIC_LIMIT && !book.read && fillTableRow(book, "modern");
   });
-  window.history.pushState("_", "_", `/`);
 }
 
 export function fillTableRow(book, where) {
@@ -43,13 +42,13 @@ export function NavBtnsFunction(function1, function2) {
   histLink.addEventListener("click", function2);
 }
 
-export function sessionBtnsFunction(function1, function2) {
+export function sessionBtnsFunction(function1) {
+  document.querySelector(".exit-btn")?.addEventListener("click", function1);
   // prettier-ignore
   document.querySelector(".enter-btn")?.addEventListener("click", () => showModal("enter"));
-  // prettier-ignore
-  document.querySelector(".exit-btn")?.addEventListener("click", function1);
   // change login modal to register and back
-  document.querySelector(".register-link").addEventListener("click", function2);
+  // prettier-ignore
+  document.querySelector(".register-link")?.addEventListener("click", changeRegLink);
 }
 
 export function meetingBtnFunction(function1) {
@@ -127,4 +126,28 @@ function capitalizeName() {
 function resizeTitle() {
   const title = document.querySelector("#upcoming-title");
   title?.innerHTML.length > 20 && (title.style.fontSize = "4vh");
+}
+
+function changeRegLink() {
+  const RegLink = document.querySelector(".register-link");
+  const RegText = document.querySelector("#register-text");
+  const EnterForm = document.querySelector(".modal-form-enter");
+  const RegForm = document.querySelector(".modal-form-register");
+  const header = document.querySelector("#register-text-header");
+  const container = document.querySelector(".modal-content");
+  if (RegLink.innerHTML === "Register") {
+    RegText.innerHTML = "Already have a bookclub?";
+    RegLink.innerHTML = "Login";
+    EnterForm.style.display = "none";
+    RegForm.style.display = "flex";
+    header.innerHTML = "Create new bookclub:";
+    container.style.backgroundColor = "rgba(69, 70, 24, 0.523)";
+  } else {
+    RegText.innerHTML = "Again!?";
+    RegLink.innerHTML = "Register";
+    EnterForm.style.display = "flex";
+    RegForm.style.display = "none";
+    header.innerHTML = "Your bookclub:";
+    container.style.backgroundColor = "rgba(59, 59, 59, 0.694)";
+  }
 }

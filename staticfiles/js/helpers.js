@@ -43,3 +43,29 @@ export function showMessage(message) {
     document.querySelector("#modalmessage").style.display = "none";
   }, 2500);
 }
+
+export function waitNreload(message) {
+  const reloadList = ["rate", "next", "logout", "save"];
+  if (reloadList.includes(message)) {
+    document.querySelector("#modalmessage").style.display = "flex";
+    document.querySelector(".message-text").innerHTML = `${
+      message === "logout" ? "Logged out" : "Updated"
+    }`;
+    setTimeout(function () {
+      window.location.reload();
+    }, 800);
+    return;
+  }
+  // some time is needed to update DB
+  setTimeout(() => {
+    showAllBooks_control();
+    showMessage(message);
+  }, 600);
+  hideModals();
+}
+
+function hideModals() {
+  [".modal", "#modalenter", "#modaladd", "#modalremove", "#modalrate"].map(
+    (elem) => (document.querySelector(elem).style.display = "none")
+  );
+}
