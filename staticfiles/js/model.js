@@ -55,6 +55,7 @@ export function fillFlags(where) {
             <div>${country.name.common}</div>
             <img src="${country.flags.png}" class='smallFlag'>
         </div>`;
+        row.cells[3].dataset.country = country.name.common;
       });
   });
 }
