@@ -3,12 +3,12 @@ import { HideAll } from "./helpers.js";
 
 !Authenticated() && hideControls();
 
-export function bookSummon(function1) {
+export function bookSummon(handler) {
   // prettier-ignore
   [".search-table", ".classic-table", ".modern-table", ".history-table", ".upcoming-book-container"]
     .forEach((item) => document.querySelector(item).addEventListener("click", (e) => {
       if (!e.target.closest(".add-date-container"))
-        function1(e.target.closest(".dataContainer").dataset.bookid);
+        handler(e.target.closest(".dataContainer").dataset.bookid);
     }
     ));
 }
@@ -82,7 +82,7 @@ function hideControls() {
   }
 }
 
-function editBook(onEdit) {
+function editBook(handler) {
   const title = document.querySelector(".view-title");
   const author = document.querySelector(".view-author");
   const desc = document.querySelector(".view-desc");
@@ -121,5 +121,5 @@ function editBook(onEdit) {
   editBtn.classList.add("save-btn");
   editBtn.innerHTML = "Save";
   editBtn.removeEventListener("click", editBook);
-  editBtn.addEventListener("click", onEdit);
+  editBtn.addEventListener("click", handler);
 }

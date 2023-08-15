@@ -35,7 +35,6 @@ def add_book(request, bookid):
     return HttpResponse(status=204)
 
 
-# todo - checks for next functions
 def remove_book(request, bookid):
     book = Book.objects.get(bookid=bookid, club=request.user)
     book.delete()
@@ -48,10 +47,6 @@ def book_check(request, bookid):
         return JsonResponse(check_book.serialize(), status=200)
     except:
         return JsonResponse({'message': 'not in DB'}, status=200)
-
-
-def book_refresh(request, bookid):
-    return index(request, bookid=bookid)
 
 
 def all_books_view(request, field):
@@ -102,14 +97,12 @@ def edit_book(request, bookid):
             book.title = newTitle
             book.pages = newPages
             book.desc = newDesc
-
         book.save()
         return HttpResponse(status=204)
 
 
-def pass_view(request):
-    # needed to JS to load history page upon clicking browser back button from history book
-    return HttpResponse(status=204)
+def book_refresh(request, bookid):
+    return index(request, bookid=bookid)
 
 
 # ----- LOGIN -----
@@ -143,7 +136,6 @@ def register(request):
         try:
             club = User.objects.create_user(username, 'email', password)
             club.save()
-
         except IntegrityError:
             return index(request)
         login(request, club)

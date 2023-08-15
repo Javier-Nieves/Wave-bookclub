@@ -36,15 +36,15 @@ export function createRow(book, where) {
   return row;
 }
 
-export function NavBtnsFunction(function1, function2) {
+export function NavBtnsFunction(handler1, handler2) {
   const readLink = document.querySelector("#reading-link");
   const histLink = document.querySelector("#history-link");
-  readLink.addEventListener("click", function1);
-  histLink.addEventListener("click", function2);
+  readLink.addEventListener("click", handler1);
+  histLink.addEventListener("click", handler2);
 }
 
-export function sessionBtnsFunction(function1) {
-  document.querySelector(".exit-btn")?.addEventListener("click", function1);
+export function sessionBtnsFunction(handler) {
+  document.querySelector(".exit-btn")?.addEventListener("click", handler);
   // prettier-ignore
   document.querySelector(".enter-btn")?.addEventListener("click", () => showModal("enter"));
   // change login modal to register and back
@@ -52,9 +52,9 @@ export function sessionBtnsFunction(function1) {
   document.querySelector(".register-link")?.addEventListener("click", changeRegLink);
 }
 
-export function meetingBtnFunction(function1) {
+export function meetingBtnFunction(handler) {
   // prettier-ignore
-  document.querySelector(".meetingBtn")?.addEventListener("click", function1);
+  document.querySelector(".meetingBtn")?.addEventListener("click", handler);
 }
 
 function switchBtnFunction() {

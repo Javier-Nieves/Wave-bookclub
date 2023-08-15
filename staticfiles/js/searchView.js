@@ -1,10 +1,10 @@
 import { HideAll } from "./helpers.js";
 
-export function activateSearchForm(function1) {
+export function activateSearchForm(handler) {
   document.querySelector(".search-form").addEventListener("submit", (e) => {
     e.preventDefault();
     let title = document.querySelector(".searchField").value;
-    function1(title);
+    handler(title);
   });
 }
 
