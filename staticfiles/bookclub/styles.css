@@ -249,9 +249,20 @@ h2 {
     color: rgb(255, 221, 0);
 }
 .small-pic {
-    width: 3vw;
+    width: 5vw;
 }
-.searchBtn, .add-btn, .remove-btn, .rate-btn, .meetingBtn, .modal-btn, .next-btn, .enter-btn, .exit-btn, .edit-btn {
+.searchResultBig {
+    font-size: 2.5vh;
+}
+.searchResultSmall {
+    font-size: 2vh;
+}
+.paginationText {
+    font-size: 3vh;
+    color: rgba(201, 201, 201, 0.94);
+}
+.searchBtn, .add-btn, .remove-btn, .rate-btn, .meetingBtn, .modal-btn,
+.next-btn, .enter-btn, .exit-btn, .edit-btn, .pagination-btn {
     color: rgba(201, 201, 201, 0.94);
     font-size: 18px;
     font-family: didot;
@@ -264,6 +275,9 @@ h2 {
 }
 .searchBtn {
     width: 10vw;
+}
+.pagination-btn, .pagination-btn_null {
+    width: 6vw;
 }
 .add-btn, .rate-btn {
     justify-content: center;
@@ -315,11 +329,18 @@ h2 {
 }
 .flex-container {
     display: flex;
-    /* flex-direction: column; */
     gap: 1vw;
     align-items: center;
 }
-.enter-btn, .exit-btn {
+.flex-column {
+    display: flex;
+    flex-direction: column;
+    gap: 3vh;
+    align-items: center;
+    justify-content: center;
+    margin-top: 3vh;
+}
+.enter-btn, .exit-btn, .pagination-btn {
     border: 1px solid yellow;
     transition: transform 0.5s ease-in-out;
 }
@@ -339,7 +360,7 @@ h2 {
     transform: scale(1.1);
     cursor: pointer;
 }
-.enter-btn:hover, .exit-btn:hover, .edit-btn:hover {
+.enter-btn:hover, .exit-btn:hover, .edit-btn:hover, .pagination-btn:hover {
     background-color: rgba(254, 236, 39, 0.806);
     box-shadow: 0 0 55px #f9f9f9d2;
     transform: scale(1.1);

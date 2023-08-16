@@ -9,8 +9,8 @@ export function loadScreen(bool) {
 export function HideAll() {
   // prettier-ignore
   const hideList = [".switch-container", ".upcoming-book-container", "#modernTable", 
-    "#classicTable", "#book-view", "#history-view", "#search-results", ".control-group",
-    ".rate-btn-container", ".view-rating"];
+    "#classicTable", "#book-view", "#history-view", "#search-results", "#searchInfo",
+    ".control-group", ".rate-btn-container", ".view-rating"];
   hideList.forEach(
     (elem) => (document.querySelector(elem).style.display = "none")
   );

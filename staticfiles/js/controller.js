@@ -2,7 +2,9 @@
 import { showAllBooks, setStyle, NavBtnsFunction, meetingBtnFunction,
           sessionBtnsFunction, showModal } from "./mainView.js";
 import showHistory from "./historyView.js";
-import { activateSearchForm, showSearchResults } from "./searchView.js";
+// prettier-ignore
+import { activateSearchForm, activatePagination, 
+        showSearchResults, currentPage } from "./searchView.js";
 // prettier-ignore
 import { showBook, bookSummon, bookBtnsFunctions } from "./bookView.js";
 import { getJSON, fillFlags, createBook, searchBooks } from "./model.js";
@@ -37,7 +39,8 @@ function loadView() {
   (url.slice(-1) === "/" || url.includes("logout") || url.includes("login")) &&
     showAllBooks_control();
   url.includes("history") && showHistory_control();
-  url.includes("search") && searchBook_control();
+  url.includes("search") &&
+    searchBook_control(url.slice(url.lastIndexOf("/") + 1));
   url.includes("refresh") &&
     showBook_contol(url.slice(url.lastIndexOf("/") + 1));
 }
@@ -74,12 +77,12 @@ async function showBook_contol(id) {
 async function searchBook_control(title) {
   // todo - pagination
   loadScreen(true);
-  const data = await searchBooks(title);
+  const data = await searchBooks(title, currentPage);
   if (data.totalItems == 0) return;
   showSearchResults(data);
+  activatePagination(searchBook_control);
   loadScreen(false);
-  window.history.pushState("_", "_", `/search`);
-  // todo - refresh for /search
+  window.history.pushState("_", "_", `/search/${title}`);
 }
 
 function checkMessages() {

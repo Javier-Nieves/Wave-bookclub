@@ -1,3 +1,5 @@
+import { RES_PAGE } from "./searchView.js";
+
 let countries = [];
 await getCountryList();
 createCountryOptions();
@@ -88,8 +90,7 @@ function createCountryOptions() {
   });
 }
 
-export function searchBooks(title) {
-  return getJSON(
-    `https://www.googleapis.com/books/v1/volumes?q=+intitle:${title}&maxResults=20`
-  );
+export function searchBooks(title, page) {
+  return getJSON(`https://www.googleapis.com/books/v1/volumes?q=+intitle:${title}
+  &startIndex=${(+page - 1) * +RES_PAGE}&maxResults=${RES_PAGE}`);
 }
