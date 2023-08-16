@@ -91,6 +91,7 @@ function createCountryOptions() {
 }
 
 export function searchBooks(title, page) {
+  // todo - if title contains several words - data is strange in pagination
   return getJSON(`https://www.googleapis.com/books/v1/volumes?q=+intitle:${title}
   &startIndex=${(+page - 1) * +RES_PAGE}&maxResults=${RES_PAGE}`);
 }

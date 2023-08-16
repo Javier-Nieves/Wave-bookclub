@@ -8,6 +8,7 @@ export function activateSearchForm(handler) {
   document.querySelector(".search-form").addEventListener("submit", (e) => {
     e.preventDefault();
     title = document.querySelector(".searchField").value;
+    currentPage = 1;
     handler(title);
   });
 }
@@ -48,11 +49,10 @@ export function showSearchResults(data) {
 
 function generateMarkUp(total) {
   const allPages = Math.ceil(total / RES_PAGE);
-  let markUp;
+  let markUp = `<div class="paginationText"> Total results: ${total}</div>`;
   // Page 1 and there are others
   if (allPages > 1 && currentPage === 1)
-    markUp = `
-        <div class="paginationText"> Total results: ${total}</div>
+    markUp += `
         <div class="flex-container">
             <button class="pagination-btn_null" style="opacity:0"> <- </button>
             <div class="simple-text">Page ${currentPage} / ${allPages}</div>
@@ -63,8 +63,7 @@ function generateMarkUp(total) {
         `;
   // Last page of many
   if (allPages > 1 && currentPage === allPages)
-    markUp = `
-        <div class="paginationText"> Total results: ${total}</div>
+    markUp += `
         <div class="flex-container">
             <button data-goto="${
               currentPage - 1
@@ -75,8 +74,7 @@ function generateMarkUp(total) {
         `;
   // Page in the middle
   if (currentPage < allPages && currentPage !== 1)
-    markUp = `
-        <div class="paginationText"> Total results: ${total}</div>
+    markUp += `
         <div class="flex-container">
             <button data-goto="${
               currentPage - 1
@@ -88,6 +86,6 @@ function generateMarkUp(total) {
         </div>
         `;
   // Just one page
-  if (total <= RES_PAGE) markUp = "";
+  //   if (total <= RES_PAGE) markUp = "";
   return markUp;
 }
