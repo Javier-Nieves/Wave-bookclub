@@ -27,18 +27,21 @@ def index(request, message='', bookid='', **kwargs):
 
 
 @csrf_exempt
-def add_book(request, bookid):
+def add_book(request):
     if request.method == "POST":
         data = json.loads(request.body)
-    Book.objects.create(bookid=bookid, club=request.user, title=data["title"], author=data["author"], year=data["year"], country=data["country"], pages=data["pages"],
-                        desc=data["desc"], image_link=data["image"])
-    return HttpResponse(status=204)
+        Book.objects.create(bookid=data["bookid"], club=request.user, title=data["title"], author=data["author"], year=data["year"], country=data["country"], pages=data["pages"],
+                            desc=data["desc"], image_link=data["image"])
+        return JsonResponse({'ok': True}, status=200)
 
 
-def remove_book(request, bookid):
-    book = Book.objects.get(bookid=bookid, club=request.user)
-    book.delete()
-    return HttpResponse(status=204)
+@csrf_exempt
+def remove_book(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        book = Book.objects.get(bookid=data["bookid"], club=request.user)
+        book.delete()
+        return JsonResponse({'ok': True}, status=200)
 
 
 def book_check(request, bookid):

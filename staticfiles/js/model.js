@@ -37,7 +37,6 @@ export async function getBook(id) {
 }
 
 async function createBook(id) {
-  // prettier-ignore
   const book = await AJAX(`${BOOK_API}/${id}`);
   const info = book.volumeInfo;
   return {
@@ -55,6 +54,26 @@ async function createBook(id) {
     upcoming: false,
     year: null,
   };
+}
+
+export async function addBook(book) {
+  await AJAX(`/add`, book);
+  book.year > CLASSIC_LIMIT
+    ? state.modernBooks.push(book)
+    : state.classicBooks.push(book);
+}
+
+export async function removeBook(book) {
+  await AJAX(`/remove`, book);
+  if (book.year > CLASSIC_LIMIT) {
+    // console.log("deleting modern", book);
+    const index = state.modernBooks.findIndex((element) => element === book);
+    state.modernBooks.splice(index);
+  } else {
+    // console.log("deleting classic", book);
+    const index = state.classicBooks.findIndex((element) => element === book);
+    state.classicBooks.splice(index);
+  }
 }
 
 export function fillFlags(where) {
@@ -87,14 +106,13 @@ export function Authenticated() {
 
 export function searchBooks(title, page) {
   // todo - if title contains several words - data is strange in pagination somehow
-  return AJAX(`${BOOK_API}?q=+intitle:${title}
-    &startIndex=${(+page - 1) * +RES_PAGE}&maxResults=${RES_PAGE}`);
+  // prettier-ignore
+  return AJAX(`${BOOK_API}?q=+intitle:${title}&startIndex=${(+page - 1) * +RES_PAGE}&maxResults=${RES_PAGE}`);
 }
 
 async function getCountryList() {
   // todo - try-catch
   if (!countries) return;
-  // prettier-ignore
   const data = await AJAX(COUNTRIES_API);
   countries = data.map((item) => {
     if (item.name.common === "United States") item.name.common = "USA";

@@ -44,6 +44,7 @@ export function showMessage(message) {
   }, 2500);
 }
 
+// todo: do I even need this? manage views with State
 export function waitNreload(message) {
   const reloadList = ["rate", "next", "logout", "save"];
   if (reloadList.includes(message)) {
@@ -58,13 +59,13 @@ export function waitNreload(message) {
   }
   // some time is needed to update DB
   setTimeout(() => {
-    showAllBooks_control();
+    window.location.reload();
     showMessage(message);
   }, 600);
   hideModals();
 }
 
-function hideModals() {
+export function hideModals() {
   [".modal", "#modalenter", "#modaladd", "#modalremove", "#modalrate"].map(
     (elem) => (document.querySelector(elem).style.display = "none")
   );

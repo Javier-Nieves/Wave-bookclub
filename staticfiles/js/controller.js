@@ -1,5 +1,5 @@
 import * as model from "./model.js";
-import { loadScreen, showMessage, waitNreload } from "./helpers.js";
+import { AJAX, loadScreen, showMessage, hideModals } from "./helpers.js";
 import showHistory from "./historyView.js";
 import { showBook, bookSummon, bookBtnsFunctions } from "./bookView.js";
 // prettier-ignore
@@ -42,8 +42,7 @@ async function loadView() {
   url.includes("history") && showHistory_control();
   url.includes("search") &&
     searchBook_control(url.slice(url.lastIndexOf("/") + 1));
-  url.includes("refresh") &&
-    showBook_contol(url.slice(url.lastIndexOf("/") + 1));
+  url.includes("book") && showBook_contol(url.slice(url.lastIndexOf("/") + 1));
   loadScreen(false);
 }
 
@@ -65,7 +64,7 @@ async function showBook_contol(id) {
   await model.getBook(id);
   showBook(model.state.bookToShow);
   loadScreen(false);
-  window.history.pushState("_", "_", `/refresh/${id}`);
+  window.history.pushState("_", "_", `/book/${id}`);
 }
 
 async function searchBook_control(title) {
@@ -85,11 +84,12 @@ function checkMessages() {
   message.innerHTML = "";
 }
 
-function logoutSequence() {
-  fetch("/logout");
+async function logoutSequence() {
+  await fetch("/logout");
   localStorage.removeItem("loggedIn");
   showMessage("Logged out");
-  waitNreload("logout");
+  // waitNreload("logout");
+  window.location.reload();
 }
 
 // todo:
@@ -175,41 +175,36 @@ function changeBookDB(action) {
 // todo:
 function addOrRemoveBook(action) {
   return function () {
-    const book2change = document.querySelector(".view-title").dataset.bookid;
     let message;
     const form = document.querySelector(`.modal-form-${action}`);
-    showModal(`${action}`);
-    form.onsubmit = (e) => {
+    showModal(action);
+    form.onsubmit = async function (e) {
       e.preventDefault();
       if (action === "add") {
         const year = document.querySelector("#year-input").value;
         const country = document.querySelector("#country-input").value;
-        const title = document.querySelector(".view-title").innerHTML;
-        const author = document.querySelector(".view-author").innerHTML;
-        const desc = document.querySelector(".view-desc").innerHTML;
-        const image = document.querySelector(".view-image").src;
-        let pages = document.querySelector(".view-pages").innerHTML;
-        // figure out
-        pages = pages.replace(/[^0-9]/g, "");
-        fetch(`/add/${book2change}`, {
-          method: "POST",
-          body: JSON.stringify({
-            year: year,
-            country: country,
-            title: title,
-            author: author,
-            desc: desc,
-            image: image,
-            pages: pages,
-          }),
-        });
+        const book = model.state.bookToShow;
+        const bookToDB = {
+          author: book.author,
+          bookid: book.bookid,
+          desc: book.desc,
+          image: book.image_link,
+          pages: book.pages,
+          title: book.title,
+          country: country,
+          year: year,
+        };
+        await model.addBook(bookToDB);
         message = "Book added";
       }
       if (action === "remove") {
-        fetch(`/${action}/${book2change}`);
+        // todo - add checks
+        await model.removeBook(model.state.bookToShow);
         message = "Book removed";
       }
-      waitNreload(message);
+      hideModals();
+      showMessage(message);
+      showAllBooks_control();
     };
   };
 }
