@@ -1,14 +1,13 @@
+import * as model from "./model.js";
+import { loadScreen, showMessage, waitNreload } from "./helpers.js";
+import showHistory from "./historyView.js";
+import { showBook, bookSummon, bookBtnsFunctions } from "./bookView.js";
 // prettier-ignore
 import { showAllBooks, setStyle, NavBtnsFunction, meetingBtnFunction,
           sessionBtnsFunction, showModal } from "./mainView.js";
-import showHistory from "./historyView.js";
 // prettier-ignore
 import { activateSearchForm, activatePagination, 
         showSearchResults, currentPage } from "./searchView.js";
-// prettier-ignore
-import { showBook, bookSummon, bookBtnsFunctions } from "./bookView.js";
-import { getJSON, fillFlags, createBook, searchBooks } from "./model.js";
-import { loadScreen, showMessage, waitNreload } from "./helpers.js";
 
 checkMessages();
 loadView();
@@ -33,7 +32,9 @@ function Btns_control() {
   activateSearchForm(searchBook_control); // todo - add search by author
 }
 
-function loadView() {
+async function loadView() {
+  loadScreen(true);
+  await model.getAllBooks();
   setStyle();
   const url = window.location.href;
   (url.slice(-1) === "/" || url.includes("logout") || url.includes("login")) &&
@@ -43,41 +44,33 @@ function loadView() {
     searchBook_control(url.slice(url.lastIndexOf("/") + 1));
   url.includes("refresh") &&
     showBook_contol(url.slice(url.lastIndexOf("/") + 1));
+  loadScreen(false);
 }
 
-async function showAllBooks_control() {
+function showAllBooks_control() {
   // todo - add try-catch, error throwing
-  loadScreen(true);
-  const books = await getJSON("/allbooks/all");
-  showAllBooks(books);
-  fillFlags("main");
-  loadScreen(false);
+  showAllBooks(model.state.classicBooks, model.state.modernBooks);
+  model.fillFlags("main");
   window.history.pushState("_", "_", `/`);
 }
 
-async function showHistory_control() {
-  loadScreen(true);
-  const oldBooks = await getJSON("/allbooks/history");
-  showHistory(oldBooks);
-  fillFlags("history");
-  loadScreen(false);
+function showHistory_control() {
+  showHistory(model.state.historyBooks);
+  model.fillFlags("history");
   window.history.pushState("_", "_", `/history`);
 }
 
 async function showBook_contol(id) {
   loadScreen(true);
-  let book = await getJSON(`/check/${id}`);
-  // if book isn't in the DB - get data from API
-  if (!book.year) book = await createBook(id);
-  showBook(book);
+  await model.getBook(id);
+  showBook(model.state.bookToShow);
   loadScreen(false);
   window.history.pushState("_", "_", `/refresh/${id}`);
 }
 
 async function searchBook_control(title) {
-  // todo - pagination
   loadScreen(true);
-  const data = await searchBooks(title, currentPage);
+  const data = await model.searchBooks(title, currentPage);
   if (data.totalItems == 0) return;
   showSearchResults(data);
   activatePagination(searchBook_control);

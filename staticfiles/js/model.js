@@ -1,17 +1,44 @@
-import { RES_PAGE } from "./searchView.js";
+import { BOOK_API, COUNTRIES_API, RES_PAGE, CLASSIC_LIMIT } from "./config.js";
+import { AJAX } from "./helpers.js";
 
 let countries = [];
 await getCountryList();
 createCountryOptions();
 
-export async function getJSON(url) {
-  const response = await fetch(url);
-  return await response.json();
+export const state = {
+  upcommingBook: {},
+  bookToShow: {},
+  search: {
+    query: "",
+    results: [],
+    page: 1,
+    resultsPerPage: RES_PAGE,
+  },
+  classicBooks: [],
+  modernBooks: [],
+  historyBooks: [],
+};
+
+export async function getAllBooks() {
+  const books = await AJAX("/allbooks");
+  state.historyBooks = books
+    .filter((book) => book.read)
+    .sort((a, b) => (a.meeting_date < b.meeting_date ? -1 : 1));
+  const readList = books.filter((book) => !book.read);
+  state.modernBooks = readList.filter((book) => book.year > CLASSIC_LIMIT);
+  state.classicBooks = readList.filter((book) => book.year <= CLASSIC_LIMIT);
+  state.upcommingBook = books.find((book) => book.upcoming);
 }
 
-export async function createBook(id) {
+export async function getBook(id) {
+  let book = await AJAX(`/check/${id}`);
+  if (book.notInDB) book = await createBook(id);
+  state.bookToShow = book;
+}
+
+async function createBook(id) {
   // prettier-ignore
-  const book = await getJSON(`https://www.googleapis.com/books/v1/volumes/${id}`);
+  const book = await AJAX(`${BOOK_API}/${id}`);
   const info = book.volumeInfo;
   return {
     author: info.authors?.[0] || "-",
@@ -28,18 +55,6 @@ export async function createBook(id) {
     upcoming: false,
     year: null,
   };
-}
-
-async function getCountryList() {
-  // todo - try-catch
-  if (!countries) return;
-  // prettier-ignore
-  const data = await getJSON(`https://restcountries.com/v3.1/all?fields=name,flags`);
-  countries = data.map((item) => {
-    if (item.name.common === "United States") item.name.common = "USA";
-    if (item.name.common === "United Kingdom") item.name.common = "UK";
-    return item;
-  });
 }
 
 export function fillFlags(where) {
@@ -70,6 +85,24 @@ export function Authenticated() {
   return localStorage.getItem("loggedIn") === "true";
 }
 
+export function searchBooks(title, page) {
+  // todo - if title contains several words - data is strange in pagination somehow
+  return AJAX(`${BOOK_API}?q=+intitle:${title}
+    &startIndex=${(+page - 1) * +RES_PAGE}&maxResults=${RES_PAGE}`);
+}
+
+async function getCountryList() {
+  // todo - try-catch
+  if (!countries) return;
+  // prettier-ignore
+  const data = await AJAX(COUNTRIES_API);
+  countries = data.map((item) => {
+    if (item.name.common === "United States") item.name.common = "USA";
+    if (item.name.common === "United Kingdom") item.name.common = "UK";
+    return item;
+  });
+}
+
 function createCountryOptions() {
   // create countries list for new book country selector
   const countryInput = document.querySelector("#country-input");
@@ -88,10 +121,4 @@ function createCountryOptions() {
     if (!isValidCountry)
       event.target.setCustomValidity("Please select a valid country");
   });
-}
-
-export function searchBooks(title, page) {
-  // todo - if title contains several words - data is strange in pagination
-  return getJSON(`https://www.googleapis.com/books/v1/volumes?q=+intitle:${title}
-  &startIndex=${(+page - 1) * +RES_PAGE}&maxResults=${RES_PAGE}`);
 }

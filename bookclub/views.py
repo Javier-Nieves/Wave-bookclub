@@ -46,23 +46,16 @@ def book_check(request, bookid):
         check_book = Book.objects.get(bookid=bookid, club=request.user)
         return JsonResponse(check_book.serialize(), status=200)
     except:
-        return JsonResponse({'message': 'not in DB'}, status=200)
+        return JsonResponse({'notInDB': True}, status=200)
 
 
-def all_books_view(request, field):
+def all_books_view(request):
     if request.user.is_anonymous:
         user = User.objects.get(username='wave')
     else:
         user = request.user
-
-    if field == 'history':
-        # Return books in reverse chronologial order
-        old_books = Book.objects.filter(
-            club=user).order_by("meeting_date").all()
-        return JsonResponse([old_book.serialize() for old_book in old_books], safe=False)
-    elif field == 'all':
-        books = Book.objects.filter(club=user).order_by('-year')
-        return JsonResponse([book.serialize() for book in books], safe=False)
+    books = Book.objects.filter(club=user).order_by('-year')
+    return JsonResponse([book.serialize() for book in books], safe=False)
 
 
 @csrf_exempt

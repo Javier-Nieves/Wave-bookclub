@@ -1,8 +1,8 @@
 import { HideAll } from "./helpers.js";
+import { RES_PAGE } from "./config.js";
 
 let title;
 export let currentPage = 1;
-export const RES_PAGE = 20; // todo - make changable
 
 export function activateSearchForm(handler) {
   document.querySelector(".search-form").addEventListener("submit", (e) => {

@@ -1,20 +1,19 @@
-import { CLASSIC_LIMIT, HideAll } from "./helpers.js";
+import { CLASSIC_LIMIT } from "./config.js";
+import { HideAll } from "./helpers.js";
 switchBtnFunction();
 capitalizeName();
 resizeTitle();
 addTableSorting();
 
-export function showAllBooks(books) {
+export function showAllBooks(classicBooks, modernBooks) {
   HideAll();
   setStyle();
   document.querySelector(".searchField").value = "";
   document.querySelector(".classic-table").innerHTML = "";
   document.querySelector(".modern-table").innerHTML = "";
   document.querySelector(".upcoming-book-container").style.display = "block";
-  books.forEach((book) => {
-    book.year <= CLASSIC_LIMIT && !book.read && fillTableRow(book, "classic");
-    book.year > CLASSIC_LIMIT && !book.read && fillTableRow(book, "modern");
-  });
+  classicBooks.forEach((book) => fillTableRow(book, "classic"));
+  modernBooks.forEach((book) => fillTableRow(book, "modern"));
 }
 
 export function fillTableRow(book, where) {
