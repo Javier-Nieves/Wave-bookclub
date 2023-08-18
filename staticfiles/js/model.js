@@ -20,59 +20,71 @@ export const state = {
 };
 
 export async function getAllBooks() {
-  const books = await AJAX("/allbooks");
-  state.historyBooks = books
-    .filter((book) => book.read)
-    .sort((a, b) => (a.meeting_date < b.meeting_date ? -1 : 1));
-  const readList = books.filter((book) => !book.read);
-  state.modernBooks = readList.filter((book) => book.year > CLASSIC_LIMIT);
-  state.classicBooks = readList.filter((book) => book.year <= CLASSIC_LIMIT);
-  state.upcommingBook = books.find((book) => book.upcoming);
+  try {
+    const books = await AJAX("/allbooks");
+    state.historyBooks = books
+      .filter((book) => book.read)
+      .sort((a, b) => (a.meeting_date < b.meeting_date ? -1 : 1));
+    const readList = books.filter((book) => !book.read);
+    state.modernBooks = readList.filter((book) => book.year > CLASSIC_LIMIT);
+    state.classicBooks = readList.filter((book) => book.year <= CLASSIC_LIMIT);
+    state.upcommingBook = books.find((book) => book.upcoming);
+  } catch (err) {
+    throw err;
+  }
 }
 
 export async function getBook(id) {
-  let book = await AJAX(`/check/${id}`);
-  if (book.notInDB) book = await createBook(id);
-  state.bookToShow = book;
+  try {
+    let book = await AJAX(`/check/${id}`);
+    if (book.notInDB) book = await createBook(id);
+    state.bookToShow = book;
+  } catch (err) {
+    throw err;
+  }
 }
 
 async function createBook(id) {
-  const book = await AJAX(`${BOOK_API}/${id}`);
-  const info = book.volumeInfo;
-  return {
-    author: info.authors?.[0] || "-",
-    bookid: book.id,
-    country: null,
-    desc: info.description,
-    image_link:
-      info.imageLinks?.smallThumbnail || "/staticfiles/bookclub/club2.png",
-    meeting_date: null,
-    pages: info.pageCount,
-    rating: null,
-    read: false,
-    title: info.title,
-    upcoming: false,
-    year: null,
-  };
+  try {
+    const book = await AJAX(`${BOOK_API}/${id}`);
+    const info = book.volumeInfo;
+    return {
+      author: info.authors?.[0] || "-",
+      bookid: book.id,
+      desc: info.description,
+      image_link:
+        info.imageLinks?.smallThumbnail || "/staticfiles/bookclub/club2.png",
+      pages: info.pageCount,
+      title: info.title,
+    };
+  } catch (err) {
+    throw err;
+  }
 }
 
 export async function addBook(book) {
-  await AJAX(`/add`, book);
-  book.year > CLASSIC_LIMIT
-    ? state.modernBooks.push(book)
-    : state.classicBooks.push(book);
+  try {
+    await AJAX(`/add`, book);
+    book.year > CLASSIC_LIMIT
+      ? state.modernBooks.push(book)
+      : state.classicBooks.push(book);
+  } catch (err) {
+    throw err;
+  }
 }
 
 export async function removeBook(book) {
-  await AJAX(`/remove`, book);
-  if (book.year > CLASSIC_LIMIT) {
-    // console.log("deleting modern", book);
-    const index = state.modernBooks.findIndex((element) => element === book);
-    state.modernBooks.splice(index);
-  } else {
-    // console.log("deleting classic", book);
-    const index = state.classicBooks.findIndex((element) => element === book);
-    state.classicBooks.splice(index);
+  try {
+    await AJAX(`/remove`, book);
+    if (book.year > CLASSIC_LIMIT) {
+      const index = state.modernBooks.findIndex((element) => element === book);
+      state.modernBooks.splice(index);
+    } else {
+      const index = state.classicBooks.findIndex((element) => element === book);
+      state.classicBooks.splice(index);
+    }
+  } catch (err) {
+    throw err;
   }
 }
 
@@ -105,20 +117,27 @@ export function Authenticated() {
 }
 
 export function searchBooks(title, page) {
-  // todo - if title contains several words - data is strange in pagination somehow
-  // prettier-ignore
-  return AJAX(`${BOOK_API}?q=+intitle:${title}&startIndex=${(+page - 1) * +RES_PAGE}&maxResults=${RES_PAGE}`);
+  try {
+    // todo - if title contains several words - data is strange in pagination somehow
+    // prettier-ignore
+    return AJAX(`${BOOK_API}?q=+intitle:${title}&startIndex=${(+page - 1) * +RES_PAGE}&maxResults=${RES_PAGE}`);
+  } catch (err) {
+    throw err;
+  }
 }
 
 async function getCountryList() {
-  // todo - try-catch
-  if (!countries) return;
-  const data = await AJAX(COUNTRIES_API);
-  countries = data.map((item) => {
-    if (item.name.common === "United States") item.name.common = "USA";
-    if (item.name.common === "United Kingdom") item.name.common = "UK";
-    return item;
-  });
+  try {
+    if (!countries) return;
+    const data = await AJAX(COUNTRIES_API);
+    countries = data.map((item) => {
+      if (item.name.common === "United States") item.name.common = "USA";
+      if (item.name.common === "United Kingdom") item.name.common = "UK";
+      return item;
+    });
+  } catch (err) {
+    console.error("Error in country list API", err.message);
+  }
 }
 
 function createCountryOptions() {

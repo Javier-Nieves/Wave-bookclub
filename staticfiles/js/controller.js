@@ -15,35 +15,49 @@ Btns_control();
 window.addEventListener("popstate", loadView);
 
 function Btns_control() {
-  // mainView functions
-  NavBtnsFunction(showAllBooks_control, showHistory_control);
-  sessionBtnsFunction(logoutSequence);
-  meetingBtnFunction(changeBookDB("meeting"));
-  // bookView functions
-  bookSummon(showBook_contol);
-  bookBtnsFunctions(
-    addOrRemoveBook("add"),
-    addOrRemoveBook("remove"),
-    changeBookDB("save"),
-    changeBookDB("next"),
-    changeBookDB("rate")
-  );
-  // searchView
-  activateSearchForm(searchBook_control); // todo - add search by author
+  try {
+    // mainView functions
+    NavBtnsFunction(showAllBooks_control, showHistory_control);
+    sessionBtnsFunction(logoutSequence);
+    meetingBtnFunction(changeBookDB("meeting"));
+    // bookView functions
+    bookSummon(showBook_contol);
+    bookBtnsFunctions(
+      addOrRemoveBook("add"),
+      addOrRemoveBook("remove"),
+      changeBookDB("save"),
+      changeBookDB("next"),
+      changeBookDB("rate")
+    );
+    // searchView
+    activateSearchForm(searchBook_control); // todo - add search by author
+  } catch (err) {
+    console.error("🚧 Error in button function:", err.message);
+    showMessage("Something went wrong :(");
+  }
 }
 
 async function loadView() {
-  loadScreen(true);
-  await model.getAllBooks();
-  setStyle();
-  const url = window.location.href;
-  (url.slice(-1) === "/" || url.includes("logout") || url.includes("login")) &&
-    showAllBooks_control();
-  url.includes("history") && showHistory_control();
-  url.includes("search") &&
-    searchBook_control(url.slice(url.lastIndexOf("/") + 1));
-  url.includes("book") && showBook_contol(url.slice(url.lastIndexOf("/") + 1));
-  loadScreen(false);
+  try {
+    loadScreen(true);
+    await model.getAllBooks();
+    setStyle();
+    const url = window.location.href;
+    (url.slice(-1) === "/" ||
+      url.includes("logout") ||
+      url.includes("login")) &&
+      showAllBooks_control();
+    url.includes("history") && showHistory_control();
+    url.includes("search") &&
+      searchBook_control(url.slice(url.lastIndexOf("/") + 1));
+    url.includes("book") &&
+      showBook_contol(url.slice(url.lastIndexOf("/") + 1));
+  } catch (err) {
+    console.error("🚧 Error in loadView:", err.message);
+    showMessage("Something went wrong :(");
+  } finally {
+    loadScreen(false);
+  }
 }
 
 function showAllBooks_control() {
@@ -60,21 +74,33 @@ function showHistory_control() {
 }
 
 async function showBook_contol(id) {
-  loadScreen(true);
-  await model.getBook(id);
-  showBook(model.state.bookToShow);
-  loadScreen(false);
-  window.history.pushState("_", "_", `/book/${id}`);
+  try {
+    loadScreen(true);
+    await model.getBook(id);
+    showBook(model.state.bookToShow);
+    window.history.pushState("_", "_", `/book/${id}`);
+  } catch (err) {
+    console.error("🚧 Error in showBook:", err.message);
+    showMessage("Something went wrong :(");
+  } finally {
+    loadScreen(false);
+  }
 }
 
 async function searchBook_control(title) {
-  loadScreen(true);
-  const data = await model.searchBooks(title, currentPage);
-  if (data.totalItems == 0) return;
-  showSearchResults(data);
-  activatePagination(searchBook_control);
-  loadScreen(false);
-  window.history.pushState("_", "_", `/search/${title}`);
+  try {
+    loadScreen(true);
+    const data = await model.searchBooks(title, currentPage);
+    if (data.totalItems == 0) return;
+    showSearchResults(data);
+    activatePagination(searchBook_control);
+    window.history.pushState("_", "_", `/search/${title}`);
+  } catch (err) {
+    console.error("🚧 Error in search:", err.message);
+    showMessage("Something went wrong :(");
+  } finally {
+    loadScreen(false);
+  }
 }
 
 function checkMessages() {
@@ -172,39 +198,43 @@ function changeBookDB(action) {
   };
 }
 
-// todo:
 function addOrRemoveBook(action) {
   return function () {
-    let message;
-    const form = document.querySelector(`.modal-form-${action}`);
-    showModal(action);
-    form.onsubmit = async function (e) {
-      e.preventDefault();
-      if (action === "add") {
-        const year = document.querySelector("#year-input").value;
-        const country = document.querySelector("#country-input").value;
-        const book = model.state.bookToShow;
-        const bookToDB = {
-          author: book.author,
-          bookid: book.bookid,
-          desc: book.desc,
-          image: book.image_link,
-          pages: book.pages,
-          title: book.title,
-          country: country,
-          year: year,
-        };
-        await model.addBook(bookToDB);
-        message = "Book added";
-      }
-      if (action === "remove") {
-        // todo - add checks
-        await model.removeBook(model.state.bookToShow);
-        message = "Book removed";
-      }
-      hideModals();
-      showMessage(message);
-      showAllBooks_control();
-    };
+    try {
+      let message;
+      const form = document.querySelector(`.modal-form-${action}`);
+      showModal(action);
+      form.onsubmit = async function (e) {
+        e.preventDefault();
+        if (action === "add") {
+          const year = document.querySelector("#year-input").value;
+          const country = document.querySelector("#country-input").value;
+          const book = model.state.bookToShow;
+          const bookToDB = {
+            author: book.author,
+            bookid: book.bookid,
+            desc: book.desc,
+            image: book.image_link,
+            pages: book.pages,
+            title: book.title,
+            country: country,
+            year: year,
+          };
+          await model.addBook(bookToDB);
+          message = "Book added";
+        }
+        if (action === "remove") {
+          await model.removeBook(model.state.bookToShow);
+          message = "Book removed";
+        }
+        hideModals();
+        showMessage(message);
+        showAllBooks_control();
+      };
+    } catch (err) {
+      // todo - for some reason error from Add and Remove can't be caught here
+      // console.log("throwing 2");
+      throw err;
+    }
   };
 }
