@@ -20,6 +20,8 @@ function Btns_control() {
     NavBtnsFunction(showAllBooks_control, showHistory_control);
     sessionBtnsFunction(logoutSequence);
     meetingBtnFunction(changeBookDB("meeting"));
+    // searchView
+    activateSearchForm(searchBook_control); // todo - add search by author
     // bookView functions
     bookSummon(showBook_contol);
     bookBtnsFunctions(
@@ -29,8 +31,6 @@ function Btns_control() {
       changeBookDB("next"),
       changeBookDB("rate")
     );
-    // searchView
-    activateSearchForm(searchBook_control); // todo - add search by author
   } catch (err) {
     console.error("🚧 Error in button function:", err.message);
     showMessage("Something went wrong :(");
@@ -50,7 +50,7 @@ async function loadView() {
     url.includes("history") && showHistory_control();
     url.includes("search") &&
       searchBook_control(url.slice(url.lastIndexOf("/") + 1));
-    url.includes("book") &&
+    url.includes("show") &&
       showBook_contol(url.slice(url.lastIndexOf("/") + 1));
   } catch (err) {
     console.error("🚧 Error in loadView:", err.message);
@@ -78,7 +78,7 @@ async function showBook_contol(id) {
     loadScreen(true);
     await model.getBook(id);
     showBook(model.state.bookToShow);
-    window.history.pushState("_", "_", `/book/${id}`);
+    window.history.pushState("_", "_", `/show/${id}`);
   } catch (err) {
     console.error("🚧 Error in showBook:", err.message);
     showMessage("Something went wrong :(");
@@ -124,8 +124,8 @@ function changeBookDB(action) {
     let bookid = document.querySelector(".view-title").dataset.bookid;
     // create meeting date
     if (action === "meeting") {
-      bookid = document.querySelector(".upcoming-book-container").dataset
-        .bookid;
+      bookid = model.state.upcommingBook.bookid;
+      console.log(bookid);
       const meetingBtn = document.querySelector(".meetingBtn");
       document.querySelector(".meetingField").style.display = "block";
       // input will appear on first click
