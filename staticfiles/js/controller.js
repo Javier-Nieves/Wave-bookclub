@@ -159,7 +159,11 @@ function changeBookDB(action) {
           next: true,
         }),
       });
-      waitNreload("next");
+      // waitNreload("next");
+      hideModals();
+      showMessage("Next book is selected");
+      // model.state.upcommingBook =
+      showAllBooks_control();
     }
     if (action === "rate") {
       let form = document.querySelector(`.modal-form-${action}`);
@@ -173,7 +177,10 @@ function changeBookDB(action) {
             rating: rating,
           }),
         });
-        waitNreload("rate");
+        // waitNreload("rate");
+        hideModals();
+        showMessage("Book is rated!");
+        showAllBooks_control();
       };
     }
     // save changes to book's data in DB
@@ -193,7 +200,10 @@ function changeBookDB(action) {
           newDesc: newDesc,
         }),
       });
-      waitNreload("save");
+      // waitNreload("save");
+      hideModals();
+      showMessage("Changes are saved");
+      showAllBooks_control();
     }
   };
 }
