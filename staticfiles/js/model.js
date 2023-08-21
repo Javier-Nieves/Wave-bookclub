@@ -39,6 +39,7 @@ export async function getBook(id) {
     let book = await AJAX(`/check/${id}`);
     if (book.notInDB) book = await createBook(id);
     state.bookToShow = book;
+    return book;
   } catch (err) {
     throw err;
   }
@@ -64,7 +65,7 @@ async function createBook(id) {
 
 export async function addBook(book) {
   try {
-    await AJAX(`/add`, book);
+    await AJAX(`/add`, book, "POST");
     book.year > CLASSIC_LIMIT
       ? state.modernBooks.push(book)
       : state.classicBooks.push(book);
@@ -75,7 +76,7 @@ export async function addBook(book) {
 
 export async function removeBook(book) {
   try {
-    await AJAX(`/remove`, book);
+    await AJAX(`/remove`, book, "POST");
     if (book.year > CLASSIC_LIMIT) {
       const index = state.modernBooks.findIndex((element) => element === book);
       state.modernBooks.splice(index);
@@ -83,6 +84,18 @@ export async function removeBook(book) {
       const index = state.classicBooks.findIndex((element) => element === book);
       state.classicBooks.splice(index);
     }
+  } catch (err) {
+    throw err;
+  }
+}
+
+export async function changeDB(body, meeting = false) {
+  try {
+    const bookid = meeting
+      ? state.upcommingBook.bookid
+      : state.bookToShow.bookid;
+    console.log(bookid);
+    await AJAX(`/edit/${bookid}`, body, "PUT");
   } catch (err) {
     throw err;
   }

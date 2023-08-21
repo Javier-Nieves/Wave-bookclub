@@ -14,6 +14,7 @@ export function showAllBooks(classicBooks, modernBooks) {
   document.querySelector(".upcoming-book-container").style.display = "block";
   classicBooks.forEach((book) => fillTableRow(book, "classic"));
   modernBooks.forEach((book) => fillTableRow(book, "modern"));
+  // todo - add filling upcomming book from state
 }
 
 export function fillTableRow(book, where) {
@@ -52,7 +53,6 @@ export function sessionBtnsFunction(handler) {
 }
 
 export function meetingBtnFunction(handler) {
-  // prettier-ignore
   document.querySelector(".meetingBtn")?.addEventListener("click", handler);
 }
 
@@ -62,6 +62,7 @@ function switchBtnFunction() {
 }
 
 export function showModal(action) {
+  console.log("showing modal", action);
   // todo - use Dialog
   const close = document.querySelector(".close");
   const modal = document.querySelector(".modal");
@@ -206,4 +207,13 @@ function deleteYearRows(table) {
   Array.from(table.rows).forEach(
     (row) => row.classList.contains("yearRow") && row.remove()
   );
+}
+
+export function showNewDate(date) {
+  document.querySelector(".meetingField").style.display = "none";
+  document.querySelector(".meetingBtn").style.display = "none";
+  const newDate = document.createElement("div");
+  newDate.className = "meeting-date";
+  newDate.innerHTML = date;
+  document.querySelector(".add-date-container").append(newDate);
 }

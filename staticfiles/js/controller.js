@@ -1,10 +1,10 @@
 import * as model from "./model.js";
-import { AJAX, loadScreen, showMessage, hideModals } from "./helpers.js";
+import { loadScreen, showMessage, hideModals } from "./helpers.js";
 import showHistory from "./historyView.js";
 import { showBook, bookSummon, bookBtnsFunctions } from "./bookView.js";
 // prettier-ignore
 import { showAllBooks, setStyle, NavBtnsFunction, meetingBtnFunction,
-          sessionBtnsFunction, showModal } from "./mainView.js";
+        sessionBtnsFunction, showModal, showNewDate } from "./mainView.js";
 // prettier-ignore
 import { activateSearchForm, activatePagination, 
         showSearchResults, currentPage } from "./searchView.js";
@@ -19,7 +19,7 @@ function Btns_control() {
     // mainView functions
     NavBtnsFunction(showAllBooks_control, showHistory_control);
     sessionBtnsFunction(logoutSequence);
-    meetingBtnFunction(changeBookDB("meeting"));
+    meetingBtnFunction(meetingBook);
     // searchView
     activateSearchForm(searchBook_control); // todo - add search by author
     // bookView functions
@@ -27,9 +27,9 @@ function Btns_control() {
     bookBtnsFunctions(
       addOrRemoveBook("add"),
       addOrRemoveBook("remove"),
-      changeBookDB("save"),
-      changeBookDB("next"),
-      changeBookDB("rate")
+      saveBook,
+      nextBook,
+      rateBook
     );
   } catch (err) {
     console.error("🚧 Error in button function:", err.message);
@@ -61,7 +61,6 @@ async function loadView() {
 }
 
 function showAllBooks_control() {
-  // todo - add try-catch, error throwing
   showAllBooks(model.state.classicBooks, model.state.modernBooks);
   model.fillFlags("main");
   window.history.pushState("_", "_", `/`);
@@ -118,94 +117,72 @@ async function logoutSequence() {
   window.location.reload();
 }
 
-// todo:
-function changeBookDB(action) {
-  return function () {
-    let bookid = document.querySelector(".view-title").dataset.bookid;
-    // create meeting date
-    if (action === "meeting") {
-      bookid = model.state.upcommingBook.bookid;
-      console.log(bookid);
-      const meetingBtn = document.querySelector(".meetingBtn");
-      document.querySelector(".meetingField").style.display = "block";
-      // input will appear on first click
-      meetingBtn.addEventListener("click", () => {
-        const date = document.querySelector(".meetingField").value;
-        document
-          .querySelector(".add-date-container")
-          .addEventListener("submit", (e) => {
-            e.preventDefault();
-            // second click will sent API
-            fetch(`/edit/${bookid}`, {
-              method: "PUT",
-              body: JSON.stringify({
-                meeting_date: date,
-              }),
-            });
-            showMessage("Date selected");
-            document.querySelector(".meetingField").style.display = "none";
-            meetingBtn.style.display = "none";
-            const newDate = document.createElement("div");
-            newDate.className = "meeting-date";
-            newDate.innerHTML = date;
-            document.querySelector(".add-date-container").append(newDate);
-          });
-      });
-    }
-    if (action === "next") {
-      fetch(`/edit/${bookid}`, {
-        method: "PUT",
-        body: JSON.stringify({
-          next: true,
-        }),
-      });
-      // waitNreload("next");
+function rateBook() {
+  try {
+    showModal("rate");
+    const form = document.querySelector(".modal-form-rate");
+    form.onsubmit = async function (e) {
+      e.preventDefault();
+      const rating = document.querySelector("#rating-input").value;
+      await model.changeDB({ rating: rating });
+      showMessage("Book is rated!");
       hideModals();
-      showMessage("Next book is selected");
-      // model.state.upcommingBook =
       showAllBooks_control();
-    }
-    if (action === "rate") {
-      let form = document.querySelector(`.modal-form-${action}`);
-      showModal(`rate`);
-      form.onsubmit = (e) => {
-        e.preventDefault();
-        const rating = document.querySelector("#rating-input").value;
-        fetch(`/edit/${bookid}`, {
-          method: "PUT",
-          body: JSON.stringify({
-            rating: rating,
-          }),
-        });
-        // waitNreload("rate");
-        hideModals();
-        showMessage("Book is rated!");
-        showAllBooks_control();
-      };
-    }
-    // save changes to book's data in DB
-    if (action === "save") {
-      // todo - Would be great not to reload page but just change content
-      const newAuthor = document.querySelector(".newAuthorInput").value;
-      const newTitle = document.querySelector(".newTitleInput").value;
-      const newPages = document.querySelector(".newPagesInput").value;
-      const newDesc = document.querySelector(".newDesc").value;
-      fetch(`/edit/${bookid}`, {
-        method: "PUT",
-        body: JSON.stringify({
-          save: true,
-          newAuthor: newAuthor,
-          newTitle: newTitle,
-          newPages: newPages,
-          newDesc: newDesc,
-        }),
-      });
-      // waitNreload("save");
+    };
+  } catch (err) {
+    throw err;
+  }
+}
+
+async function nextBook() {
+  try {
+    model.state.upcommingBook = model.state.bookToShow;
+    await model.changeDB({ next: true });
+    showMessage("Next book is selected");
+    showAllBooks_control();
+  } catch (err) {
+    throw err;
+  }
+}
+
+async function saveBook() {
+  try {
+    const newAuthor = document.querySelector(".newAuthorInput").value;
+    const newTitle = document.querySelector(".newTitleInput").value;
+    const newPages = document.querySelector(".newPagesInput").value;
+    const newDesc = document.querySelector(".newDesc").value;
+    const body = {
+      save: true,
+      newAuthor: newAuthor,
+      newTitle: newTitle,
+      newPages: newPages,
+      newDesc: newDesc,
+    };
+    await model.changeDB(body);
+    model.state.upcommingBook = model.state.bookToShow;
+    showMessage("Changes are saved");
+    // todo - ugly finish
+    showBook(model.state.bookToShow);
+  } catch (err) {
+    throw err;
+  }
+}
+
+function meetingBook() {
+  try {
+    document.querySelector(".meetingField").style.display = "block";
+    // prettier-ignore
+    document.querySelector(".add-date-container").onsubmit = async function (e) {
+      e.preventDefault();
+      const date = document.querySelector(".meetingField").value;
+      await model.changeDB({ meeting_date: date }, true);
+      showMessage("Date is selected");
       hideModals();
-      showMessage("Changes are saved");
-      showAllBooks_control();
-    }
-  };
+      showNewDate(date);
+    };
+  } catch (err) {
+    throw err;
+  }
 }
 
 function addOrRemoveBook(action) {

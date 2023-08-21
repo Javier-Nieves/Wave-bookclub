@@ -69,7 +69,6 @@ def edit_book(request, bookid):
         return JsonResponse({"error": "Book not found."}, status=404)
     if request.method == "PUT":
         data = json.loads(request.body)
-
         if data.get("meeting_date") is not None:
             book.meeting_date = data["meeting_date"]
 
@@ -94,7 +93,7 @@ def edit_book(request, bookid):
             book.pages = newPages
             book.desc = newDesc
         book.save()
-        return HttpResponse(status=204)
+        return JsonResponse({'edited': True}, status=200)
 
 
 def book_refresh(request, bookid):

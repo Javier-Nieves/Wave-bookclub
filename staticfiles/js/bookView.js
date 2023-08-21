@@ -86,7 +86,6 @@ function editBook(handler) {
   const title = document.querySelector(".view-title");
   const author = document.querySelector(".view-author");
   const desc = document.querySelector(".view-desc");
-  // const image = document.querySelector(".view-image");
   let pages = document.querySelector(".view-pages");
   try {
     document.querySelector(".view-rating").style.display = "none";
