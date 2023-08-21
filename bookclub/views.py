@@ -69,9 +69,6 @@ def edit_book(request, bookid):
         return JsonResponse({"error": "Book not found."}, status=404)
     if request.method == "PUT":
         data = json.loads(request.body)
-        if data.get("meeting_date") is not None:
-            book.meeting_date = data["meeting_date"]
-
         if data.get("next") is not None:
             book.upcoming = data["next"]
 
@@ -81,6 +78,9 @@ def edit_book(request, bookid):
             book.rating = rating
             book.read = True
             book.upcoming = False
+
+        if data.get("meeting") is not None:
+            book.meeting_date = data["meeting"]
 
         if data.get("save") is not None:
             book = Book.objects.get(bookid=bookid, club=request.user)

@@ -5,15 +5,15 @@ capitalizeName();
 resizeTitle();
 addTableSorting();
 
-export function showAllBooks(classicBooks, modernBooks) {
+export function showAllBooks(state) {
   HideAll();
   setStyle();
   document.querySelector(".searchField").value = "";
   document.querySelector(".classic-table").innerHTML = "";
   document.querySelector(".modern-table").innerHTML = "";
   document.querySelector(".upcoming-book-container").style.display = "block";
-  classicBooks.forEach((book) => fillTableRow(book, "classic"));
-  modernBooks.forEach((book) => fillTableRow(book, "modern"));
+  state.classicBooks.forEach((book) => fillTableRow(book, "classic"));
+  state.modernBooks.forEach((book) => fillTableRow(book, "modern"));
   // todo - add filling upcomming book from state
 }
 
@@ -62,7 +62,6 @@ function switchBtnFunction() {
 }
 
 export function showModal(action) {
-  console.log("showing modal", action);
   // todo - use Dialog
   const close = document.querySelector(".close");
   const modal = document.querySelector(".modal");
@@ -81,16 +80,16 @@ export function showModal(action) {
   };
 }
 
-// todo:
 export function setStyle(changeStyle = false) {
   const upcomBookYear =
-    document.querySelector(".upcoming-book-container").dataset.year || 1666;
-  // if book is classic => style should be made modern
+    document.querySelector(".upcoming-book-container").dataset.year ||
+    CLASSIC_LIMIT - 1;
+  // if upcomming book is classic => style should be made modern
   let makeModern = upcomBookYear < CLASSIC_LIMIT;
   document.querySelector(".switch-container").style.display = "flex";
   const classicTable = document.querySelector("#classicTable");
   const modernTable = document.querySelector("#modernTable");
-  // if switch btn is clicked - style will change to the other one
+  // if switch btn is clicked - style will change
   if (changeStyle) makeModern = classicTable.style.display !== "none";
 
   classicTable.style.display = makeModern ? "none" : "block";
@@ -98,11 +97,10 @@ export function setStyle(changeStyle = false) {
   document.body.style.backgroundImage = makeModern
     ? "URL('/staticfiles/bookclub/13small.jpg')"
     : "URL('/staticfiles/bookclub/back2small.jpg')";
-  const switchBtn = document.querySelector(".switch");
-  switchBtn.style.backgroundImage = makeModern
+  document.querySelector(".switch").style.backgroundImage = makeModern
     ? "URL('/staticfiles/bookclub/Modern2.png')"
     : "URL('/staticfiles/bookclub/classic2.png')";
-  let img = new Image();
+  const img = new Image();
   img.src = makeModern
     ? "/staticfiles/bookclub/13.jpg"
     : "/staticfiles/bookclub/back2.jpeg";

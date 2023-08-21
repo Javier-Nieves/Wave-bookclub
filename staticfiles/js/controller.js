@@ -9,6 +9,8 @@ import { showAllBooks, setStyle, NavBtnsFunction, meetingBtnFunction,
 import { activateSearchForm, activatePagination, 
         showSearchResults, currentPage } from "./searchView.js";
 
+// TODO - fill all views in functions, without Django
+
 checkMessages();
 loadView();
 Btns_control();
@@ -61,7 +63,7 @@ async function loadView() {
 }
 
 function showAllBooks_control() {
-  showAllBooks(model.state.classicBooks, model.state.modernBooks);
+  showAllBooks(model.state);
   model.fillFlags("main");
   window.history.pushState("_", "_", `/`);
 }
@@ -113,7 +115,6 @@ async function logoutSequence() {
   await fetch("/logout");
   localStorage.removeItem("loggedIn");
   showMessage("Logged out");
-  // waitNreload("logout");
   window.location.reload();
 }
 
@@ -130,7 +131,8 @@ function rateBook() {
       showAllBooks_control();
     };
   } catch (err) {
-    throw err;
+    console.error("🚧 Error in rating:", err.message);
+    showMessage("Something went wrong :(");
   }
 }
 
@@ -141,7 +143,8 @@ async function nextBook() {
     showMessage("Next book is selected");
     showAllBooks_control();
   } catch (err) {
-    throw err;
+    console.error("🚧 Error in next book selection:", err.message);
+    showMessage("Something went wrong :(");
   }
 }
 
@@ -164,7 +167,8 @@ async function saveBook() {
     // todo - ugly finish
     showBook(model.state.bookToShow);
   } catch (err) {
-    throw err;
+    console.error("🚧 Can't edit the book:", err.message);
+    showMessage("Something went wrong :(");
   }
 }
 
@@ -175,13 +179,14 @@ function meetingBook() {
     document.querySelector(".add-date-container").onsubmit = async function (e) {
       e.preventDefault();
       const date = document.querySelector(".meetingField").value;
-      await model.changeDB({ meeting_date: date }, true);
+      await model.changeDB({ meeting: date });
       showMessage("Date is selected");
       hideModals();
       showNewDate(date);
     };
   } catch (err) {
-    throw err;
+    console.error("🚧 Can't add new meeting date:", err.message);
+    showMessage("Something went wrong :(");
   }
 }
 

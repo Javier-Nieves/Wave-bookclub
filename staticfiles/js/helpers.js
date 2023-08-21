@@ -44,27 +44,6 @@ export function showMessage(message) {
   }, 2500);
 }
 
-// todo: do I even need this? manage views with State
-export function waitNreload(message) {
-  const reloadList = ["rate", "next", "logout", "save"];
-  if (reloadList.includes(message)) {
-    document.querySelector("#modalmessage").style.display = "flex";
-    document.querySelector(".message-text").innerHTML = `${
-      message === "logout" ? "Logged out" : "Updated"
-    }`;
-    setTimeout(function () {
-      window.location.reload();
-    }, 800);
-    return;
-  }
-  // some time is needed to update DB
-  setTimeout(() => {
-    window.location.reload();
-    showMessage(message);
-  }, 600);
-  hideModals();
-}
-
 export function hideModals() {
   [".modal", "#modalenter", "#modaladd", "#modalremove", "#modalrate"].map(
     (elem) => (document.querySelector(elem).style.display = "none")
@@ -84,7 +63,6 @@ export async function AJAX(url, uploadData = undefined, method = "GET") {
     } else fetchPro = fetch(url);
     const response = await Promise.race([fetchPro, timeout(TIMEOUT_SEC)]);
     const data = await response.json();
-    // todo:
     //   if (!response.ok) throw new Error(`${data.message} (${response.status})`);
     return data;
   } catch (err) {

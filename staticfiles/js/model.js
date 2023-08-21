@@ -64,6 +64,7 @@ async function createBook(id) {
 }
 
 export async function addBook(book) {
+  // todo - books don't load right away
   try {
     await AJAX(`/add`, book, "POST");
     book.year > CLASSIC_LIMIT
@@ -89,13 +90,21 @@ export async function removeBook(book) {
   }
 }
 
-export async function changeDB(body, meeting = false) {
+export async function changeDB(body) {
+  // adding rated book to history, meeting has other bookid. and NEXT!
   try {
-    const bookid = meeting
-      ? state.upcommingBook.bookid
-      : state.bookToShow.bookid;
-    console.log(bookid);
+    const bookid =
+      "meeting" in body ? state.upcommingBook.bookid : state.bookToShow.bookid;
+    // if there was no meeting date - assign today in YYYY-MM-DD format
+    if (!state.upcommingBook.meeting_date)
+      body.meeting = new Date().toLocaleDateString("en-CA");
     await AJAX(`/edit/${bookid}`, body, "PUT");
+    if ("rating" in body) {
+      state.historyBooks.push(state.upcommingBook);
+      state.upcommingBook = {};
+    }
+    if ("next" in body) state.upcommingBook.push(state.bookToShow);
+    console.log(state);
   } catch (err) {
     throw err;
   }
