@@ -39,21 +39,21 @@ function Btns_control() {
   }
 }
 
-async function loadView() {
+async function loadView(location = undefined) {
   try {
     loadScreen(true);
     await model.getAllBooks();
     setStyle();
-    const url = window.location.href;
-    (url.slice(-1) === "/" ||
-      url.includes("logout") ||
-      url.includes("login")) &&
+    const goTo = location || window.location.href;
+    (goTo.slice(-1) === "/" ||
+      goTo.includes("logout") ||
+      goTo.includes("login")) &&
       showAllBooks_control();
-    url.includes("history") && showHistory_control();
-    url.includes("search") &&
-      searchBook_control(url.slice(url.lastIndexOf("/") + 1));
-    url.includes("show") &&
-      showBook_contol(url.slice(url.lastIndexOf("/") + 1));
+    goTo.includes("history") && showHistory_control();
+    goTo.includes("search") &&
+      searchBook_control(goTo.slice(goTo.lastIndexOf("/") + 1));
+    goTo.includes("show") &&
+      showBook_contol(goTo.slice(goTo.lastIndexOf("/") + 1));
   } catch (err) {
     console.error("🚧 Error in loadView:", err.message);
     showMessage("Something went wrong :(");
@@ -128,7 +128,7 @@ function rateBook() {
       await model.changeDB({ rating: rating });
       showMessage("Book is rated!");
       hideModals();
-      showAllBooks_control();
+      loadView("/");
     };
   } catch (err) {
     console.error("🚧 Error in rating:", err.message);
@@ -141,7 +141,7 @@ async function nextBook() {
     model.state.upcommingBook = model.state.bookToShow;
     await model.changeDB({ next: true });
     showMessage("Next book is selected");
-    showAllBooks_control();
+    loadView("/");
   } catch (err) {
     console.error("🚧 Error in next book selection:", err.message);
     showMessage("Something went wrong :(");

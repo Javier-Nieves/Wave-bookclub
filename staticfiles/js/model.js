@@ -96,14 +96,15 @@ export async function changeDB(body) {
     const bookid =
       "meeting" in body ? state.upcommingBook.bookid : state.bookToShow.bookid;
     // if there was no meeting date - assign today in YYYY-MM-DD format
-    if (!state.upcommingBook.meeting_date)
+    if ("rating" in body && !state.upcommingBook.meeting_date)
       body.meeting = new Date().toLocaleDateString("en-CA");
     await AJAX(`/edit/${bookid}`, body, "PUT");
+
     if ("rating" in body) {
       state.historyBooks.push(state.upcommingBook);
       state.upcommingBook = {};
     }
-    if ("next" in body) state.upcommingBook.push(state.bookToShow);
+    if ("next" in body) state.upcommingBook = state.bookToShow;
     console.log(state);
   } catch (err) {
     throw err;

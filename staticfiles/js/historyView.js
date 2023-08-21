@@ -9,6 +9,7 @@ function showHistory(oldBooks) {
   document.querySelector(".history-table").innerHTML = "";
   let yearChange;
   oldBooks.forEach((book) => {
+    console.log(book);
     if (!book.read) return;
     if (!yearChange) yearChange = book.meeting_date.slice(0, 4);
     // create yearRows to separate bookclub years
