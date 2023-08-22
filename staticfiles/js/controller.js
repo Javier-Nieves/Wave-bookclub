@@ -1,15 +1,9 @@
-import * as model from "./model.js";
 import { loadScreen, showMessage, hideModals } from "./helpers.js";
+import * as model from "./model.js";
+import * as mainView from "./mainView.js";
+import * as bookView from "./bookView.js";
+import * as searchView from "./searchView.js";
 import showHistory from "./historyView.js";
-// prettier-ignore
-import { showBook, bookSummon, 
-  bookBtnsFunctions, clearUpcomBook } from "./bookView.js";
-// prettier-ignore
-import { showAllBooks, setStyle, NavBtnsFunction, meetingBtnFunction,
-        sessionBtnsFunction, showModal, showNewDate } from "./mainView.js";
-// prettier-ignore
-import { activateSearchForm, activatePagination, 
-        showSearchResults, currentPage } from "./searchView.js";
 
 checkMessages();
 await loadView();
@@ -18,15 +12,12 @@ window.addEventListener("popstate", loadView);
 
 function Btns_control() {
   try {
-    // mainView functions
-    NavBtnsFunction(showAllBooks_control, showHistory_control);
-    sessionBtnsFunction(logoutSequence);
-    meetingBtnFunction(meetingBook);
-    // searchView
-    activateSearchForm(searchBook_control); // todo - add search by author
-    // bookView functions
-    bookSummon(showBook_contol);
-    bookBtnsFunctions(
+    mainView.NavBtnsFunction(showAllBooks_control, showHistory_control);
+    mainView.sessionBtnsFunction(logoutSequence);
+    mainView.meetingBtnFunction(meetingBook);
+    searchView.activateSearchForm(searchBook_control); // todo - add search by author
+    bookView.bookSummon(showBook_contol);
+    bookView.bookBtnsFunctions(
       addOrRemoveBook("add"),
       addOrRemoveBook("remove"),
       saveBook,
@@ -43,16 +34,13 @@ async function loadView(location = undefined) {
   try {
     loadScreen(true);
     await model.getAllBooks();
-    // console.log(model.state);
-    setStyle();
+    mainView.setStyle();
     const goTo = location || window.location.href;
-    (goTo.slice(-1) === "/" ||
-      goTo.includes("logout") ||
-      goTo.includes("login")) &&
+    // prettier-ignore
+    (goTo.slice(-1) === "/" || goTo.includes("logout") || goTo.includes("login")) &&
       showAllBooks_control();
     goTo.includes("history") && showHistory_control();
-    goTo.includes("search") &&
-      searchBook_control(goTo.slice(goTo.lastIndexOf("/") + 1));
+    goTo.includes("search") && searchBook_control(model.state.search.query);
     goTo.includes("show") &&
       showBook_contol(goTo.slice(goTo.lastIndexOf("/") + 1));
   } catch (err) {
@@ -64,7 +52,7 @@ async function loadView(location = undefined) {
 }
 
 function showAllBooks_control() {
-  showAllBooks(model.state);
+  mainView.showAllBooks(model.state);
   model.fillFlags("main");
   window.history.pushState("_", "_", `/`);
 }
@@ -79,7 +67,7 @@ async function showBook_contol(id) {
   try {
     loadScreen(true);
     await model.getBook(id);
-    showBook(model.state.bookToShow);
+    bookView.showBook(model.state.bookToShow);
     window.history.pushState("_", "_", `/show/${id}`);
   } catch (err) {
     console.error("🚧 Error in showBook:", err.message);
@@ -92,10 +80,10 @@ async function showBook_contol(id) {
 async function searchBook_control(title) {
   try {
     loadScreen(true);
-    await model.searchBooks(title, currentPage);
+    await model.searchBooks(title, searchView.currentPage);
     if (model.state.search.results.totalItems === 0) return;
-    showSearchResults(model.state.search.results);
-    activatePagination(searchBook_control);
+    searchView.showSearchResults(model.state.search.results);
+    searchView.activatePagination(searchBook_control);
     window.history.pushState("_", "_", `/search/${title}`);
   } catch (err) {
     console.error("🚧 Error in search:", err.message);
@@ -121,26 +109,25 @@ async function logoutSequence() {
 
 function rateBook() {
   try {
-    showModal("rate");
+    mainView.showModal("rate");
     const form = document.querySelector(".modal-form-rate");
     form.onsubmit = async function (e) {
       e.preventDefault();
       const rating = document.querySelector("#rating-input").value;
       await model.changeDB({ rating: rating });
-      clearUpcomBook();
+      bookView.clearUpcomBook();
       showMessage("Book is rated!");
       hideModals();
       loadView("/");
     };
   } catch (err) {
-    console.error("🚧 Error in rating:", err.message);
+    console.error("🚧 Error in rating book:", err.message);
     showMessage("Something went wrong :(");
   }
 }
 
 async function nextBook() {
   try {
-    model.state.upcommingBook = model.state.bookToShow;
     await model.changeDB({ next: true });
     showMessage("Next book is selected");
     await loadView("/");
@@ -164,10 +151,9 @@ async function saveBook() {
       newDesc: newDesc,
     };
     await model.changeDB(body);
-    model.state.upcommingBook = model.state.bookToShow;
     showMessage("Changes are saved");
     // todo - ugly finish
-    showBook(model.state.bookToShow);
+    bookView.showBook(model.state.bookToShow);
   } catch (err) {
     console.error("🚧 Can't edit the book:", err.message);
     showMessage("Something went wrong :(");
@@ -180,7 +166,7 @@ async function meetingBook() {
     await model.changeDB({ meeting: date });
     showMessage("Date is selected");
     hideModals();
-    showNewDate(date);
+    mainView.showNewDate(date);
   } catch (err) {
     console.error("🚧 Can't add new meeting date:", err.message);
     showMessage("Something went wrong :(");
@@ -192,7 +178,7 @@ function addOrRemoveBook(action) {
     try {
       let message;
       const form = document.querySelector(`.modal-form-${action}`);
-      showModal(action);
+      mainView.showModal(action);
       form.onsubmit = async function (e) {
         e.preventDefault();
         if (action === "add") {

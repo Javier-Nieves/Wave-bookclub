@@ -105,7 +105,6 @@ export async function changeDB(body) {
       state.upcommingBook = {};
     }
     if ("next" in body) state.upcommingBook = state.bookToShow;
-    console.log(state);
   } catch (err) {
     throw err;
   }
