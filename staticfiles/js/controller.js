@@ -10,6 +10,7 @@ import { activateSearchForm, activatePagination,
         showSearchResults, currentPage } from "./searchView.js";
 
 // TODO - fill all views in functions, without Django
+// TODO - RATE-NEXT sequence
 
 checkMessages();
 await loadView();
@@ -43,7 +44,7 @@ async function loadView(location = undefined) {
   try {
     loadScreen(true);
     await model.getAllBooks();
-    console.log(model.state);
+    // console.log(model.state);
     setStyle();
     const goTo = location || window.location.href;
     (goTo.slice(-1) === "/" ||
@@ -143,9 +144,6 @@ async function nextBook() {
     await model.changeDB({ next: true });
     showMessage("Next book is selected");
     await loadView("/");
-    // setTimeout(() => {
-    meetingBtnFunction(meetingBook);
-    // }, 5000);
   } catch (err) {
     console.error("🚧 Error in next book selection:", err.message);
     showMessage("Something went wrong :(");
@@ -204,7 +202,7 @@ function addOrRemoveBook(action) {
           const bookToDB = {
             author: book.author,
             bookid: book.bookid,
-            desc: book.desc,
+            desc: book.desc || "-",
             image: book.image_link,
             pages: book.pages,
             title: book.title,

@@ -19,32 +19,30 @@ export function showAllBooks(state) {
 }
 
 function fillUpcomBook(book) {
-  const parentElement = document.querySelector(".upcoming-book-container");
-  parentElement.innerHTML = "";
+  const infoContainer = document.querySelector(".upcoming-container");
+  infoContainer.innerHTML = "";
   let markUp;
-  if (!book?.title)
+  if (!book?.title) {
     markUp = '<h1 id="upcoming-title">Select a book to read</h1>';
-  else {
-    parentElement.dataset.bookid = book.bookid;
-    parentElement.dataset.year = book.year;
+    document.querySelector("#upcoming-date").style.display = "none";
+    document.querySelector(".add-date-container").style.display = "none";
+  } else {
+    document.querySelector("#upcoming-date").style.display = "block";
+    document.querySelector(".add-date-container").style.display = "flex";
+    infoContainer.parentElement.dataset.bookid = book.bookid;
+    infoContainer.parentElement.dataset.year = book.year;
     markUp = `
     <h1 id="upcoming-title">${book.title}</h1>
         <h3 id="upcoming-autor">${book.author}, ${book.year}</h3>
         <img id="upcoming-pic" src=${book.image_link} loading="lazy"></img>
-        <div class="upcoming-container">
-            <div id="upcoming-date">Meeting date:</div>
-            <form class="add-date-container">
-                ${
-                  book.meeting_date
-                    ? ` <div class="meeting-date">${book.meeting_date}</div>`
-                    : '<input type="date" class="meetingField" required>' +
-                      '<button class="meetingBtn">Add date</button>'
-                }
-            </form>
-        </div>`;
+        `;
+    if (book.meeting_date) {
+      document.querySelector(".meeting-date").innerHTML = book.meeting_date;
+      document.querySelector(".meetingField").style.display = "none";
+      document.querySelector(".meetingBtn").style.display = "none";
+    }
   }
-  parentElement.insertAdjacentHTML("afterBegin", markUp);
-  console.log("upcom filled");
+  infoContainer.insertAdjacentHTML("afterBegin", markUp);
 }
 
 export function fillTableRow(book, where) {
@@ -83,13 +81,11 @@ export function sessionBtnsFunction(handler) {
 }
 
 export function meetingBtnFunction(handler) {
-  console.log("trying", document.querySelector(".add-date-container"));
   // prettier-ignore
-  document.querySelector(".add-date-container")?.addEventListener("submit", (e) => {
-    console.log('submitted');
+  document.querySelector(".add-date-container").onsubmit = function(e) {
       e.preventDefault();
       handler();
-    });
+    };
 }
 
 function switchBtnFunction() {
