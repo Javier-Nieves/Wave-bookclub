@@ -312,13 +312,14 @@ h2 {
     font-size: 21px;
     margin-right: 15px;
 }
-.edit-btn {
+.edit-btn, .save-btn {
     color: black;
     border: 1px solid yellow;
     padding: 0px 18px 0px 18px;
     height: 6vh;
 }
 .save-btn {
+    display: none;
     background-color: rgba(3, 3, 3, 0.877);
     color: whitesmoke;
 }
@@ -360,7 +361,7 @@ h2 {
     transform: scale(1.1);
     cursor: pointer;
 }
-.enter-btn:hover, .exit-btn:hover, .edit-btn:hover, .pagination-btn:hover {
+.enter-btn:hover, .exit-btn:hover, .edit-btn:hover, .pagination-btn:hover, .save-btn:hover {
     background-color: rgba(254, 236, 39, 0.806);
     box-shadow: 0 0 55px #f9f9f9d2;
     transform: scale(1.1);

@@ -1,8 +1,6 @@
 import { Authenticated } from "./model.js";
 import { HideAll } from "./helpers.js";
 
-!Authenticated() && hideControls();
-
 export function bookSummon(handler) {
   // prettier-ignore
   [".search-table", ".classic-table", ".modern-table", ".history-table", ".upcoming-book-container"]
@@ -15,14 +13,8 @@ export function bookSummon(handler) {
 
 export function showBook(book) {
   HideAll();
+  chooseButtons(book);
   document.querySelector("#book-view").style.display = "flex";
-  // manage buttons on page
-  if (Authenticated()) {
-    book.year && displayButtons("edit");
-    book.year && !book.read && displayButtons("remove", "edit");
-    book.year && book.upcoming && displayButtons("rate", "edit");
-    !book.year && displayButtons("add");
-  } else displayButtons();
 
   const title = document.querySelector(".view-title");
   const author = document.querySelector(".view-author");
@@ -47,10 +39,21 @@ export function showBook(book) {
 export function bookBtnsFunctions(add, remove, onEdit, next, rate) {
   document.querySelector(".add-btn").addEventListener("click", add);
   document.querySelector(".remove-btn").addEventListener("click", remove);
-  // prettier-ignore
-  document.querySelector(".edit-btn").addEventListener("click", () => editBook(onEdit));
   document.querySelector(".next-btn").addEventListener("click", next);
   document.querySelector(".rate-btn").addEventListener("click", rate);
+  document.querySelector(".edit-btn").addEventListener("click", () => {
+    mutateInputs();
+    changeEditBtn(onEdit);
+  });
+}
+
+function chooseButtons(book) {
+  if (Authenticated()) {
+    book.year && displayButtons("edit");
+    book.year && !book.read && displayButtons("remove", "edit");
+    book.year && book.upcoming && displayButtons("rate", "edit");
+    !book.year && displayButtons("add");
+  } else displayButtons();
 }
 
 function displayButtons(...buttons) {
@@ -58,38 +61,70 @@ function displayButtons(...buttons) {
   const addBtn = document.querySelector(".add-btn");
   const rateBtn = document.querySelector(".rate-btn-container");
   const nextBtn = document.querySelector(".next-btn");
+  const editBtn = document.querySelector(".edit-btn");
   const nextBook = document.querySelector(".upcoming-book-container").dataset
     .bookid;
-  const editBtn = document.querySelector(".edit-btn");
   [removeBtn, addBtn, rateBtn, nextBtn, editBtn].map(
     (btn) => (btn.style.display = "none")
   );
   if (buttons.includes("remove")) {
     removeBtn.style.display = "flex";
-    if (!nextBook) nextBtn.style.display = "block";
+    !nextBook && (nextBtn.style.display = "block");
   }
-  if (buttons.includes("add")) addBtn.style.display = "flex";
-  if (buttons.includes("rate")) rateBtn.style.display = "block";
-  if (buttons.includes("edit")) editBtn.style.display = "block";
+  buttons.includes("add") && (addBtn.style.display = "flex");
+  buttons.includes("rate") && (rateBtn.style.display = "block");
+  buttons.includes("edit") && (editBtn.style.display = "block");
 }
 
-function hideControls() {
+export function hideControls() {
   document.querySelector(".control-group").style.display = "none";
-  try {
-    document.querySelector(".add-date-container").style.display = "none";
-  } catch {
-    console.log("no date container");
-  }
+  document.querySelector(".add-date-container").style.display = "none";
 }
 
-function editBook(handler) {
+export function clearUpcomBook() {
+  const container = document.querySelector(".upcoming-book-container");
+  container.dataset.bookid = "";
+  container.dataset.year = "";
+}
+
+export function bookChange() {
+  const newAuthor = document.querySelector(".newAuthorInput");
+  const newTitle = document.querySelector(".newTitleInput");
+  const newPages = document.querySelector(".newPagesInput");
+  const newDesc = document.querySelector(".newDesc");
+  newAuthor.style.display = "none";
+  newTitle.style.display = "none";
+  newPages.style.display = "none";
+  newDesc.style.display = "none";
+  return {
+    save: true,
+    newAuthor: newAuthor.value,
+    newTitle: newTitle.value,
+    newPages: newPages.value,
+    newDesc: newDesc.value,
+  };
+}
+
+function changeEditBtn(handler) {
+  const editBtn = document.querySelector(".edit-btn");
+  const saveBtn = document.querySelector(".save-btn");
+  editBtn.style.display = "none";
+  saveBtn.style.display = "block";
+  saveBtn.addEventListener("click", () => {
+    saveBtn.style.display = "none";
+    handler();
+  });
+}
+
+// todo: cleaning
+function mutateInputs() {
   const title = document.querySelector(".view-title");
   const author = document.querySelector(".view-author");
   const desc = document.querySelector(".view-desc");
   let pages = document.querySelector(".view-pages");
-  try {
-    document.querySelector(".view-rating").style.display = "none";
-  } catch {}
+  //   const rating = document.querySelector(".view-rating");
+  //   rating && (rating.style.display = "none");
+
   const info = document.querySelector(".book-info");
   const heig = info.offsetHeight;
   const wid = info.offsetWidth;
@@ -116,15 +151,4 @@ function editBook(handler) {
   newDesc.innerHTML = desc.innerText;
   desc.parentElement.append(newDesc);
   desc.style.display = "none";
-  const editBtn = document.querySelector(".edit-btn");
-  editBtn.classList.add("save-btn");
-  editBtn.innerHTML = "Save";
-  editBtn.removeEventListener("click", editBook);
-  editBtn.addEventListener("click", handler);
-}
-
-export function clearUpcomBook() {
-  const container = document.querySelector(".upcoming-book-container");
-  container.dataset.bookid = "";
-  container.dataset.year = "";
 }

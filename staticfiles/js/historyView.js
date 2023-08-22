@@ -3,7 +3,6 @@ import { fillTableRow, createRow } from "./mainView.js";
 
 function showHistory(oldBooks) {
   HideAll();
-  window.history.pushState("_", "_", `/`);
   document.querySelector("#history-view").style.display = "block";
   document.querySelector(".upcoming-book-container").style.display = "block";
   document.querySelector(".history-table").innerHTML = "";

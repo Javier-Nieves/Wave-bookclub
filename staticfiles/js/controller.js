@@ -7,10 +7,11 @@ import showHistory from "./historyView.js";
 
 checkMessages();
 await loadView();
-Btns_control();
+btnsControl();
+!model.Authenticated() && bookView.hideControls();
 window.addEventListener("popstate", loadView);
 
-function Btns_control() {
+function btnsControl() {
   try {
     mainView.NavBtnsFunction(showAllBooks_control, showHistory_control);
     mainView.sessionBtnsFunction(logoutSequence);
@@ -139,23 +140,13 @@ async function nextBook() {
 
 async function saveBook() {
   try {
-    const newAuthor = document.querySelector(".newAuthorInput").value;
-    const newTitle = document.querySelector(".newTitleInput").value;
-    const newPages = document.querySelector(".newPagesInput").value;
-    const newDesc = document.querySelector(".newDesc").value;
-    const body = {
-      save: true,
-      newAuthor: newAuthor,
-      newTitle: newTitle,
-      newPages: newPages,
-      newDesc: newDesc,
-    };
-    await model.changeDB(body);
+    const newInfo = bookView.bookChange();
+    await model.changeDB(newInfo);
     showMessage("Changes are saved");
     // todo - ugly finish
     bookView.showBook(model.state.bookToShow);
   } catch (err) {
-    console.error("🚧 Can't edit the book:", err.message);
+    console.error("🚧 Can't edit the book:", err.message, err);
     showMessage("Something went wrong :(");
   }
 }

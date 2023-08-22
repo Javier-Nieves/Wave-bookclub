@@ -4,6 +4,7 @@ import { HideAll } from "./helpers.js";
 switchBtnFunction();
 capitalizeName();
 addTableSorting();
+// TODO - rating element style
 
 export function showAllBooks(state) {
   HideAll();
@@ -22,6 +23,7 @@ function fillUpcomBook(book) {
   const infoContainer = document.querySelector(".upcoming-container");
   infoContainer.innerHTML = "";
   let markUp;
+  // if no upcomming book
   if (!book?.title) {
     markUp = '<h1 id="upcoming-title">Select a book to read</h1>';
     document.querySelector("#upcoming-date").style.display = "none";

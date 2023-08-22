@@ -100,11 +100,18 @@ export async function changeDB(body) {
       body.meeting = new Date().toLocaleDateString("en-CA");
     await AJAX(`/edit/${bookid}`, body, "PUT");
 
+    // change STATE considering new info
     if ("rating" in body) {
       state.historyBooks.push(state.upcommingBook);
       state.upcommingBook = {};
     }
     if ("next" in body) state.upcommingBook = state.bookToShow;
+    if ("save" in body) {
+      state.bookToShow.title = body.newTitle;
+      state.bookToShow.author = body.newAuthor;
+      state.bookToShow.pages = body.newPages;
+      state.bookToShow.desc = body.newDesc;
+    }
   } catch (err) {
     throw err;
   }
