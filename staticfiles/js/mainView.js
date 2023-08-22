@@ -1,8 +1,8 @@
 import { CLASSIC_LIMIT } from "./config.js";
 import { HideAll } from "./helpers.js";
+
 switchBtnFunction();
 capitalizeName();
-resizeTitle();
 addTableSorting();
 
 export function showAllBooks(state) {
@@ -14,7 +14,37 @@ export function showAllBooks(state) {
   document.querySelector(".upcoming-book-container").style.display = "block";
   state.classicBooks.forEach((book) => fillTableRow(book, "classic"));
   state.modernBooks.forEach((book) => fillTableRow(book, "modern"));
-  // todo - add filling upcomming book from state
+  fillUpcomBook(state.upcommingBook);
+  resizeTitle();
+}
+
+function fillUpcomBook(book) {
+  const parentElement = document.querySelector(".upcoming-book-container");
+  parentElement.innerHTML = "";
+  let markUp;
+  if (!book?.title)
+    markUp = '<h1 id="upcoming-title">Select a book to read</h1>';
+  else {
+    parentElement.dataset.bookid = book.bookid;
+    parentElement.dataset.year = book.year;
+    markUp = `
+    <h1 id="upcoming-title">${book.title}</h1>
+        <h3 id="upcoming-autor">${book.author}, ${book.year}</h3>
+        <img id="upcoming-pic" src=${book.image_link} loading="lazy"></img>
+        <div class="upcoming-container">
+            <div id="upcoming-date">Meeting date:</div>
+            <form class="add-date-container">
+                ${
+                  book.meeting_date
+                    ? ` <div class="meeting-date">${book.meeting_date}</div>`
+                    : '<input type="date" class="meetingField" required>' +
+                      '<button class="meetingBtn">Add date</button>'
+                }
+            </form>
+        </div>`;
+  }
+  parentElement.insertAdjacentHTML("afterBegin", markUp);
+  console.log("upcom filled");
 }
 
 export function fillTableRow(book, where) {
@@ -53,7 +83,13 @@ export function sessionBtnsFunction(handler) {
 }
 
 export function meetingBtnFunction(handler) {
-  document.querySelector(".meetingBtn")?.addEventListener("click", handler);
+  console.log("trying", document.querySelector(".add-date-container"));
+  // prettier-ignore
+  document.querySelector(".add-date-container")?.addEventListener("submit", (e) => {
+    console.log('submitted');
+      e.preventDefault();
+      handler();
+    });
 }
 
 function switchBtnFunction() {

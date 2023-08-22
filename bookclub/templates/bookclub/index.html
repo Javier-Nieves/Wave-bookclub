@@ -46,24 +46,6 @@
 
               <div class="upcoming-book-container dataContainer" data-year= "{{up_book.year}}" 
                 data-bookid="{{up_book.bookid}}">
-                {% if up_book.bookid %}
-                <h1 id="upcoming-title">{{up_book.title}}</h1>
-                <h3 id="upcoming-autor">{{up_book.author}}, {{up_book.year}}</h3>
-                <img id="upcoming-pic" src={{up_book.image_link}} loading="lazy"></img>
-                <div class="upcoming-container">
-                  <div id="upcoming-date">Meeting date:</div>
-                  <form class="add-date-container">
-                    <input type="date" class="meetingField" style="display: none" required>
-                    {% if not up_book.meeting_date %}
-                    <button class="meetingBtn">Add date</button>
-                    {% else %}
-                    <div class="meeting-date">{{up_book.meeting_date}}</div>
-                    {% endif %}
-                  </form>
-                </div>
-                {% else %}
-                <h1 id="upcoming-title">Select a book to read</h1>
-                {% endif %}
               </div>
 
               <div class="control-group">

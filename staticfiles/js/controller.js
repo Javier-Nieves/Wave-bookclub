@@ -12,7 +12,7 @@ import { activateSearchForm, activatePagination,
 // TODO - fill all views in functions, without Django
 
 checkMessages();
-loadView();
+await loadView();
 Btns_control();
 window.addEventListener("popstate", loadView);
 
@@ -43,6 +43,7 @@ async function loadView(location = undefined) {
   try {
     loadScreen(true);
     await model.getAllBooks();
+    console.log(model.state);
     setStyle();
     const goTo = location || window.location.href;
     (goTo.slice(-1) === "/" ||
@@ -141,7 +142,10 @@ async function nextBook() {
     model.state.upcommingBook = model.state.bookToShow;
     await model.changeDB({ next: true });
     showMessage("Next book is selected");
-    loadView("/");
+    await loadView("/");
+    // setTimeout(() => {
+    meetingBtnFunction(meetingBook);
+    // }, 5000);
   } catch (err) {
     console.error("🚧 Error in next book selection:", err.message);
     showMessage("Something went wrong :(");
@@ -172,18 +176,13 @@ async function saveBook() {
   }
 }
 
-function meetingBook() {
+async function meetingBook() {
   try {
-    document.querySelector(".meetingField").style.display = "block";
-    // prettier-ignore
-    document.querySelector(".add-date-container").onsubmit = async function (e) {
-      e.preventDefault();
-      const date = document.querySelector(".meetingField").value;
-      await model.changeDB({ meeting: date });
-      showMessage("Date is selected");
-      hideModals();
-      showNewDate(date);
-    };
+    const date = document.querySelector(".meetingField").value;
+    await model.changeDB({ meeting: date });
+    showMessage("Date is selected");
+    hideModals();
+    showNewDate(date);
   } catch (err) {
     console.error("🚧 Can't add new meeting date:", err.message);
     showMessage("Something went wrong :(");
@@ -221,7 +220,7 @@ function addOrRemoveBook(action) {
         }
         hideModals();
         showMessage(message);
-        showAllBooks_control();
+        loadView("/");
       };
     } catch (err) {
       // todo - for some reason error from Add and Remove can't be caught here
