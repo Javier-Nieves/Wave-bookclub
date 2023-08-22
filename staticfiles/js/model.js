@@ -139,11 +139,15 @@ export function Authenticated() {
   return localStorage.getItem("loggedIn") === "true";
 }
 
-export function searchBooks(title, page) {
+export async function searchBooks(title, page) {
   try {
     // todo - if title contains several words - data is strange in pagination somehow
     // prettier-ignore
-    return AJAX(`${BOOK_API}?q=+intitle:${title}&startIndex=${(+page - 1) * +RES_PAGE}&maxResults=${RES_PAGE}`);
+    const books = await AJAX(`${BOOK_API}?q=+intitle:${title}&startIndex=${(+page - 1) * +RES_PAGE}&maxResults=${RES_PAGE}`);
+    state.search.query = title;
+    state.search.results = books;
+    // console.log(state);
+    // return books;
   } catch (err) {
     throw err;
   }

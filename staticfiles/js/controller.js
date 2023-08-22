@@ -11,8 +11,6 @@ import { showAllBooks, setStyle, NavBtnsFunction, meetingBtnFunction,
 import { activateSearchForm, activatePagination, 
         showSearchResults, currentPage } from "./searchView.js";
 
-// TODO - fill all views in functions, without Django
-
 checkMessages();
 await loadView();
 Btns_control();
@@ -94,9 +92,9 @@ async function showBook_contol(id) {
 async function searchBook_control(title) {
   try {
     loadScreen(true);
-    const data = await model.searchBooks(title, currentPage);
-    if (data.totalItems == 0) return;
-    showSearchResults(data);
+    await model.searchBooks(title, currentPage);
+    if (model.state.search.results.totalItems === 0) return;
+    showSearchResults(model.state.search.results);
     activatePagination(searchBook_control);
     window.history.pushState("_", "_", `/search/${title}`);
   } catch (err) {
