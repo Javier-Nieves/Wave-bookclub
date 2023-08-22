@@ -1,7 +1,9 @@
 import * as model from "./model.js";
 import { loadScreen, showMessage, hideModals } from "./helpers.js";
 import showHistory from "./historyView.js";
-import { showBook, bookSummon, bookBtnsFunctions } from "./bookView.js";
+// prettier-ignore
+import { showBook, bookSummon, 
+  bookBtnsFunctions, clearUpcomBook } from "./bookView.js";
 // prettier-ignore
 import { showAllBooks, setStyle, NavBtnsFunction, meetingBtnFunction,
         sessionBtnsFunction, showModal, showNewDate } from "./mainView.js";
@@ -10,7 +12,6 @@ import { activateSearchForm, activatePagination,
         showSearchResults, currentPage } from "./searchView.js";
 
 // TODO - fill all views in functions, without Django
-// TODO - RATE-NEXT sequence
 
 checkMessages();
 await loadView();
@@ -128,6 +129,7 @@ function rateBook() {
       e.preventDefault();
       const rating = document.querySelector("#rating-input").value;
       await model.changeDB({ rating: rating });
+      clearUpcomBook();
       showMessage("Book is rated!");
       hideModals();
       loadView("/");

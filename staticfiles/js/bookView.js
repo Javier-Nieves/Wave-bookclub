@@ -122,3 +122,9 @@ function editBook(handler) {
   editBtn.removeEventListener("click", editBook);
   editBtn.addEventListener("click", handler);
 }
+
+export function clearUpcomBook() {
+  const container = document.querySelector(".upcoming-book-container");
+  container.dataset.bookid = "";
+  container.dataset.year = "";
+}
