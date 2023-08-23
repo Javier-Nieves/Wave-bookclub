@@ -37,6 +37,8 @@ export function showBook(book) {
 }
 
 export function bookBtnsFunctions(add, remove, onEdit, next, rate) {
+  // FYI: other way to havecallback function with parameter here -
+  // is pass that function and call is with parameter.. doh
   document.querySelector(".add-btn").addEventListener("click", add);
   document.querySelector(".remove-btn").addEventListener("click", remove);
   document.querySelector(".next-btn").addEventListener("click", next);

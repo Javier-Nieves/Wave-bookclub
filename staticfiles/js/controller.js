@@ -173,8 +173,7 @@ function addOrRemoveBook(action) {
       form.onsubmit = async function (e) {
         e.preventDefault();
         if (action === "add") {
-          const year = document.querySelector("#year-input").value;
-          const country = document.querySelector("#country-input").value;
+          const formData = Object.fromEntries([...new FormData(form)]);
           const book = model.state.bookToShow;
           const bookToDB = {
             author: book.author,
@@ -183,8 +182,8 @@ function addOrRemoveBook(action) {
             image: book.image_link,
             pages: book.pages,
             title: book.title,
-            country: country,
-            year: year,
+            country: formData.country,
+            year: formData.year,
           };
           await model.addBook(bookToDB);
           message = "Book added";
