@@ -44,7 +44,6 @@ export function bookBtnsFunctions(add, remove, onEdit, next, rate) {
   document.querySelector(".next-btn").addEventListener("click", next);
   document.querySelector(".rate-btn").addEventListener("click", rate);
   document.querySelector(".edit-btn").addEventListener("click", () => {
-    mutateInputs();
     changeEditBtn(onEdit);
   });
 }
@@ -108,12 +107,14 @@ export function bookChange() {
 }
 
 function changeEditBtn(handler) {
+  mutateInputs();
   const editBtn = document.querySelector(".edit-btn");
   const saveBtn = document.querySelector(".save-btn");
   editBtn.style.display = "none";
   saveBtn.style.display = "block";
   saveBtn.addEventListener("click", () => {
     saveBtn.style.display = "none";
+    document.querySelector(".book-info").style = "";
     handler();
   });
 }
@@ -123,33 +124,34 @@ function mutateInputs() {
   const title = document.querySelector(".view-title");
   const author = document.querySelector(".view-author");
   const desc = document.querySelector(".view-desc");
-  let pages = document.querySelector(".view-pages");
-  //   const rating = document.querySelector(".view-rating");
-  //   rating && (rating.style.display = "none");
-
+  const pages = document.querySelector(".view-pages");
   const info = document.querySelector(".book-info");
   const heig = info.offsetHeight;
   const wid = info.offsetWidth;
   info.style.height = `${heig + 200}px`;
+
   const newTitle = document.createElement("input");
   newTitle.value = title.innerHTML;
-  newTitle.className = "newTitleInput";
+  newTitle.classList.add("newTitleInput");
   newTitle.style.width = `${wid - 40}px`;
   title.parentElement.prepend(newTitle);
   title.style.display = "none";
+
   const newAuthor = document.createElement("input");
   newAuthor.value = author.innerHTML;
-  newAuthor.className = "newAuthorInput";
+  newAuthor.classList.add("newAuthorInput");
   author.parentElement.prepend(newAuthor);
   author.style.display = "none";
+
   const newPages = document.createElement("input");
   newPages.value = pages.innerHTML;
-  newPages.className = "newPagesInput";
+  newPages.classList.add("newPagesInput");
   newPages.setAttribute("type", "number");
   pages.parentElement.append(newPages);
   pages.style.display = "none";
+
   const newDesc = document.createElement("textarea");
-  newDesc.className = "newDesc";
+  newDesc.classList.add("newDesc");
   newDesc.innerHTML = desc.innerText;
   desc.parentElement.append(newDesc);
   desc.style.display = "none";

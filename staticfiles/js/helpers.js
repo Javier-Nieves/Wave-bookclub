@@ -10,7 +10,7 @@ export function HideAll() {
   // prettier-ignore
   const hideList = [".switch-container", ".upcoming-book-container", "#modernTable", 
     "#classicTable", "#book-view", "#history-view", "#search-results", "#searchInfo",
-    ".control-group", ".rate-btn-container", ".view-rating" ];
+    ".control-group", ".rate-btn-container", ".view-rating", '.save-btn'];
   hideList.forEach(
     (elem) => (document.querySelector(elem).style.display = "none")
   );
@@ -27,9 +27,6 @@ export function HideAll() {
     document.querySelector(".view-desc").style.display = "block";
     document.querySelector(".view-pages").style.display = "block";
     document.querySelector(".book-info").style.overflow = "auto";
-    const editBtn = document.querySelector(".edit-btn");
-    editBtn.classList.remove("save-btn");
-    editBtn.innerHTML = "Edit";
   } catch {}
 }
 

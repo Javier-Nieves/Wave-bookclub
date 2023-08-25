@@ -64,7 +64,6 @@ async function createBook(id) {
 }
 
 export async function addBook(book) {
-  // todo - books don't load right away
   try {
     await AJAX(`/add`, book, "POST");
     book.year > CLASSIC_LIMIT
