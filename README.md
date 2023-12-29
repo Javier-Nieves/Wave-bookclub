@@ -13,7 +13,7 @@ Wave Bookclub is a vanilla JS web application (with simple Django backend for da
 - **Rate books**
 - **Look at the history of the Bookclub and previous ratings**
 
-![Main page](https://github.com/Javier-Nieves/Wave-bookclub/tree/master/staticfiles/READMEimg/main.jpg 'Wave Bookclub main page')
+![Main page](https://github.com/Javier-Nieves/Wave-bookclub/assets/102490566/a0e559a9-3a70-4462-ad1a-a85c42e5a49a)
 
 Wave Bookclub is the _single-page application_.
 
@@ -21,4 +21,4 @@ Frontend is MVC based modern ES6+ vanilla JS code.
 
 Backend is Django with basic request management and database.
 
-![Book view](https://github.com/Javier-Nieves/Wave-bookclub/tree/master/staticfiles/READMEimg/book.jpg 'Book')
+![Book view](https://github.com/Javier-Nieves/Wave-bookclub/assets/102490566/4cb5a0df-acb2-4b03-9dc4-62617be729a9)
