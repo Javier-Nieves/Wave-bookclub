@@ -262,7 +262,7 @@ h2 {
     color: rgba(201, 201, 201, 0.94);
 }
 .searchBtn, .add-btn, .remove-btn, .rate-btn, .meetingBtn, .modal-btn,
-.next-btn, .enter-btn, .exit-btn, .edit-btn, .pagination-btn, .welcome-btn {
+.next-btn, .enter-btn, .exit-btn, .edit-btn, .pagination-btn, .welcome-btn, .example-enter {
     color: rgba(201, 201, 201, 0.94);
     font-size: 18px;
     font-family: didot;
@@ -323,8 +323,8 @@ h2 {
     background-color: rgba(3, 3, 3, 0.877);
     color: whitesmoke;
 }
-.enter-container {
-    position: absolute;
+.enter-container, .example-enter {
+    position: fixed;
     right: 2vw;
     top: 2vh;
 }
@@ -345,9 +345,7 @@ h2 {
     border: 1px solid yellow;
     transition: transform 0.5s ease-in-out;
 }
-.enter-btn {
-    z-index: 100;
-}
+
 .rate-btn:hover, .next-btn:hover, .welcome-btn:hover {
     transform: scale(1.1);
     cursor: pointer;
@@ -364,7 +362,8 @@ h2 {
     transform: scale(1.1);
     cursor: pointer;
 }
-.enter-btn:hover, .exit-btn:hover, .edit-btn:hover, .pagination-btn:hover, .save-btn:hover {
+.enter-btn:hover, .exit-btn:hover, .edit-btn:hover, .pagination-btn:hover,
+.save-btn:hover, .example-enter:hover {
     background-color: rgba(254, 236, 39, 0.806);
     box-shadow: 0 0 55px #f9f9f9d2;
     transform: scale(1.1);
@@ -480,6 +479,7 @@ h2 {
     transition: all 0.5s;
     width: 100%;
     height: 100%;
+    z-index: 80;
   }
   dialog[open] {
     opacity: 1;
