@@ -79,10 +79,8 @@ function displayButtons(...buttons) {
 
 export function hideControls() {
   const dialog = document.querySelector('#welcome-dialog');
-  console.log('selected');
   dialog.showModal();
   dialog.addEventListener('click', () => {
-    console.log('clicked');
     dialog.close();
   });
   document.querySelector('.control-group').style.display = 'none';

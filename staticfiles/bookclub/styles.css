@@ -324,7 +324,7 @@ h2 {
     color: whitesmoke;
 }
 .enter-container, .example-enter {
-    position: fixed;
+    position: absolute;
     right: 2vw;
     top: 2vh;
 }
